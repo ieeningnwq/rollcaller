@@ -46,4 +46,26 @@ class StudentClassDao {
     );
     return response.isNotEmpty;
   }
+
+  Future<void> deleteStudentClassById(int id) async {
+    final db = await dbHelper.database;
+    await db.delete(tableName, where: 'id=?', whereArgs: [id]);
+  }
+
+  Future<void> updateStudentClassByClassName(
+    StudentClassModel studentClassModel,
+  ) async {
+    final db = await dbHelper.database;
+    await db.update(
+      tableName,
+      studentClassModel.toMap(),
+      where: 'class_name=?',
+      whereArgs: [studentClassModel.className],
+    );
+  }
+
+  Future<void> deleteStudentClassByClassName(String className) async {
+    final db = await dbHelper.database;
+    await db.delete(tableName, where: 'class_name=?', whereArgs: [className]);
+  }
 }

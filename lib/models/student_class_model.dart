@@ -34,7 +34,9 @@ class StudentClassModel {
 
   Map<String, dynamic> toMap() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
+    if (id != null) {
+      data['id'] = id;
+    }
     data['class_name'] = className;
     data['teacher_name'] = teacherName;
     data['student_quantity'] = studentQuantity;

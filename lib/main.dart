@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:rollcall/providers/student_class_provider.dart';
 import './configs/color.dart';
 import './pages/index.dart';
 import './providers/current_index_provider.dart';
@@ -11,6 +12,9 @@ void main() {
       providers: [
         ChangeNotifierProvider<CurrentIndexProvider>(
           create: (_) => CurrentIndexProvider(),
+        ),
+        ChangeNotifierProvider<StudentClassProvider>(
+          create: (_) => StudentClassProvider(),
         ),
       ],
       child: MyApp(),

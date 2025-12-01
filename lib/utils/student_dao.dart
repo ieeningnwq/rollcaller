@@ -23,4 +23,11 @@ class StudentDao {
     final db = await dbHelper.database;
     return await db.query(tableName);
   }
+
+  Future<List<Map<String, dynamic>>> getStudentsByClassName(
+    String className,
+  ) async {
+    final db = await dbHelper.database;
+    return await db.query(tableName);
+  }
 }
