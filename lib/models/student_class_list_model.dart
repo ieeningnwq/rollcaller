@@ -1,20 +1,20 @@
 import 'student_class_model.dart';
 import 'student_model.dart';
 
-class StudentClassListModel {
+class StudentClassListItem {
   StudentClassModel studentClass;
   List<StudentModel> students;
 
-  StudentClassListModel({required this.studentClass, required this.students});
+  StudentClassListItem({required this.studentClass, required this.students});
 
-  factory StudentClassListModel.fromMap(Map<String, dynamic> mapData) {
+  factory StudentClassListItem.fromMap(Map<String, dynamic> mapData) {
     final List<StudentModel> listData = <StudentModel>[];
     if (mapData['students'] != null) {
       mapData['students'].forEach((v) {
         listData.add(StudentModel.fromMap(v));
       });
     }
-    return StudentClassListModel(
+    return StudentClassListItem(
       studentClass: StudentClassModel.fromMap(mapData['class']),
       students: listData,
     );

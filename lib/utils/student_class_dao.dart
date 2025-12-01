@@ -23,4 +23,27 @@ class StudentClassDao {
     final db = await dbHelper.database;
     return await db.query(tableName);
   }
+
+  Future<List<Map<String, dynamic>>> getStudentClassesByName(
+    String className,
+  ) async {
+    final db = await dbHelper.database;
+    return await db.query(
+      tableName,
+      columns: ['class_name'],
+      where: 'class_name=?',
+      whereArgs: [className],
+    );
+  }
+
+  Future<bool> isStudentClassesNameExist(String className) async {
+    final db = await dbHelper.database;
+    var response = await db.query(
+      tableName,
+      columns: ['class_name'],
+      where: 'class_name=?',
+      whereArgs: [className],
+    );
+    return response.isNotEmpty;
+  }
 }
