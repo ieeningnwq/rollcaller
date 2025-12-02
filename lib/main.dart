@@ -5,6 +5,7 @@ import 'package:rollcall/providers/student_class_provider.dart';
 import './configs/color.dart';
 import './pages/index.dart';
 import './providers/current_index_provider.dart';
+import 'providers/class_selected_provider.dart';
 
 void main() {
   runApp(
@@ -15,6 +16,9 @@ void main() {
         ),
         ChangeNotifierProvider<StudentClassProvider>(
           create: (_) => StudentClassProvider(),
+        ),
+        ChangeNotifierProvider<StudentClassSelectedProvider>(
+          create: (_) => StudentClassSelectedProvider(),
         ),
       ],
       child: MyApp(),

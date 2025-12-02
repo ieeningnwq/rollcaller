@@ -46,14 +46,16 @@ class _StudentClassState extends State<StudentClassPage> {
                 for (Map<String, dynamic> item in data!) {
                   studentClassList.add(StudentClassModel.fromMap(item));
                 }
-                studentClassProvider.studentClassList = studentClassList;
+                studentClassProvider.changeStudentClassWithoutNotify(
+                  studentClassList,
+                );
                 return ListView.builder(
                   scrollDirection: Axis.vertical,
-                  itemCount: studentClassProvider.studentClassList.length,
+                  itemCount: studentClassProvider.studentClassesList.length,
                   itemBuilder: (context, index) {
                     return _classCardItem(
                       index,
-                      studentClassProvider.studentClassList[index],
+                      studentClassProvider.studentClassesList[index],
                       context,
                     );
                   },

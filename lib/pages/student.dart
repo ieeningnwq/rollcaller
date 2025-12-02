@@ -1,9 +1,12 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rollcall/configs/strings.dart';
+import 'package:rollcall/providers/student_class_provider.dart';
 
 import '../models/student_model.dart';
+import '../providers/class_selected_provider.dart';
 import '../utils/database_helper.dart';
 import '../utils/student_dao.dart';
 
@@ -21,14 +24,6 @@ class _StudentPageState extends State<StudentPage> {
 
   final GlobalKey _formKey = GlobalKey<FormState>();
   bool _isStudentNumberUnique = true;
-  final List<String> _classOptions = [
-    '一年级一班',
-    '一年级二班',
-    '二年级一班',
-    '二年级二班',
-    '三年级一班',
-  ];
-  final List<bool> _selectedClasses = List<bool>.filled(5, false);
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +53,21 @@ class _StudentPageState extends State<StudentPage> {
     studentNameController.text = studentName;
     studentNumberController.text = studentNumber;
     classNameController.text = className;
+
+    Provider.of<StudentClassSelectedProvider>(
+      context,
+      listen: false,
+    ).changeSelectedClassesWithoutNotify(
+      List<bool>.filled(
+        Provider.of<StudentClassProvider>(context).studentClassesList.length,
+        false,
+      ),
+    );
+
+    final List<String> classOptions = Provider.of<StudentClassProvider>(
+      context,
+      listen: false,
+    ).studentClassesList.map((e) => e.className).toList();
     return AlertDialog(
       title: Text(title),
       content: Form(
@@ -123,18 +133,26 @@ class _StudentPageState extends State<StudentPage> {
 
               // 班级选择
               const Text('所在班级', style: TextStyle(fontSize: 16)),
-              Column(
-                children: List.generate(_classOptions.length, (index) {
-                  return CheckboxListTile(
-                    title: Text(_classOptions[index]),
-                    value: _selectedClasses[index],
-                    onChanged: (value) =>
-                        _checkboxListTileOnProcess(index, value),
-                    controlAffinity: ListTileControlAffinity.leading,
-                    contentPadding: EdgeInsets.zero,
-                    dense: true,
+              Consumer<StudentClassSelectedProvider>(
+                builder: (context, selectedClassProvider, child) {
+                  return Column(
+                    children: List.generate(classOptions.length, (index) {
+                      return CheckboxListTile(
+                        title: Text(classOptions[index]),
+                        value: selectedClassProvider.selectedClasses[index],
+                        onChanged: (value) {
+                          selectedClassProvider.setSelectedClasses(
+                            index,
+                            value,
+                          );
+                        },
+                        controlAffinity: ListTileControlAffinity.leading,
+                        contentPadding: EdgeInsets.zero,
+                        dense: true,
+                      );
+                    }),
                   );
-                }),
+                },
               ),
             ],
           ),
@@ -191,12 +209,5 @@ class _StudentPageState extends State<StudentPage> {
         ),
       ],
     );
-  }
-
-  void _checkboxListTileOnProcess(int index, bool? value) {
-    setState(() {
-      _selectedClasses[index] = value ?? false;
-      log(_selectedClasses.toString());
-    });
   }
 }
