@@ -1,14 +1,13 @@
-import './student_class_model.dart';
+import 'student_class_model.dart';
 
 class StudentModel {
-  int id;
+  int? id;
   String studentNumber;
   String studentName;
   String className;
   DateTime created;
 
   StudentModel({
-    required this.id,
     required this.studentName,
     required this.studentNumber,
     required this.className,
@@ -19,15 +18,18 @@ class StudentModel {
       studentClass.className.contains(className);
 
   factory StudentModel.fromMap(Map<String, dynamic> mapData) {
-    return StudentModel(
-      id: mapData['id'],
+    var studentModel = StudentModel(
       studentName: mapData['student_name'],
       studentNumber: mapData['student_number'],
       className: mapData['class_name'],
-      created: mapData['created']
+      created: mapData['created'] != null
           ? DateTime.parse(mapData['created'])
           : DateTime.now(),
     );
+    if (mapData.containsKey('id')) {
+      studentModel.id = mapData['id'];
+    }
+    return studentModel;
   }
 
   Map<String, dynamic> toMap() {

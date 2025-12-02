@@ -7,6 +7,7 @@ import '../pages/record.dart';
 import '../pages/settings.dart';
 import '../pages/student_class.dart';
 import '../providers/current_index_provider.dart';
+import 'student.dart';
 
 class IndexPage extends StatelessWidget {
   const IndexPage({super.key});
@@ -21,6 +22,10 @@ class IndexPage extends StatelessWidget {
       label: KString.studentClassTitle, // 班级
     ),
     BottomNavigationBarItem(
+      icon: FaIcon(FontAwesomeIcons.user),
+      label: KString.studentTitle, // 学生
+    ),
+    BottomNavigationBarItem(
       icon: FaIcon(FontAwesomeIcons.clockRotateLeft),
       label: KString.recordTitle, // 记录
     ),
@@ -32,6 +37,7 @@ class IndexPage extends StatelessWidget {
   static const List<Widget> tabBodies = [
     HomePage(),
     StudentClassPage(),
+    StudentPage(),
     RecordPage(),
     SettingsPage(),
   ];

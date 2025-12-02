@@ -40,7 +40,7 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE ${KString.studentTableName} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        student_number TEXT NOT NULL,
+        student_number TEXT NOT NULL UNIQUE,
         student_name TEXT NOT NULL,
         class_name TEXT,
         created TEXT NOT NULL

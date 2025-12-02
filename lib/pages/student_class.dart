@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:rollcall/models/student_class_model.dart';
-import 'package:rollcall/utils/student_class_dao.dart';
 
+import '../configs/strings.dart';
+import '../models/student_class_model.dart';
 import '../providers/student_class_provider.dart';
 import '../utils/database_helper.dart';
+import '../utils/student_class_dao.dart';
 
 class StudentClassPage extends StatefulWidget {
   const StudentClassPage({super.key});
@@ -32,11 +33,13 @@ class _StudentClassState extends State<StudentClassPage> {
     return Consumer<StudentClassProvider>(
       builder: (context, studentClassProvider, child) {
         return Scaffold(
-          appBar: AppBar(title: const Text('班级管理')),
+          appBar: AppBar(title: const Text(KString.studentClassAppBarTitle)),
           body: FutureBuilder(
             future: _getStudentClassList(),
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
+              if (snapshot.hasData &&
+                  snapshot.data != null &&
+                  snapshot.data!.isNotEmpty) {
                 List<Map<String, dynamic>>? data = snapshot.data;
                 log(data.toString());
                 List<StudentClassModel> studentClassList = [];
@@ -56,7 +59,7 @@ class _StudentClassState extends State<StudentClassPage> {
                   },
                 );
               } else {
-                return Center(child: Text('数据加载中...'));
+                return Center(child: Text('没有数据...'));
               }
             },
           ),

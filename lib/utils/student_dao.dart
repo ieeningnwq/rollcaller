@@ -1,7 +1,7 @@
-import 'package:rollcall/models/Student_model.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../configs/strings.dart';
+import '../models/student_model.dart';
 import './database_helper.dart';
 
 class StudentDao {
@@ -30,4 +30,17 @@ class StudentDao {
     final db = await dbHelper.database;
     return await db.query(tableName);
   }
+
+  Future<bool> isStudentNumberExist(String studentNumber) async {
+    final db = await dbHelper.database;
+    var response = await db.query(
+      tableName,
+      columns: ['student_number'],
+      where: 'student_number=?',
+      whereArgs: [studentNumber],
+    );
+    return response.isNotEmpty;
+  }
+
+  Future<void> updateStudentClassByClassName(fromMap) async {}
 }
