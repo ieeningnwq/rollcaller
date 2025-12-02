@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:rollcall/utils/student_dao.dart';
 
 import '../configs/strings.dart';
 import '../models/student_class_model.dart';
@@ -28,6 +30,10 @@ class _StudentClassState extends State<StudentClassPage> {
   final GlobalKey _formKey = GlobalKey<FormState>();
   bool _isClassNameUnique = true;
 
+  final RefreshController _refreshController = RefreshController(
+    initialRefresh: false,
+  );
+
   @override
   Widget build(BuildContext context) {
     return Consumer<StudentClassProvider>(
@@ -49,16 +55,29 @@ class _StudentClassState extends State<StudentClassPage> {
                 studentClassProvider.changeStudentClassWithoutNotify(
                   studentClassList,
                 );
-                return ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  itemCount: studentClassProvider.studentClassesList.length,
-                  itemBuilder: (context, index) {
-                    return _classCardItem(
-                      index,
-                      studentClassProvider.studentClassesList[index],
-                      context,
-                    );
-                  },
+                return SmartRefresher(
+                  // 启用下拉刷新
+                  enablePullDown: true,
+                  // 启用上拉加载
+                  enablePullUp: true,
+                  // 水滴效果头部
+                  header: WaterDropHeader(),
+                  // 经典底部加载
+                  footer: ClassicFooter(loadStyle: LoadStyle.ShowWhenLoading),
+                  controller: _refreshController,
+                  onRefresh: _onRefresh,
+                  onLoading: _onLoading,
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    itemCount: studentClassProvider.studentClassesList.length,
+                    itemBuilder: (context, index) {
+                      return _classCardItem(
+                        index,
+                        studentClassProvider.studentClassesList[index],
+                        context,
+                      );
+                    },
+                  ),
                 );
               } else {
                 return Center(child: Text('没有数据...'));
@@ -75,7 +94,7 @@ class _StudentClassState extends State<StudentClassPage> {
               );
             },
             tooltip: '添加班级',
-            child: FaIcon(FontAwesomeIcons.plus),
+            child: Icon(Icons.add),
           ),
         );
       },
@@ -375,16 +394,8 @@ class _StudentClassState extends State<StudentClassPage> {
 
             // 底部操作按钮
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                TextButton.icon(
-                  onPressed: () {
-                    // 查看按钮点击事件
-                  },
-                  icon: Icon(Icons.visibility, color: Colors.blue),
-                  label: Text('查看', style: TextStyle(color: Colors.blue)),
-                ),
-                SizedBox(width: 8.0),
                 TextButton.icon(
                   onPressed: () {
                     // 编辑按钮点击事件
@@ -427,23 +438,55 @@ class _StudentClassState extends State<StudentClassPage> {
                             ),
                             TextButton(
                               onPressed: () async {
-                                await classDao.deleteStudentClassByClassName(
-                                  studentClass.className,
-                                );
-                                var classes = await classDao
-                                    .getAllStudentClasses();
-                                if (context.mounted) {
-                                  Provider.of<StudentClassProvider>(
-                                    context,
-                                    listen: false,
-                                  ).changeStudentClass(
-                                    classes
-                                        .map(
-                                          (e) => StudentClassModel.fromMap(e),
-                                        )
-                                        .toList(),
+                                // 校验该班级下是否还有学生
+                                var dbHelper =
+                                    DatabaseHelper(); // 创建DatabaseHelper实例。
+                                var studentDao = StudentDao(dbHelper);
+                                var students = await studentDao
+                                    .getAllStudentsByClassName(
+                                      studentClass.className,
+                                    );
+                                if (students.isEmpty) {
+                                  await classDao.deleteStudentClassByClassName(
+                                    studentClass.className,
                                   );
-                                  Navigator.of(context).pop(); // 关闭确认弹窗
+                                  var classes = await classDao
+                                      .getAllStudentClasses();
+                                  if (context.mounted) {
+                                    Provider.of<StudentClassProvider>(
+                                      context,
+                                      listen: false,
+                                    ).changeStudentClass(
+                                      classes
+                                          .map(
+                                            (e) => StudentClassModel.fromMap(e),
+                                          )
+                                          .toList(),
+                                    );
+                                    Navigator.of(context).pop(); // 关闭确认弹窗
+                                  }
+                                } else {
+                                  // 班级下还有学生，提示用户先删除学生
+                                  if (context.mounted) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('提示'),
+                                          content: Text(
+                                            '该班级下还有学生，无法删除。请先删除班级下的所有学生。',
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.of(context).pop(),
+                                              child: Text('确定'),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  }
                                 }
                               },
                               child: Text(
@@ -474,5 +517,17 @@ class _StudentClassState extends State<StudentClassPage> {
     studentQuantityController.dispose();
     teacherNameController.dispose();
     notesController.dispose();
+  }
+
+  void _onRefresh() async {
+    await _getStudentClassList();
+    // 刷新完成
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    await _getStudentClassList();
+    // 加载完成
+    _refreshController.loadComplete();
   }
 }

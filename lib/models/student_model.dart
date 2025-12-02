@@ -34,11 +34,18 @@ class StudentModel {
 
   Map<String, dynamic> toMap() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
+    if (id != null) {
+      data['id'] = id;
+    }
     data['student_number'] = studentNumber;
     data['student_name'] = studentName;
     data['class_name'] = className;
     data['created'] = created.toIso8601String();
     return data;
+  }
+
+  @override
+  toString() {
+    return 'StudentModel(id: $id, studentNumber: $studentNumber, studentName: $studentName, className: $className, created: $created)';
   }
 }

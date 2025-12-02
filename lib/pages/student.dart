@@ -2,12 +2,17 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:rollcall/configs/strings.dart';
+import 'package:rollcall/models/student_class_model.dart';
+import 'package:rollcall/providers/class_groups_provider.dart';
 import 'package:rollcall/providers/student_class_provider.dart';
 
+import '../models/student_class_group.dart';
 import '../models/student_model.dart';
 import '../providers/class_selected_provider.dart';
 import '../utils/database_helper.dart';
+import '../utils/student_class_dao.dart';
 import '../utils/student_dao.dart';
 
 class StudentPage extends StatefulWidget {
@@ -18,17 +23,75 @@ class StudentPage extends StatefulWidget {
 }
 
 class _StudentPageState extends State<StudentPage> {
+  final TextEditingController _searchController = TextEditingController();
+
   final TextEditingController studentNumberController = TextEditingController();
   final TextEditingController studentNameController = TextEditingController();
 
   final GlobalKey _formKey = GlobalKey<FormState>();
   bool _isStudentNumberUnique = true;
 
+  final RefreshController _refreshController = RefreshController(
+    initialRefresh: false,
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text(KString.studentClassTitle)),
-      body: const Center(child: Text(KString.studentClassTitle)),
+      body: Consumer<ClassGroupsProvider>(
+        builder: (context, classGroupsProvider, child) {
+          return FutureBuilder(
+            future: _getAllStudentsByClassNames(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  classGroupsProvider.changeClassGroupsWithoutNotify(
+                    snapshot.data as List<StudentClassGroup>,
+                  );
+                  classGroupsProvider.changeFilterClassGroupsWithoutNotify(
+                    _searchController.text,
+                  );
+                  return SmartRefresher(
+                    // 启用下拉刷新
+                    enablePullDown: true,
+                    // 启用上拉加载
+                    enablePullUp: true,
+                    // 水滴效果头部
+                    header: WaterDropHeader(),
+                    // 经典底部加载
+                    footer: ClassicFooter(loadStyle: LoadStyle.ShowWhenLoading),
+                    controller: _refreshController,
+                    onRefresh: _onRefresh,
+                    onLoading: _onLoading,
+                    child: ListView.builder(
+                      itemCount: classGroupsProvider.filterClassGroups.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(
+                            classGroupsProvider
+                                .filterClassGroups[index]
+                                .studentClass
+                                .className,
+                          ),
+                          subtitle: Text(
+                            '${classGroupsProvider.filterClassGroups[index].students.length} 人',
+                          ),
+                          onTap: () {},
+                        );
+                      },
+                    ),
+                  );
+                }
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          );
+        },
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => {
           showDialog(
@@ -195,7 +258,7 @@ class _StudentPageState extends State<StudentPage> {
                   }),
                 );
               } else {
-                // 修改班级
+                // 修改学生
                 await studentDao.updateStudentClassByClassName(
                   StudentModel.fromMap({
                     'class_name': selectedClassListStr,
@@ -221,5 +284,69 @@ class _StudentPageState extends State<StudentPage> {
         ),
       ],
     );
+  }
+
+  Future<List<StudentClassGroup>> _getAllStudentsByClassNames() async {
+    WidgetsFlutterBinding.ensureInitialized(); // 确保初始化Flutter绑定。对于插件很重要。
+    var dbHelper = DatabaseHelper(); // 创建DatabaseHelper实例。
+    var studentDao = StudentDao(dbHelper); // 创建StudentDao实例。
+    List<StudentClassGroup> classGroups = [];
+    final List<StudentClassModel> studentClasses = [];
+    // 获取所有班级数据
+    WidgetsFlutterBinding.ensureInitialized(); // 确保初始化Flutter绑定。对于插件很重要。
+    var classDao = StudentClassDao(dbHelper); // 创建StudentClassDao实例。
+    await classDao.getAllStudentClasses().then(
+      (value) => studentClasses.addAll(
+        value.map((e) => StudentClassModel.fromMap(e)).toList(),
+      ),
+    );
+    for (StudentClassModel classModel in studentClasses) {
+      var students = await studentDao.getAllStudentsByClassName(
+        classModel.className,
+      );
+      StudentClassGroup classGroup = StudentClassGroup(
+        studentClass: classModel,
+        students: students.map((e) => StudentModel.fromMap(e)).toList(),
+      );
+      classGroups.add(classGroup);
+      log(classGroup.toString());
+    }
+    return classGroups;
+  }
+
+  @override
+  dispose() {
+    studentNumberController.dispose();
+    studentNameController.dispose();
+    super.dispose();
+  }
+
+  void _onRefresh() async {
+    List<StudentClassGroup> classGroups = await _getAllStudentsByClassNames();
+
+    if (context.mounted) {
+      ClassGroupsProvider classGroupsProvider =
+          Provider.of<ClassGroupsProvider>(context, listen: false);
+      // 更新全部数据
+      classGroupsProvider.changeClassGroupsWithoutNotify(classGroups);
+      // 更新列表
+      classGroupsProvider.changeFilterClassGroups(_searchController.text);
+    }
+    // 刷新完成
+    _refreshController.refreshCompleted();
+  }
+
+  void _onLoading() async {
+    List<StudentClassGroup> classGroups = await _getAllStudentsByClassNames();
+    if (context.mounted) {
+      ClassGroupsProvider classGroupsProvider =
+          Provider.of<ClassGroupsProvider>(context, listen: false);
+      // 更新全部数据
+      classGroupsProvider.changeClassGroupsWithoutNotify(classGroups);
+      // 更新列表
+      classGroupsProvider.changeFilterClassGroups(_searchController.text);
+    }
+    // 加载完成
+    _refreshController.loadComplete();
   }
 }

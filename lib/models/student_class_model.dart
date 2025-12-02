@@ -45,6 +45,8 @@ class StudentClassModel {
     return data;
   }
 
-  bool isStudentIn(StudentModel student) =>
-      className.contains(student.className);
+  @override
+  toString() {
+    return 'StudentClassModel(id: $id, className: $className, studentQuantity: $studentQuantity, teacherName: $teacherName, notes: $notes, created: $created)';
+  }
 }

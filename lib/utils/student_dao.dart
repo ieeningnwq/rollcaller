@@ -24,11 +24,16 @@ class StudentDao {
     return await db.query(tableName);
   }
 
-  Future<List<Map<String, dynamic>>> getStudentsByClassName(
+  Future<List<Map<String, dynamic>>> getAllStudentsByClassName(
     String className,
   ) async {
     final db = await dbHelper.database;
-    return await db.query(tableName);
+    return await db.query(
+      tableName,
+      where:
+          'class_name like ? or class_name like ? or class_name like ? or class_name=?',
+      whereArgs: ['$className,', ',$className', ',%$className,', className],
+    );
   }
 
   Future<bool> isStudentNumberExist(String studentNumber) async {
@@ -42,5 +47,13 @@ class StudentDao {
     return response.isNotEmpty;
   }
 
-  Future<void> updateStudentClassByClassName(fromMap) async {}
+  Future<void> updateStudentClassByClassName(StudentModel student) async {
+    final db = await dbHelper.database;
+    await db.update(
+      tableName,
+      student.toMap(),
+      where: 'student_number=?',
+      whereArgs: [student.studentNumber],
+    );
+  }
 }

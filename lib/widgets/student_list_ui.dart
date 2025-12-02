@@ -11,10 +11,7 @@ class StudentListApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: '学生名单管理',
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-        useMaterial3: true,
-      ),
+      theme: ThemeData(primarySwatch: Colors.purple, useMaterial3: true),
       home: const StudentListScreen(),
     );
   }
@@ -40,10 +37,7 @@ class ClassGroup {
   final String className;
   final List<Student> students;
 
-  ClassGroup({
-    required this.className,
-    required this.students,
-  });
+  ClassGroup({required this.className, required this.students});
 }
 
 class StudentListScreen extends StatefulWidget {
@@ -136,16 +130,19 @@ class _StudentListScreenState extends State<StudentListScreen> {
     }
 
     setState(() {
-      _filteredClassGroups = _classGroups.map((group) {
-        final filteredStudents = group.students.where((student) {
-          return student.name.toLowerCase().contains(query) ||
-              student.studentId.toLowerCase().contains(query);
-        }).toList();
-        return ClassGroup(
-          className: group.className,
-          students: filteredStudents,
-        );
-      }).where((group) => group.students.isNotEmpty).toList();
+      _filteredClassGroups = _classGroups
+          .map((group) {
+            final filteredStudents = group.students.where((student) {
+              return student.name.toLowerCase().contains(query) ||
+                  student.studentId.toLowerCase().contains(query);
+            }).toList();
+            return ClassGroup(
+              className: group.className,
+              students: filteredStudents,
+            );
+          })
+          .where((group) => group.students.isNotEmpty)
+          .toList();
     });
   }
 
@@ -180,10 +177,7 @@ class _StudentListScreenState extends State<StudentListScreen> {
                   SizedBox(height: 8),
                   Text(
                     '管理学生信息，按班级分组查看',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.white70,
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.white70),
                   ),
                 ],
               ),
@@ -205,7 +199,10 @@ class _StudentListScreenState extends State<StudentListScreen> {
                     borderRadius: BorderRadius.circular(8),
                     borderSide: const BorderSide(color: Colors.purple),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                   filled: true,
                   fillColor: Colors.white,
                 ),
@@ -223,7 +220,10 @@ class _StudentListScreenState extends State<StudentListScreen> {
                     children: [
                       // 班级标题
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         color: const Color(0xFFF5F5F5),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -250,7 +250,10 @@ class _StudentListScreenState extends State<StudentListScreen> {
                       Column(
                         children: group.students.map((student) {
                           return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
                             child: Container(
                               padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
@@ -265,11 +268,13 @@ class _StudentListScreenState extends State<StudentListScreen> {
                                 ],
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           children: [
@@ -282,10 +287,16 @@ class _StudentListScreenState extends State<StudentListScreen> {
                                             ),
                                             const SizedBox(width: 8),
                                             Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 8,
+                                                    vertical: 2,
+                                                  ),
                                               decoration: BoxDecoration(
-                                                color: Colors.purple.withOpacity(0.1),
-                                                borderRadius: BorderRadius.circular(12),
+                                                color: Colors.purple
+                                                    .withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
                                               ),
                                               child: Text(
                                                 student.studentId,
@@ -311,13 +322,19 @@ class _StudentListScreenState extends State<StudentListScreen> {
                                   Row(
                                     children: [
                                       IconButton(
-                                        icon: const Icon(Icons.edit, color: Colors.grey),
+                                        icon: const Icon(
+                                          Icons.edit,
+                                          color: Colors.grey,
+                                        ),
                                         onPressed: () {
                                           // 编辑功能
                                         },
                                       ),
                                       IconButton(
-                                        icon: const Icon(Icons.delete, color: Colors.grey),
+                                        icon: const Icon(
+                                          Icons.delete,
+                                          color: Colors.grey,
+                                        ),
                                         onPressed: () {
                                           // 删除功能
                                         },

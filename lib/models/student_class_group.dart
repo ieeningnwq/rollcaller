@@ -1,20 +1,20 @@
 import 'student_class_model.dart';
 import 'student_model.dart';
 
-class StudentClassListItem {
+class StudentClassGroup {
   StudentClassModel studentClass;
   List<StudentModel> students;
 
-  StudentClassListItem({required this.studentClass, required this.students});
+  StudentClassGroup({required this.studentClass, required this.students});
 
-  factory StudentClassListItem.fromMap(Map<String, dynamic> mapData) {
+  factory StudentClassGroup.fromMap(Map<String, dynamic> mapData) {
     final List<StudentModel> listData = <StudentModel>[];
     if (mapData['students'] != null) {
       mapData['students'].forEach((v) {
         listData.add(StudentModel.fromMap(v));
       });
     }
-    return StudentClassListItem(
+    return StudentClassGroup(
       studentClass: StudentClassModel.fromMap(mapData['class']),
       students: listData,
     );
@@ -25,5 +25,10 @@ class StudentClassListItem {
     data['class'] = studentClass.toMap();
     data['students'] = students.map((v) => v.toMap()).toList();
     return data;
+  }
+
+  @override
+  toString() {
+    return 'StudentClassGroup(studentClass: $studentClass, students: $students)';
   }
 }
