@@ -10,14 +10,18 @@ class StudentClassSelectedProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void setSelectedClassesWithoutNotify(int index, bool? value) {
+    _selectedClasses[index] = value ?? false;
+  }
+
   void changeSelectedClasses(List<bool> newList) {
     _selectedClasses.clear();
     _selectedClasses.addAll(newList);
     notifyListeners();
   }
 
-  void changeSelectedClassesWithoutNotify(List<bool> list) {
+  void changeSelectedClassesWithoutNotify(List<bool> newList) {
     _selectedClasses.clear();
-    _selectedClasses.addAll(list);
+    _selectedClasses.addAll(newList);
   }
 }

@@ -280,6 +280,27 @@ class _StudentPageState extends State<StudentPage> {
                                                         ),
                                                         onPressed: () {
                                                           // 编辑功能
+                                                          showDialog(
+                                                            context: context,
+                                                            builder:
+                                                                (
+                                                                  BuildContext
+                                                                  context,
+                                                                ) {
+                                                                  return _studentDialog(
+                                                                    '编辑学生',
+                                                                    studentNumber:
+                                                                        student
+                                                                            .studentNumber,
+                                                                    studentName:
+                                                                        student
+                                                                            .studentName,
+                                                                    className:
+                                                                        student
+                                                                            .className,
+                                                                  );
+                                                                },
+                                                          );
                                                         },
                                                       ),
                                                       IconButton(
@@ -376,6 +397,7 @@ class _StudentPageState extends State<StudentPage> {
     String title, {
     String studentName = '',
     String studentNumber = '',
+    String className = '',
   }) {
     // 判断是新增还是修改
     bool isAdd = title == '创建学生';
@@ -467,15 +489,37 @@ class _StudentPageState extends State<StudentPage> {
               const Text('所在班级', style: TextStyle(fontSize: 16)),
               Consumer<StudentClassSelectedProvider>(
                 builder: (context, selectedClassProvider, child) {
+                  // ! 更新 selectedClassProvider 中的 selectedClasses 列表
+                  // * 1、拿到所有班级，使用 classOptions 中的班级
+                  // * 2、拿到学生班级，使用参数 className
+                  // * 3、判断更新
+                  for (int i = 0; i < classOptions.length; i++) {
+                    selectedClassProvider.setSelectedClassesWithoutNotify(
+                      i,
+                      ',$className,'.contains(',${classOptions[i]},'),
+                    );
+                  }
+
                   return Column(
                     children: List.generate(classOptions.length, (index) {
                       return CheckboxListTile(
-                        title: Text(classOptions[index]),
                         value: selectedClassProvider.selectedClasses[index],
+                        title: Text(classOptions[index]),
                         onChanged: (value) {
                           selectedClassProvider.setSelectedClasses(
                             index,
                             value,
+                          );
+                          // 更新 className
+                          className = selectedClassProvider.selectedClasses
+                              .asMap()
+                              .entries
+                              .where((entry) => entry.value)
+                              .map((entry) => classOptions[entry.key])
+                              .toList()
+                              .join(',');
+                          log(
+                            '${classOptions[index]}: $value,${selectedClassProvider.selectedClasses[index]}',
                           );
                         },
                         controlAffinity: ListTileControlAffinity.leading,
