@@ -1,12 +1,11 @@
-import './Student_model.dart';
-
 class StudentClassModel {
   int? id;
   String className;
-  int studentQuantity;
+  int studentQuantity; // 学生人数,班级应该有的人数
   String teacherName;
   String notes;
   DateTime created;
+  int classQuantity = 0; // 班级实际人数
 
   StudentClassModel({
     required this.className,
@@ -14,6 +13,7 @@ class StudentClassModel {
     required this.teacherName,
     required this.notes,
     required this.created,
+    required this.classQuantity,
   });
 
   factory StudentClassModel.fromMap(Map<String, dynamic> mapData) {
@@ -25,6 +25,7 @@ class StudentClassModel {
       created: mapData['created'] != null
           ? DateTime.parse(mapData['created'])
           : DateTime.now(),
+      classQuantity: mapData['class_quantity'] ?? 0,
     );
     if (mapData.containsKey('id')) {
       studentClass.id = mapData['id'];
@@ -42,11 +43,12 @@ class StudentClassModel {
     data['student_quantity'] = studentQuantity;
     data['notes'] = notes;
     data['created'] = created.toIso8601String();
+    data['class_quantity'] = classQuantity;
     return data;
   }
 
   @override
   toString() {
-    return 'StudentClassModel(id: $id, className: $className, studentQuantity: $studentQuantity, teacherName: $teacherName, notes: $notes, created: $created)';
+    return 'StudentClassModel(id: $id, className: $className, studentQuantity: $studentQuantity, teacherName: $teacherName, notes: $notes, created: $created, classQuantity: $classQuantity)';
   }
 }

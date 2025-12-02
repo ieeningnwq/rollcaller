@@ -42,42 +42,44 @@ class _StudentClassState extends State<StudentClassPage> {
           body: FutureBuilder(
             future: _getStudentClassList(),
             builder: (context, snapshot) {
-              if (snapshot.hasData &&
-                  snapshot.data != null &&
-                  snapshot.data!.isNotEmpty) {
-                List<Map<String, dynamic>>? data = snapshot.data;
-                log(data.toString());
-                List<StudentClassModel> studentClassList = [];
-                for (Map<String, dynamic> item in data!) {
-                  studentClassList.add(StudentClassModel.fromMap(item));
+              if (snapshot.connectionState == ConnectionState.done) {
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else {
+                  List<Map<String, dynamic>>? data = snapshot.data;
+                  log(data.toString());
+                  List<StudentClassModel> studentClassList = [];
+                  for (Map<String, dynamic> item in data!) {
+                    studentClassList.add(StudentClassModel.fromMap(item));
+                  }
+                  studentClassProvider.changeStudentClassWithoutNotify(
+                    studentClassList,
+                  );
+                  return SmartRefresher(
+                    // 启用下拉刷新
+                    enablePullDown: true,
+                    // 启用上拉加载
+                    enablePullUp: false,
+                    // 水滴效果头部
+                    header: WaterDropHeader(),
+                    // 经典底部加载
+                    footer: ClassicFooter(loadStyle: LoadStyle.ShowWhenLoading),
+                    controller: _refreshController,
+                    onRefresh: _onRefresh,
+                    onLoading: _onLoading,
+                    child: ListView.builder(
+                      scrollDirection: Axis.vertical,
+                      itemCount: snapshot.data?.length ?? 0,
+                      itemBuilder: (context, index) {
+                        return _classCardItem(
+                          index,
+                          studentClassProvider,
+                          context,
+                        );
+                      },
+                    ),
+                  );
                 }
-                studentClassProvider.changeStudentClassWithoutNotify(
-                  studentClassList,
-                );
-                return SmartRefresher(
-                  // 启用下拉刷新
-                  enablePullDown: true,
-                  // 启用上拉加载
-                  enablePullUp: true,
-                  // 水滴效果头部
-                  header: WaterDropHeader(),
-                  // 经典底部加载
-                  footer: ClassicFooter(loadStyle: LoadStyle.ShowWhenLoading),
-                  controller: _refreshController,
-                  onRefresh: _onRefresh,
-                  onLoading: _onLoading,
-                  child: ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    itemCount: snapshot.data?.length ?? 0,
-                    itemBuilder: (context, index) {
-                      return _classCardItem(
-                        index,
-                        studentClassProvider.studentClassesList[index],
-                        context,
-                      );
-                    },
-                  ),
-                );
               } else {
                 return Center(child: Text('没有数据...'));
               }
@@ -100,11 +102,25 @@ class _StudentClassState extends State<StudentClassPage> {
     );
   }
 
-  Future<List<Map<String, dynamic>>> _getStudentClassList() {
+  Future<List<Map<String, dynamic>>> _getStudentClassList() async {
     WidgetsFlutterBinding.ensureInitialized(); // 确保初始化Flutter绑定。对于插件很重要。
     var dbHelper = DatabaseHelper(); // 创建DatabaseHelper实例。
     var classDao = StudentClassDao(dbHelper); // 创建StudentClassDao实例。
-    return classDao.getAllStudentClasses();
+    StudentDao studentDao = StudentDao(dbHelper);
+
+    List<Map<String, dynamic>> data = [];
+    List<Map<String, dynamic>> studentClasses = await classDao
+        .getAllStudentClasses();
+    if (studentClasses.isNotEmpty) {
+      for (Map<String, dynamic> item in studentClasses) {
+        Map<String, dynamic> copyItem = Map.from(item);
+        List<Map<String, dynamic>> number = await studentDao
+            .getAllStudentsByClassName(item['class_name']);
+        copyItem['class_quantity'] = number.length;
+        data.add(copyItem);
+      }
+    }
+    return data;
   }
 
   AlertDialog _studentClassDialog(
@@ -236,7 +252,7 @@ class _StudentClassState extends State<StudentClassPage> {
                   }),
                 ); // 插入或者更新用户数据。
               }
-              var classes = await classDao.getAllStudentClasses(); // 获取所有班级数据。
+              var classes = await _getStudentClassList(); // 获取所有班级数据。
               log(classes.toString());
               if (mounted) {
                 // 更新列表
@@ -255,10 +271,12 @@ class _StudentClassState extends State<StudentClassPage> {
     );
   }
 
-  Widget _classCardItem(int index, StudentClassModel studentClass, context) {
-    // 检查是否人数已满
-    bool isFull = studentClass.studentQuantity >= 45; // 假设45是班级最大人数
-
+  Widget _classCardItem(
+    int index,
+    StudentClassProvider studentClassProvider,
+    context,
+  ) {
+    var studentClass = studentClassProvider.studentClassesList[index];
     return Card(
       elevation: 2.0,
       margin: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
@@ -282,18 +300,18 @@ class _StudentClassState extends State<StudentClassPage> {
                     vertical: 4.0,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.green.shade100,
+                    color: studentClassProvider.deprecationColor[index],
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.check_circle, size: 16.0, color: Colors.green),
+                      studentClassProvider.icon[index],
                       SizedBox(width: 4.0),
                       Text(
-                        '人数已满',
+                        studentClassProvider.string[index],
                         style: TextStyle(
                           fontSize: 12.0,
-                          color: Colors.green,
+                          color: studentClassProvider.color[index],
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -320,7 +338,7 @@ class _StudentClassState extends State<StudentClassPage> {
                     ),
                     SizedBox(height: 4.0),
                     Text(
-                      '${studentClass.studentQuantity}',
+                      '${studentClass.classQuantity}',
                       style: TextStyle(
                         fontSize: 18.0,
                         fontWeight: FontWeight.w500,
@@ -449,8 +467,7 @@ class _StudentClassState extends State<StudentClassPage> {
                                   await classDao.deleteStudentClassByClassName(
                                     studentClass.className,
                                   );
-                                  var classes = await classDao
-                                      .getAllStudentClasses();
+                                  var classes = await _getStudentClassList();
                                   if (context.mounted) {
                                     Provider.of<StudentClassProvider>(
                                       context,

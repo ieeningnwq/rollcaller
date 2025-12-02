@@ -12,9 +12,11 @@ class StudentClassDao {
 
   Future<int> insertStudentClass(StudentClassModel studentClass) async {
     final db = await dbHelper.database;
+    var mapData = studentClass.toMap();
+    mapData.remove('class_quantity');
     return await db.insert(
       tableName,
-      studentClass.toMap(),
+      mapData,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
@@ -55,10 +57,12 @@ class StudentClassDao {
   Future<void> updateStudentClassByClassName(
     StudentClassModel studentClassModel,
   ) async {
+    var mapData = studentClassModel.toMap();
+    mapData.remove('class_quantity');
     final db = await dbHelper.database;
     await db.update(
       tableName,
-      studentClassModel.toMap(),
+      mapData,
       where: 'class_name=?',
       whereArgs: [studentClassModel.className],
     );
