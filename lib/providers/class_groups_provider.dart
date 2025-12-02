@@ -1,10 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 
 import '../models/student_class_group.dart';
+import '../models/student_model.dart';
 
 class ClassGroupsProvider with ChangeNotifier {
-  // final List<StudentClassGroup> _classGroups = [];
-  // final List<StudentClassGroup> _filterClassGroups = [];
   final Map<String, StudentClassGroup> _classGroups = {};
   final Map<String, StudentClassGroup> _filterClassGroups = {};
 
@@ -43,15 +44,47 @@ class ClassGroupsProvider with ChangeNotifier {
 
   void changeFilterClassGroupsWithoutNotify(String filter) {
     _filterClassGroups.clear();
-    for (var group in _classGroups.entries) {
-      _filterClassGroups.putIfAbsent(group.key, () => group.value);
+    for (var entry in _classGroups.entries) {
+      List<StudentModel> students = [];
+      String className = entry.key;
+      StudentClassGroup group = entry.value;
+      for (var student in group.students) {
+        if (student.studentNumber.contains(filter) ||
+            student.studentName.contains(filter)) {
+          students.add(student);
+        }
+      }
+      if (students.isNotEmpty) {
+        StudentClassGroup newGroup = StudentClassGroup(
+          studentClass: group.studentClass,
+          students: students,
+          isExpanded: group.isExpanded,
+        );
+        _filterClassGroups.putIfAbsent(className, () => newGroup);
+      }
     }
+    log(filterClassGroups.toString());
   }
 
   void changeFilterClassGroups(String filter) {
     _filterClassGroups.clear();
-    for (var group in _classGroups.entries) {
-      _filterClassGroups.putIfAbsent(group.key, () => group.value);
+    for (var entry in _classGroups.entries) {
+      List<StudentModel> students = [];
+      String className = entry.key;
+      StudentClassGroup group = entry.value;
+      for (var student in group.students) {
+        if (student.studentNumber.contains(filter) ||
+            student.studentName.contains(filter)) {
+          students.add(student);
+        }
+      }
+      if (students.isNotEmpty) {
+        StudentClassGroup newGroup = StudentClassGroup(
+          studentClass: group.studentClass,
+          students: students,
+        );
+        _filterClassGroups.putIfAbsent(className, () => newGroup);
+      }
     }
     notifyListeners();
   }

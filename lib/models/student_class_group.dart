@@ -6,7 +6,11 @@ class StudentClassGroup {
   List<StudentModel> students;
   bool isExpanded = false;
 
-  StudentClassGroup({required this.studentClass, required this.students});
+  StudentClassGroup({
+    required this.studentClass,
+    required this.students,
+    this.isExpanded = false,
+  });
 
   factory StudentClassGroup.fromMap(Map<String, dynamic> mapData) {
     final List<StudentModel> listData = <StudentModel>[];
@@ -18,6 +22,7 @@ class StudentClassGroup {
     return StudentClassGroup(
       studentClass: StudentClassModel.fromMap(mapData['class']),
       students: listData,
+      isExpanded: mapData['isExpanded'] ?? false,
     );
   }
 
@@ -25,6 +30,7 @@ class StudentClassGroup {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['class'] = studentClass.toMap();
     data['students'] = students.map((v) => v.toMap()).toList();
+    data['isExpanded'] = isExpanded;
     return data;
   }
 

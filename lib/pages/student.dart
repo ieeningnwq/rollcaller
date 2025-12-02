@@ -35,7 +35,16 @@ class _StudentPageState extends State<StudentPage> {
     initialRefresh: false,
   );
 
-  List<StudentClassGroup> _filteredClassGroups = [];
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(() {
+      Provider.of<ClassGroupsProvider>(
+        context,
+        listen: false,
+      ).changeFilterClassGroups(_searchController.text);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +116,8 @@ class _StudentPageState extends State<StudentPage> {
                             onRefresh: _onRefresh,
                             onLoading: _onLoading,
                             child: ListView.builder(
-                              itemCount: snapshot.data?.length ?? 0,
+                              itemCount:
+                                  classGroupsProvider.filterClassGroups.length,
                               itemBuilder: (context, groupIndex) {
                                 final group = classGroupsProvider
                                     .filterClassGroups[groupIndex];
