@@ -247,36 +247,24 @@ class _StudentPageState extends State<StudentPage> {
                       .map((entry) => classOptions[entry.key])
                       .toList()
                       .join(',');
+              var student = StudentModel.fromMap({
+                'class_name': selectedClassListStr,
+                'student_number': studentNumberController.text,
+                'student_name': studentNameController.text,
+              });
               // 判断是新增还是修改
               if (isAdd) {
                 // 新增学生
-                await studentDao.insertStudent(
-                  StudentModel.fromMap({
-                    'class_name': selectedClassListStr,
-                    'student_number': studentNumberController.text,
-                    'student_name': studentNameController.text,
-                  }),
-                );
+                await studentDao.insertStudent(student);
               } else {
                 // 修改学生
                 await studentDao.updateStudentClassByClassName(
-                  StudentModel.fromMap({
-                    'class_name': selectedClassListStr,
-                    'student_number': studentNameController.text,
-                    'student_name': studentNameController.text,
-                  }),
+                  student,
                 ); // 插入或者更新用户数据。
               }
-              var classes = await studentDao.getAllStudents(); // 获取所有班级数据。
-              log(classes.toString());
+              log('${isAdd ? '新增' : '修改'}学生: $student');
+              _refreshClassGroupData();
               if (mounted) {
-                // // 更新列表
-                // Provider.of<StudentClassProvider>(
-                //   context,
-                //   listen: false,
-                // ).changeStudentClass(
-                //   classes.map((e) => StudentClassModel.fromMap(e)).toList(),
-                // );
                 Navigator.of(context).pop(); // 关闭弹窗
               }
             }
@@ -304,6 +292,8 @@ class _StudentPageState extends State<StudentPage> {
       var students = await studentDao.getAllStudentsByClassName(
         classModel.className,
       );
+      var allStudents = await studentDao.getAllStudents();
+      log('allStudents: $allStudents');
       StudentClassGroup classGroup = StudentClassGroup(
         studentClass: classModel,
         students: students.map((e) => StudentModel.fromMap(e)).toList(),
@@ -321,7 +311,7 @@ class _StudentPageState extends State<StudentPage> {
     super.dispose();
   }
 
-  void _onRefresh() async {
+  void _refreshClassGroupData() async {
     List<StudentClassGroup> classGroups = await _getAllStudentsByClassNames();
 
     if (context.mounted) {
@@ -332,20 +322,17 @@ class _StudentPageState extends State<StudentPage> {
       // 更新列表
       classGroupsProvider.changeFilterClassGroups(_searchController.text);
     }
+  }
+
+  void _onRefresh() async {
+    _refreshClassGroupData();
     // 刷新完成
     _refreshController.refreshCompleted();
   }
 
   void _onLoading() async {
-    List<StudentClassGroup> classGroups = await _getAllStudentsByClassNames();
-    if (context.mounted) {
-      ClassGroupsProvider classGroupsProvider =
-          Provider.of<ClassGroupsProvider>(context, listen: false);
-      // 更新全部数据
-      classGroupsProvider.changeClassGroupsWithoutNotify(classGroups);
-      // 更新列表
-      classGroupsProvider.changeFilterClassGroups(_searchController.text);
-    }
+    _refreshClassGroupData();
+
     // 加载完成
     _refreshController.loadComplete();
   }

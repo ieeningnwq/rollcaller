@@ -30,9 +30,8 @@ class StudentDao {
     final db = await dbHelper.database;
     return await db.query(
       tableName,
-      where:
-          'class_name like ? or class_name like ? or class_name like ? or class_name=?',
-      whereArgs: ['$className,', ',$className', ',%$className,', className],
+      where: 'INSTR(class_name, ?) > 0',
+      whereArgs: [className],
     );
   }
 

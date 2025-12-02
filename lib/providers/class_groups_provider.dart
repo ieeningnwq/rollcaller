@@ -36,9 +36,9 @@ class ClassGroupsProvider with ChangeNotifier {
   void changeFilterClassGroups(String filter) {
     _filterClassGroups.clear();
     _filterClassGroups.addAll(
-      _classGroups
-          .where((element) => element.studentClass.className.contains(filter))
-          .toList(),
+      _classGroups,
+      //     .where((element) => element.studentClass.className.contains(filter))
+      //     .toList(),
     );
     notifyListeners();
   }

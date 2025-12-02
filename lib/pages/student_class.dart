@@ -520,13 +520,26 @@ class _StudentClassState extends State<StudentClassPage> {
   }
 
   void _onRefresh() async {
-    await _getStudentClassList();
+    _refreshClassData();
     // 刷新完成
     _refreshController.refreshCompleted();
   }
 
+  Future<void> _refreshClassData() async {
+    var classes = await _getStudentClassList();
+    if (mounted) {
+      // 更新列表
+      Provider.of<StudentClassProvider>(
+        context,
+        listen: false,
+      ).changeStudentClass(
+        classes.map((e) => StudentClassModel.fromMap(e)).toList(),
+      );
+    }
+  }
+
   void _onLoading() async {
-    await _getStudentClassList();
+    _refreshClassData();
     // 加载完成
     _refreshController.loadComplete();
   }
