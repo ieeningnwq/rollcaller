@@ -18,7 +18,6 @@ class StudentPage extends StatefulWidget {
 }
 
 class _StudentPageState extends State<StudentPage> {
-  final TextEditingController classNameController = TextEditingController();
   final TextEditingController studentNumberController = TextEditingController();
   final TextEditingController studentNameController = TextEditingController();
 
@@ -46,13 +45,11 @@ class _StudentPageState extends State<StudentPage> {
     String title, {
     String studentName = '',
     String studentNumber = '',
-    String className = '',
   }) {
     // 判断是新增还是修改
     bool isAdd = title == '创建学生';
     studentNameController.text = studentName;
     studentNumberController.text = studentNumber;
-    classNameController.text = className;
 
     Provider.of<StudentClassSelectedProvider>(
       context,
@@ -103,7 +100,9 @@ class _StudentPageState extends State<StudentPage> {
                                 _isStudentNumberUnique = true
                               else
                                 _isStudentNumberUnique = false,
-                            },
+                            }
+                          else
+                            _isStudentNumberUnique = true,
                         },
                       );
                 },
@@ -111,7 +110,9 @@ class _StudentPageState extends State<StudentPage> {
                   if (value == null || value.isEmpty) {
                     return '学号不能为空';
                   }
-                  if (!_isStudentNumberUnique) return '$value重复使用';
+                  if (!_isStudentNumberUnique) {
+                    return '$value重复使用';
+                  }
                   return null; // 如果没有找到重复值，返回null表示验证通过
                 },
               ),
@@ -172,13 +173,24 @@ class _StudentPageState extends State<StudentPage> {
               WidgetsFlutterBinding.ensureInitialized(); // 确保初始化Flutter绑定。对于插件很重要。
               var dbHelper = DatabaseHelper(); // 创建DatabaseHelper实例。
               var studentDao = StudentDao(dbHelper); // 创建StudentstudentDao实例。
+              String selectedClassListStr =
+                  Provider.of<StudentClassSelectedProvider>(
+                        context,
+                        listen: false,
+                      ).selectedClasses
+                      .asMap()
+                      .entries
+                      .where((entry) => entry.value)
+                      .map((entry) => classOptions[entry.key])
+                      .toList()
+                      .join(',');
               // 判断是新增还是修改
               if (isAdd) {
                 // 新增学生
                 await studentDao.insertStudent(
                   StudentModel.fromMap({
-                    'class_name': classNameController.text,
-                    'student_number': studentNameController.text,
+                    'class_name': selectedClassListStr,
+                    'student_number': studentNumberController.text,
                     'student_name': studentNameController.text,
                   }),
                 );
@@ -186,7 +198,7 @@ class _StudentPageState extends State<StudentPage> {
                 // 修改班级
                 await studentDao.updateStudentClassByClassName(
                   StudentModel.fromMap({
-                    'class_name': classNameController.text,
+                    'class_name': selectedClassListStr,
                     'student_number': studentNameController.text,
                     'student_name': studentNameController.text,
                   }),

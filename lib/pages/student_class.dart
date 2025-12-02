@@ -119,18 +119,24 @@ class _StudentClassState extends State<StudentClassPage> {
                 var classDao = StudentClassDao(
                   dbHelper,
                 ); // 创建StudentClassDao实例。
+                log('班级名称重复使用1:isadd:$isAdd,$value,$className');
                 classDao
                     .isStudentClassesNameExist(value)
                     .then(
                       (onValue) => {
                         if (onValue)
                           {
+                            log(
+                              '班级名称重复使用2:$value,$onValue,${classNameController.text}',
+                            ),
                             if (!isAdd &&
                                 (classNameController.text == className))
                               _isClassNameUnique = true
                             else
                               _isClassNameUnique = false,
-                          },
+                          }
+                        else
+                          _isClassNameUnique = true,
                       },
                     );
               },
@@ -138,7 +144,9 @@ class _StudentClassState extends State<StudentClassPage> {
                 if (value == null || value.isEmpty) {
                   return '班级名称不能为空';
                 }
-                if (!_isClassNameUnique) return '$value重复使用';
+                if (!_isClassNameUnique) {
+                  return '$value重复使用';
+                }
                 return null; // 如果没有找到重复值，返回null表示验证通过
               },
             ),
