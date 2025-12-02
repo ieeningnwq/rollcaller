@@ -38,60 +38,240 @@ class _StudentPageState extends State<StudentPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text(KString.studentClassTitle)),
-      body: Consumer<ClassGroupsProvider>(
-        builder: (context, classGroupsProvider, child) {
-          return FutureBuilder(
-            future: _getAllStudentsByClassNames(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  classGroupsProvider.changeClassGroupsWithoutNotify(
-                    snapshot.data as List<StudentClassGroup>,
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 顶部标题栏
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: Text(
+                '学生名单管理',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+            ),
+            // 搜索栏
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.search),
+                  hintText: '搜索学号或姓名...',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                  filled: true,
+                ),
+              ),
+            ),
+            // 学生列表
+            Expanded(
+              child: Consumer<ClassGroupsProvider>(
+                builder: (context, classGroupsProvider, child) {
+                  return FutureBuilder(
+                    future: _getAllStudentsByClassNames(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else {
+                          classGroupsProvider.changeClassGroupsWithoutNotify(
+                            snapshot.data as List<StudentClassGroup>,
+                          );
+                          classGroupsProvider
+                              .changeFilterClassGroupsWithoutNotify(
+                                _searchController.text,
+                              );
+                          return SmartRefresher(
+                            // 启用下拉刷新
+                            enablePullDown: true,
+                            // 启用上拉加载
+                            enablePullUp: true,
+                            // 水滴效果头部
+                            header: WaterDropHeader(),
+                            // 经典底部加载
+                            footer: ClassicFooter(
+                              loadStyle: LoadStyle.ShowWhenLoading,
+                            ),
+                            controller: _refreshController,
+                            onRefresh: _onRefresh,
+                            onLoading: _onLoading,
+                            child: ListView.builder(
+                              itemCount: snapshot.data?.length ?? 0,
+                              itemBuilder: (context, groupIndex) {
+                                final group = classGroupsProvider
+                                    .filterClassGroups[groupIndex];
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // 班级标题
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 12,
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            group.studentClass.className,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            '${group.students.length}人',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    // 学生列表
+                                    Column(
+                                      children: group.students.map((student) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 8,
+                                          ),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(12),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withValues(alpha: 0.05),
+                                                  blurRadius: 2,
+                                                  offset: const Offset(0, 1),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Expanded(
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          Text(
+                                                            student.studentName,
+                                                            style:
+                                                                const TextStyle(
+                                                                  fontSize: 16,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w500,
+                                                                ),
+                                                          ),
+                                                          const SizedBox(
+                                                            width: 8,
+                                                          ),
+                                                          Container(
+                                                            padding:
+                                                                const EdgeInsets.symmetric(
+                                                                  horizontal: 8,
+                                                                  vertical: 2,
+                                                                ),
+                                                            decoration: BoxDecoration(
+                                                              color: Colors
+                                                                  .purple
+                                                                  .withValues(
+                                                                    alpha: 0.1,
+                                                                  ),
+                                                              borderRadius:
+                                                                  BorderRadius.circular(
+                                                                    12,
+                                                                  ),
+                                                            ),
+                                                            child: Text(
+                                                              student
+                                                                  .studentNumber,
+                                                              style: TextStyle(
+                                                                fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      const SizedBox(height: 4),
+                                                      Text(
+                                                        '创建时间: ${student.created}',
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.grey,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    IconButton(
+                                                      icon: const Icon(
+                                                        Icons.edit,
+                                                        color: Colors.grey,
+                                                      ),
+                                                      onPressed: () {
+                                                        // 编辑功能
+                                                      },
+                                                    ),
+                                                    IconButton(
+                                                      icon: const Icon(
+                                                        Icons.delete,
+                                                        color: Colors.grey,
+                                                      ),
+                                                      onPressed: () {
+                                                        // 删除功能
+                                                      },
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                          );
+                        }
+                      } else {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                    },
                   );
-                  classGroupsProvider.changeFilterClassGroupsWithoutNotify(
-                    _searchController.text,
-                  );
-                  return SmartRefresher(
-                    // 启用下拉刷新
-                    enablePullDown: true,
-                    // 启用上拉加载
-                    enablePullUp: true,
-                    // 水滴效果头部
-                    header: WaterDropHeader(),
-                    // 经典底部加载
-                    footer: ClassicFooter(loadStyle: LoadStyle.ShowWhenLoading),
-                    controller: _refreshController,
-                    onRefresh: _onRefresh,
-                    onLoading: _onLoading,
-                    child: ListView.builder(
-                      itemCount: classGroupsProvider.filterClassGroups.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(
-                            classGroupsProvider
-                                .filterClassGroups[index]
-                                .studentClass
-                                .className,
-                          ),
-                          subtitle: Text(
-                            '${classGroupsProvider.filterClassGroups[index].students.length} 人',
-                          ),
-                          onTap: () {},
-                        );
-                      },
-                    ),
-                  );
-                }
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
-          );
-        },
+                },
+              ),
+            ),
+          ],
+        ),
       ),
+      // 浮动添加按钮
       floatingActionButton: FloatingActionButton(
         onPressed: () => {
           showDialog(
@@ -331,8 +511,7 @@ class _StudentPageState extends State<StudentPage> {
   }
 
   void _onLoading() async {
-    _refreshClassGroupData();
-
+    // _refreshClassGroupData();
     // 加载完成
     _refreshController.loadComplete();
   }

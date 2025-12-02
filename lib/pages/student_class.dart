@@ -69,7 +69,7 @@ class _StudentClassState extends State<StudentClassPage> {
                   onLoading: _onLoading,
                   child: ListView.builder(
                     scrollDirection: Axis.vertical,
-                    itemCount: studentClassProvider.studentClassesList.length,
+                    itemCount: snapshot.data?.length ?? 0,
                     itemBuilder: (context, index) {
                       return _classCardItem(
                         index,
