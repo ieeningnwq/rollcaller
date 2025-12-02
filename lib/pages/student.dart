@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:rollcall/configs/strings.dart';
 import 'package:rollcall/models/student_class_model.dart';
 import 'package:rollcall/providers/class_groups_provider.dart';
 import 'package:rollcall/providers/student_class_provider.dart';
@@ -14,6 +13,7 @@ import '../providers/class_selected_provider.dart';
 import '../utils/database_helper.dart';
 import '../utils/student_class_dao.dart';
 import '../utils/student_dao.dart';
+import '../widgets/student_view_dialog.dart';
 
 class StudentPage extends StatefulWidget {
   const StudentPage({super.key});
@@ -55,20 +55,21 @@ class _StudentPageState extends State<StudentPage> {
           children: [
             // 顶部标题栏
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(12),
               child: Text(
                 '学生名单管理',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
             // 搜索栏
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(8),
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
                   prefixIcon: const Icon(Icons.search),
                   hintText: '搜索学号或姓名...',
+                  hintStyle: TextStyle(fontSize: 14),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -76,8 +77,8 @@ class _StudentPageState extends State<StudentPage> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
+                    horizontal: 6,
+                    vertical: 4,
                   ),
                   filled: true,
                 ),
@@ -162,11 +163,11 @@ class _StudentPageState extends State<StudentPage> {
                                         children: group.students.map((student) {
                                           return Padding(
                                             padding: const EdgeInsets.symmetric(
-                                              horizontal: 16,
-                                              vertical: 8,
+                                              horizontal: 8,
+                                              vertical: 2,
                                             ),
                                             child: Container(
-                                              padding: const EdgeInsets.all(12),
+                                              padding: const EdgeInsets.all(4),
                                               decoration: BoxDecoration(
                                                 borderRadius:
                                                     BorderRadius.circular(8),
@@ -242,7 +243,7 @@ class _StudentPageState extends State<StudentPage> {
                                                           height: 4,
                                                         ),
                                                         Text(
-                                                          '创建时间: ${student.created}',
+                                                          '创建时间: ${'${student.created.year}-${student.created.month.toString().padLeft(2, '0')}-${student.created.day.toString().padLeft(2, '0')}'}',
                                                           style:
                                                               const TextStyle(
                                                                 fontSize: 12,
@@ -255,6 +256,23 @@ class _StudentPageState extends State<StudentPage> {
                                                   ),
                                                   Row(
                                                     children: [
+                                                      IconButton(
+                                                        icon: const Icon(
+                                                          Icons.visibility,
+                                                          color: Colors.grey,
+                                                        ),
+                                                        onPressed: () {
+                                                          // 查看功能
+                                                          showDialog(
+                                                            context: context,
+                                                            builder: (context) =>
+                                                                StudentViewDialog(
+                                                                  student:
+                                                                      student,
+                                                                ),
+                                                          );
+                                                        },
+                                                      ),
                                                       IconButton(
                                                         icon: const Icon(
                                                           Icons.edit,
@@ -271,6 +289,49 @@ class _StudentPageState extends State<StudentPage> {
                                                         ),
                                                         onPressed: () {
                                                           // 删除功能
+                                                          showDialog(
+                                                            context: context,
+                                                            builder: (context) => AlertDialog(
+                                                              title: const Text(
+                                                                '确认删除',
+                                                              ),
+                                                              content:
+                                                                  const Text(
+                                                                    '确定删除该学生吗？',
+                                                                  ),
+                                                              actions: [
+                                                                TextButton(
+                                                                  onPressed: () =>
+                                                                      Navigator.of(
+                                                                        context,
+                                                                      ).pop(),
+                                                                  child:
+                                                                      const Text(
+                                                                        '取消',
+                                                                      ),
+                                                                ),
+                                                                TextButton(
+                                                                  onPressed: () async {
+                                                                    await StudentDao(
+                                                                      DatabaseHelper(),
+                                                                    ).deleteStudentById(
+                                                                      student
+                                                                          .id,
+                                                                    );
+                                                                    Navigator.of(
+                                                                      context,
+                                                                    ).pop();
+                                                                    // 刷新学生列表
+                                                                    _refreshClassGroupData();
+                                                                  },
+                                                                  child:
+                                                                      const Text(
+                                                                        '删除',
+                                                                      ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          );
                                                         },
                                                       ),
                                                     ],
@@ -542,6 +603,4 @@ class _StudentPageState extends State<StudentPage> {
     // 加载完成
     _refreshController.loadComplete();
   }
-
-  void _toggleClassExpanded(int index) {}
 }

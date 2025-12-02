@@ -55,4 +55,9 @@ class StudentDao {
       whereArgs: [student.studentNumber],
     );
   }
+
+  Future<void> deleteStudentById(int? id) async {
+    final db = await dbHelper.database;
+    await db.delete(tableName, where: 'id=?', whereArgs: [id]);
+  }
 }
