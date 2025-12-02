@@ -14,14 +14,22 @@ class ClassGroupsProvider with ChangeNotifier {
   }
 
   void changeClassGroups(List<StudentClassGroup> newList) {
+    var isExpands = _classGroups.map((e) => e.isExpanded).toList();
     _classGroups.clear();
     _classGroups.addAll(newList);
+    for (int i = 0; i < _classGroups.length; i++) {
+      _classGroups[i].isExpanded = isExpands[i];
+    }
     notifyListeners();
   }
 
   void changeClassGroupsWithoutNotify(List<StudentClassGroup> newList) {
+    var isExpands = _classGroups.map((e) => e.isExpanded).toList();
     _classGroups.clear();
     _classGroups.addAll(newList);
+    for (int i = 0; i < _classGroups.length; i++) {
+      _classGroups[i].isExpanded = isExpands[i];
+    }
   }
 
   void changeFilterClassGroupsWithoutNotify(String filter) {
@@ -40,6 +48,12 @@ class ClassGroupsProvider with ChangeNotifier {
       //     .where((element) => element.studentClass.className.contains(filter))
       //     .toList(),
     );
+    notifyListeners();
+  }
+
+  void changeExpanded(int index) {
+    _filterClassGroups[index].isExpanded =
+        !_filterClassGroups[index].isExpanded;
     notifyListeners();
   }
 }

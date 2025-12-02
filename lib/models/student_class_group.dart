@@ -4,6 +4,7 @@ import 'student_model.dart';
 class StudentClassGroup {
   StudentClassModel studentClass;
   List<StudentModel> students;
+  bool isExpanded = false;
 
   StudentClassGroup({required this.studentClass, required this.students});
 
