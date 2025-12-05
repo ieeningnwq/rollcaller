@@ -1,6 +1,8 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import '../models/student_class_model.dart';
+import '../utils/student_class_dao.dart';
+import '../utils/student_dao.dart';
 
 class StudentClassProvider with ChangeNotifier {
   final Map<int,StudentClassModel> _studentClass = {};
@@ -78,15 +80,7 @@ class StudentClassProvider with ChangeNotifier {
 
   // student class数据发生改变
    void changeStudentClass(List<StudentClassModel> newList) {
-    // 清除所有信息重新设置
-    _clear();
-    for (var element in newList) {
-      _studentClass.putIfAbsent(
-        element.id!,
-        () => element,
-      );
-      _addIconColorQuantityInfo(element);
-    }
+    changeStudentClassWithoutNotify(newList);
     notifyListeners();
   }
 

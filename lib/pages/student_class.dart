@@ -26,8 +26,6 @@ class _StudentClassState extends State<StudentClassPage> {
   final TextEditingController teacherNameController = TextEditingController();
   final TextEditingController notesController = TextEditingController();
 
-
-
   final RefreshController _refreshController = RefreshController(
     initialRefresh: false,
   );
@@ -37,63 +35,99 @@ class _StudentClassState extends State<StudentClassPage> {
     return Consumer<StudentClassProvider>(
       builder: (context, studentClassProvider, child) {
         return Scaffold(
-          appBar: AppBar(title: const Text(KString.studentClassAppBarTitle)),
-          body: FutureBuilder(
-            future: _getStudentClassList(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  List<Map<String, dynamic>>? data = snapshot.data;
-                  log(data.toString());
-                  List<StudentClassModel> studentClassList = [];
-                  for (Map<String, dynamic> item in data!) {
-                    studentClassList.add(StudentClassModel.fromMap(item));
-                  }
-                  studentClassProvider.changeStudentClassWithoutNotify(
-                    studentClassList,
-                  );
-                  return SmartRefresher(
-                    // 启用下拉刷新
-                    enablePullDown: true,
-                    // 启用上拉加载
-                    enablePullUp: false,
-                    // 水滴效果头部
-                    header: WaterDropHeader(),
-                    // 经典底部加载
-                    footer: ClassicFooter(loadStyle: LoadStyle.ShowWhenLoading),
-                    controller: _refreshController,
-                    onRefresh: _onRefresh,
-                    onLoading: _onLoading,
-                    child: ListView.builder(
-                      scrollDirection: Axis.vertical,
-                      itemCount: snapshot.data?.length ?? 0,
-                      itemBuilder: (context, index) {
-                        return ClassItemCard(
-                          index: index,
-                          studentClassProvider: studentClassProvider, classNameController: classNameController, studentQuantityController: studentQuantityController, teacherNameController: teacherNameController, notesController: notesController,
-                        );
-                      },
-                    ),
-                  );
-                }
-              } else {
-                return Center(child: Text('没有数据...'));
-              }
-            },
+          // appBar: AppBar(title: const Text(KString.studentClassAppBarTitle)),
+          body: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+
+              children: [
+                // 顶部标题栏
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  child: Text(
+                    KString.studentClassAppBarTitle,
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Expanded(
+                  child: FutureBuilder(
+                    future: _getStudentClassList(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else {
+                          List<Map<String, dynamic>>? data = snapshot.data;
+                          log(data.toString());
+                          List<StudentClassModel> studentClassList = [];
+                          for (Map<String, dynamic> item in data!) {
+                            studentClassList.add(
+                              StudentClassModel.fromMap(item),
+                            );
+                          }
+                          studentClassProvider.changeStudentClassWithoutNotify(
+                            studentClassList,
+                          );
+                          return SmartRefresher(
+                            // 启用下拉刷新
+                            enablePullDown: true,
+                            // 启用上拉加载
+                            enablePullUp: false,
+                            // 水滴效果头部
+                            header: WaterDropHeader(),
+                            // 经典底部加载
+                            footer: ClassicFooter(
+                              loadStyle: LoadStyle.ShowWhenLoading,
+                            ),
+                            controller: _refreshController,
+                            onRefresh: _onRefresh,
+                            onLoading: _onLoading,
+                            child: ListView.builder(
+                              scrollDirection: Axis.vertical,
+                              itemCount: snapshot.data?.length ?? 0,
+                              itemBuilder: (context, index) {
+                                return ClassItemCard(
+                                  index: index,
+                                  studentClassProvider: studentClassProvider,
+                                  classNameController: classNameController,
+                                  studentQuantityController:
+                                      classNameController,
+                                  teacherNameController: classNameController,
+                                  notesController: classNameController,
+                                );
+                              },
+                            ),
+                          );
+                        }
+                      } else {
+                        return Center(child: Text('没有数据...'));
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
-                  return StudentClassAddEditDialog(studentClass: StudentClassModel(
-                    className: '',
-                    studentQuantity: 0,
-                    teacherName: '',
-                    notes: '', created: DateTime.now(),
-                  ), title: '添加班级', studentClassProvider: studentClassProvider, classNameController: classNameController, teacherNameController: teacherNameController, notesController: notesController, studentQuantityController: studentQuantityController,);
+                  return StudentClassAddEditDialog(
+                    studentClass: StudentClassModel(
+                      className: '',
+                      studentQuantity: 0,
+                      teacherName: '',
+                      notes: '',
+                      created: DateTime.now(),
+                    ),
+                    title: '添加班级',
+                    studentClassProvider: studentClassProvider,
+                    classNameController: classNameController,
+                    teacherNameController: teacherNameController,
+                    notesController: notesController,
+                    studentQuantityController: studentQuantityController,
+                  );
                 },
               );
             },
@@ -124,8 +158,6 @@ class _StudentClassState extends State<StudentClassPage> {
     return data;
   }
 
-
-  
   @override
   dispose() {
     super.dispose();

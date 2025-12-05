@@ -67,7 +67,6 @@ class StudentClassAddEditDialog extends StatelessWidget {
               await _saveOnPressed();
               if (context.mounted) {
                 Navigator.of(context).pop();
-                (context);
               }
             }
           },

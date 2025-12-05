@@ -26,8 +26,6 @@ class _StudentPageState extends State<StudentPage> {
   final TextEditingController studentNumberController = TextEditingController();
   final TextEditingController studentNameController = TextEditingController();
 
-  final GlobalKey _formKey = GlobalKey<FormState>();
-  bool _isStudentNumberUnique = true;
 
   final RefreshController _refreshController = RefreshController(
     initialRefresh: false,
