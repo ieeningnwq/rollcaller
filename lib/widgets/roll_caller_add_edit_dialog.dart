@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
 import '../models/roll_caller_model.dart';
@@ -49,9 +50,24 @@ class RollCallerAddEditDialog extends StatelessWidget {
         ),
         TextButton(
           onPressed: () {
-            _saveRollCaller(context);
+            if (Provider.of<RollCallerSelectedClassIdProvider>(
+                  context,
+                  listen: false,
+                ).selectedClassId ==
+                -1) {
+              Fluttertoast.showToast(
+                msg: '暂无班级，无法添加点名器，请先添加班级',
+                toastLength: Toast.LENGTH_SHORT,
+                gravity: ToastGravity.BOTTOM,
+                timeInSecForIosWeb: 1,
+                backgroundColor: Colors.grey,
+                textColor: Colors.white,
+                fontSize: 16.0,
+              );
+              return;
             }
-        ,
+            _saveRollCaller(context);
+          },
           child: const Text('保存'),
         ),
       ],
@@ -71,7 +87,8 @@ class RollCallerAddEditDialog extends StatelessWidget {
         rollCallerDao.isRollCallerNameExist(value).then((value) {
           if (value) {
             if (!isAdd &&
-                rollCaller.randomCallerName != randomCallerNameController.text) {
+                rollCaller.randomCallerName !=
+                    randomCallerNameController.text) {
               isRollCallerNameUnique = true;
             } else {
               isRollCallerNameUnique = false;
@@ -104,66 +121,76 @@ class RollCallerAddEditDialog extends StatelessWidget {
     StudentClassDao studentClassDao = StudentClassDao();
     return await studentClassDao.getAllStudentClasses();
   }
-  
+
   Consumer<RollCallerSelectedClassIdProvider> _buildClassIdField() {
     return Consumer<RollCallerSelectedClassIdProvider>(
-              builder: (context, rollCallerSelectedClassProvider, child) {
-                return FutureBuilder(
-              future: _getClasses(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else {
-                    if (snapshot.data!.isEmpty) {
-                      return const Text('暂无班级，无法添加点名器，请先添加班级');
-                    }
-                    if (rollCallerSelectedClassProvider.selectedClassId == -1) {
-                      rollCallerSelectedClassProvider.selectedClassIdWithoutNotify(snapshot.data![0]['id']!);
-                    }
-                    return RadioGroup<int>(
-                      groupValue: rollCallerSelectedClassProvider.selectedClassId,
-                      onChanged: (value) {
-                        rollCallerSelectedClassProvider.updateSelectedClassId(value!);
-                      },
-                      child: Column(
-                        children: snapshot.data!
-                            .map(
-                              (e) => RadioListTile<int>(
-                                value: e['id']!,
-                                title: Text(e['class_name']!),
-                              ),
-                            )
-                            .toList(),
-                      ),
-                    );
-                  }
-                } else {
-                  return CircularProgressIndicator();
+      builder: (context, rollCallerSelectedClassProvider, child) {
+        return FutureBuilder(
+          future: _getClasses(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                if (snapshot.data!.isEmpty) {
+                  rollCallerSelectedClassProvider.selectedClassIdWithoutNotify(
+                    -1,
+                  );
+                  return const Text('暂无班级，无法添加点名器，请先添加班级');
                 }
-              },
-            );
+                if (rollCallerSelectedClassProvider.selectedClassId == -1) {
+                  rollCallerSelectedClassProvider.selectedClassIdWithoutNotify(
+                    snapshot.data![0]['id']!,
+                  );
+                }
+                return RadioGroup<int>(
+                  groupValue: rollCallerSelectedClassProvider.selectedClassId,
+                  onChanged: (value) {
+                    rollCallerSelectedClassProvider.updateSelectedClassId(
+                      value!,
+                    );
+                  },
+                  child: Column(
+                    children: snapshot.data!
+                        .map(
+                          (e) => RadioListTile<int>(
+                            value: e['id']!,
+                            title: Text(e['class_name']!),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                );
+              }
+            } else {
+              return CircularProgressIndicator();
+            }
           },
-            );
+        );
+      },
+    );
   }
-  
+
   void _saveRollCaller(BuildContext context) {
     if ((_formKey.currentState as FormState).validate()) {
       rollCaller.randomCallerName = randomCallerNameController.text;
-      rollCaller.classId = Provider.of<RollCallerSelectedClassIdProvider>(context, listen: false).selectedClassId!;
+      rollCaller.classId = Provider.of<RollCallerSelectedClassIdProvider>(
+        context,
+        listen: false,
+      ).selectedClassId!;
       rollCaller.notes = notesController.text;
       if (isAdd) {
         rollCaller.created = DateTime.now();
-        var rollCallerDao=RollCallerDao();
+        var rollCallerDao = RollCallerDao();
         rollCallerDao.insertRollCaller(rollCaller).then((value) {
           if (value != 0) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('添加成功')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('添加成功')));
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('添加失败')),
-            );
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('添加失败')));
           }
         });
       } else {
