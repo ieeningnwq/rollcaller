@@ -91,9 +91,9 @@ class _StudentClassState extends State<StudentClassPage> {
                                   studentClassProvider: studentClassProvider,
                                   classNameController: classNameController,
                                   studentQuantityController:
-                                      classNameController,
-                                  teacherNameController: classNameController,
-                                  notesController: classNameController,
+                                      studentQuantityController,
+                                  teacherNameController: teacherNameController,
+                                  notesController: notesController,
                                 );
                               },
                             ),

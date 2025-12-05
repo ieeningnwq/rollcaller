@@ -1,8 +1,6 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import '../models/student_class_model.dart';
-import '../utils/student_class_dao.dart';
-import '../utils/student_dao.dart';
 
 class StudentClassProvider with ChangeNotifier {
   final Map<int,StudentClassModel> _studentClass = {};

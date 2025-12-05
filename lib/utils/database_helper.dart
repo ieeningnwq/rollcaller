@@ -46,5 +46,23 @@ class DatabaseHelper {
         created TEXT NOT NULL
       )
     ''');
+    await db.execute('''
+      CREATE TABLE ${KString.randomCallerTableName} (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        random_caller_name TEXT NOT NULL,
+        class_id INTEGER NOT NULL,
+        notes TEXT,
+        created TEXT NOT NULL
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE ${KString.randomCallerRecordTableName} (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        random_caller_id INTEGER NOT NULL,
+        student_id INTEGER NOT NULL,
+        score INTEGER NOT NULL,
+        created TEXT NOT NULL
+      )
+    ''');
   }
 }

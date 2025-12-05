@@ -11,5 +11,6 @@ class KString {
   static const String databaseName = 'rollcall.db';
   static const String studentClassTableName = 'student_class';
   static const String studentTableName = 'student';
-  static const String rollCallTableName = 'roll_call';
+  static const String randomCallerTableName = 'random_caller';
+  static const String randomCallerRecordTableName = 'random_caller_record';
 }
