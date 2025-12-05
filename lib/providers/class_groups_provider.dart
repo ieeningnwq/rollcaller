@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 
 import '../models/student_class_group.dart';
@@ -35,8 +33,7 @@ class ClassGroupsProvider with ChangeNotifier {
     _classGroups.clear();
     for (var group in newList) {
       if (tClassGroups.containsKey(group.studentClass.id)) {
-        group.isExpanded =
-            tClassGroups[group.studentClass.id!]!.isExpanded;
+        group.isExpanded = tClassGroups[group.studentClass.id!]!.isExpanded;
       }
       _classGroups.putIfAbsent(group.studentClass.id!, () => group);
     }
@@ -54,14 +51,14 @@ class ClassGroupsProvider with ChangeNotifier {
           students.add(student);
         }
       }
-        StudentClassGroup newGroup = StudentClassGroup(
-          studentClass: group.studentClass,
-          students: students,
-          isExpanded: group.isExpanded,
-        );
-        _filterClassGroups.putIfAbsent(classId, () => newGroup);
-      }
+      StudentClassGroup newGroup = StudentClassGroup(
+        studentClass: group.studentClass,
+        students: students,
+        isExpanded: group.isExpanded,
+      );
+      _filterClassGroups.putIfAbsent(classId, () => newGroup);
     }
+  }
 
   void changeFilterClassGroups(String filter) {
     _filterClassGroups.clear();
@@ -90,6 +87,47 @@ class ClassGroupsProvider with ChangeNotifier {
     var aList = _filterClassGroups.values.toList();
     _classGroups[aList[index].studentClass.id!]!.isExpanded =
         !aList[index].isExpanded;
+    notifyListeners();
+  }
+
+  void addStudent(StudentModel student) {
+    addStudentWithoutNotify(student);
+    notifyListeners();
+  }
+
+  void addStudentWithoutNotify(StudentModel student) {
+    for (var element in _classGroups.values) {
+      if (',${student.className},'.contains(
+        ',${element.studentClass.className},',
+      )) {
+        element.students.add(student);
+      }
+    }
+  }
+
+  void removeStudentWithoutNotify(StudentModel student) {
+    for (var element in _classGroups.values) {
+      if (',${student.className},'.contains(
+        ',${element.studentClass.className},',
+      )) {
+        for (int i = 0; i < element.students.length; i++) {
+          if (element.students[i].id == student.id) {
+            element.students.removeAt(i);
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  void removeStudent(StudentModel student) {
+    removeStudentWithoutNotify(student);
+    notifyListeners();
+  }
+
+  void updateStudent(StudentModel student, StudentModel oldStudent) {
+    removeStudentWithoutNotify(oldStudent);
+    addStudentWithoutNotify(student);
     notifyListeners();
   }
 }

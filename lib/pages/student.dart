@@ -12,6 +12,8 @@ import '../models/student_model.dart';
 import '../providers/class_selected_provider.dart';
 import '../utils/student_class_dao.dart';
 import '../utils/student_dao.dart';
+import '../widgets/student_add_edit_dialog.dart';
+import '../widgets/student_class_add_edit_dialog.dart';
 import '../widgets/student_view_dialog.dart';
 
 class StudentPage extends StatefulWidget {
@@ -62,7 +64,7 @@ class _StudentPageState extends State<StudentPage> {
             ),
             // 搜索栏
             _searchWidget(),
-            // 学生列表
+            // 班级列表
             Expanded(
               child: Consumer<ClassGroupsProvider>(
                 builder: (context, classGroupsProvider, child) {
@@ -84,7 +86,7 @@ class _StudentPageState extends State<StudentPage> {
                             // 启用下拉刷新
                             enablePullDown: true,
                             // 启用上拉加载
-                            enablePullUp: true,
+                            enablePullUp: false,
                             // 水滴效果头部
                             header: WaterDropHeader(),
                             // 经典底部加载
@@ -308,10 +310,15 @@ class _StudentPageState extends State<StudentPage> {
                                                                   BuildContext
                                                                   context,
                                                                 ) {
-                                                                  return _studentDialog(
-                                                                    student,
+                                                                  return StudentAddEditDialog(
+                                                                    student:
+                                                                        student,
                                                                     title:
                                                                         '编辑学生',
+                                                                    studentNameController:
+                                                                        studentNameController,
+                                                                    studentNumberController:
+                                                                        studentNumberController,
                                                                   );
                                                                 },
                                                           );
@@ -414,14 +421,16 @@ class _StudentPageState extends State<StudentPage> {
           ),
           showDialog(
             context: context,
-            builder: (context) => _studentDialog(
-              StudentModel(
+            builder: (context) => StudentAddEditDialog(
+              student: StudentModel(
                 studentName: '',
                 studentNumber: '',
                 className: '',
                 created: DateTime.now(),
               ),
-              title: '创建学生',
+              title: '添加学生',
+              studentNameController: studentNameController,
+              studentNumberController: studentNumberController,
             ),
           ),
         },
@@ -617,18 +626,20 @@ class _StudentPageState extends State<StudentPage> {
     }
     // 查询有的学生没有班级
     var allStudents = await studentDao.getAllStudentsWithoutClassName();
-    var studentClass=StudentClassModel(
-          className: '无班级学生',
-          studentQuantity: allStudents.length,
-          teacherName: '',
-          notes: '',
-          classQuantity: allStudents.length, created: DateTime.now(),);
-    studentClass.id=-1;
+    var studentClass = StudentClassModel(
+      className: '无班级学生',
+      studentQuantity: allStudents.length,
+      teacherName: '',
+      notes: '',
+      classQuantity: allStudents.length,
+      created: DateTime.now(),
+    );
+    studentClass.id = -1;
     StudentClassGroup classGroup = StudentClassGroup(
-        studentClass: studentClass,
-        students: allStudents.map((e) => StudentModel.fromMap(e)).toList(),
-      );
-      classGroups.add(classGroup);
+      studentClass: studentClass,
+      students: allStudents.map((e) => StudentModel.fromMap(e)).toList(),
+    );
+    classGroups.add(classGroup);
     return classGroups;
   }
 
@@ -664,27 +675,22 @@ class _StudentPageState extends State<StudentPage> {
     // 加载完成
     _refreshController.loadComplete();
   }
-  
-  Padding _searchWidget() =>Padding(
-              padding: const EdgeInsets.all(8),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search),
-                  hintText: '搜索学号或姓名...',
-                  hintStyle: TextStyle(fontSize: 14),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 4,
-                  ),
-                  filled: true,
-                ),
-              ),
-            );
+
+  Padding _searchWidget() => Padding(
+    padding: const EdgeInsets.all(8),
+    child: TextField(
+      controller: _searchController,
+      decoration: InputDecoration(
+        prefixIcon: const Icon(Icons.search),
+        hintText: '搜索学号或姓名...',
+        hintStyle: TextStyle(fontSize: 14),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+        filled: true,
+      ),
+    ),
+  );
 }
