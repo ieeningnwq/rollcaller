@@ -5,15 +5,17 @@ import '../models/student_class_model.dart';
 import './database_helper.dart';
 
 class StudentClassDao {
-  final DatabaseHelper dbHelper; // 使用单例数据库帮助类实例
+  static final StudentClassDao _instance = StudentClassDao._internal();
+  final DatabaseHelper dbHelper = DatabaseHelper(); // 使用单例数据库帮助类实例
   final String tableName = KString.studentClassTableName;
 
-  StudentClassDao(this.dbHelper);
+  StudentClassDao._internal();
+
+  factory StudentClassDao() => _instance;
 
   Future<int> insertStudentClass(StudentClassModel studentClass) async {
     final db = await dbHelper.database;
-    var mapData = studentClass.toMap();
-    mapData.remove('class_quantity');
+    var mapData = _processMap(studentClass);
     return await db.insert(
       tableName,
       mapData,
@@ -57,8 +59,7 @@ class StudentClassDao {
   Future<void> updateStudentClassByClassName(
     StudentClassModel studentClassModel,
   ) async {
-    var mapData = studentClassModel.toMap();
-    mapData.remove('class_quantity');
+    var mapData = _processMap(studentClassModel);
     final db = await dbHelper.database;
     await db.update(
       tableName,
@@ -71,5 +72,22 @@ class StudentClassDao {
   Future<void> deleteStudentClassByClassName(String className) async {
     final db = await dbHelper.database;
     await db.delete(tableName, where: 'class_name=?', whereArgs: [className]);
+  }
+
+   Future<int> updateStudentClassById(StudentClassModel studentClassModel) async {
+    Map<String, dynamic> mapData = _processMap(studentClassModel);
+    final db = await dbHelper.database;
+    return await db.update(
+      tableName,
+      mapData,
+      where: 'id=?',
+      whereArgs: [studentClassModel.id],
+    );
+  }
+
+  Map<String, dynamic> _processMap(StudentClassModel studentClassModel) {
+    var mapData = studentClassModel.toMap();
+    mapData.remove('class_quantity');
+    return mapData;
   }
 }

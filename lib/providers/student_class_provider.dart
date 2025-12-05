@@ -1,92 +1,156 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
-
 import '../models/student_class_model.dart';
 
 class StudentClassProvider with ChangeNotifier {
-  final List<StudentClassModel> _studentClassList = [];
+  final Map<String,StudentClassModel> _studentClass = {};
 
-  final List<Icon> _icon = [];
-  final List<Color> _color = [];
-  final List<Color> _deprecationColor = [];
-  final List<String> _string = [];
+  final Map<String,Icon> _icon = {};
+  final Map<String,Color> _color = {};
+  final Map<String,Color> _deprecationColor = {};
+  final Map<String,String> _quantityInfo = {};
 
-  List<Icon> get icon => _icon;
-  List<Color> get color => _color;
-  List<String> get string => _string;
-  List<Color> get deprecationColor => _deprecationColor;
+  List<Icon> get icon => _icon.values.toList();
+  List<Color> get color => _color.values.toList();
+  List<String> get quantityInfo => _quantityInfo.values.toList();
+  List<Color> get deprecationColor => _deprecationColor.values.toList();
 
   // 获取student class列表
-  List<StudentClassModel> get studentClassesList => _studentClassList;
+  List<StudentClassModel> get studentClassesList => _studentClass.values.toList();
 
-  // student class数据发生改变
-  void changeStudentClassWithoutNotify(List<StudentClassModel> newList) {
-    _studentClassList.clear();
+  // 清除所有信息重新设置
+  void _clear() {
+    _studentClass.clear();
     _icon.clear();
     _color.clear();
-    _string.clear();
+    _quantityInfo.clear();
+    _deprecationColor.clear();
+  }
+  // student class数据发生改变
+  Future<void> changeStudentClassWithoutNotify(List<StudentClassModel> newList) async {
+    // 清除所有信息重新设置
+    _clear();
     for (var element in newList) {
-      _icon.add(
-        element.classQuantity == element.studentQuantity
-            ? Icon(Icons.check_circle, size: 16, color: Colors.green)
-            : element.classQuantity < element.studentQuantity
-            ? Icon(Icons.warning_amber, size: 16, color: Colors.yellow)
-            : Icon(Icons.error, size: 16, color: Colors.red),
+      _studentClass.putIfAbsent(
+        element.className,
+        () => element,
       );
-      _color.add(
-        element.classQuantity == element.studentQuantity
-            ? Colors.green
-            : element.classQuantity < element.studentQuantity
-            ? Colors.yellow
-            : Colors.red,
-      );
-      _deprecationColor.add(
-        element.classQuantity == element.studentQuantity
-            ? Colors.green.shade100
-            : element.classQuantity < element.studentQuantity
-            ? Colors.yellow.shade100
-            : Colors.red.shade100,
-      );
-      _string.add(
-        element.classQuantity == element.studentQuantity
-            ? '人数已满'
-            : element.classQuantity < element.studentQuantity
-            ? '人数未满'
-            : '人数超员',
-      );
+      _addIconColorQuantityInfo(element);
     }
-    _studentClassList.addAll(newList);
+    log(_studentClass.toString());
+  }
+
+   void _addIconColorQuantityInfo(StudentClassModel element) {
+    int classQuantity = element.classQuantity;
+    _icon.putIfAbsent(
+      element.className,
+      () => classQuantity == element.studentQuantity
+          ? Icon(Icons.check_circle, size: 16, color: Colors.green)
+          : classQuantity < element.studentQuantity
+          ? Icon(Icons.warning_amber, size: 16, color: Colors.yellow)
+          : Icon(Icons.error, size: 16, color: Colors.red),
+    );
+    _color.putIfAbsent(
+      element.className,
+      () => classQuantity == element.studentQuantity
+          ? Colors.green
+          : classQuantity < element.studentQuantity
+          ? Colors.yellow
+          : Colors.red,
+    );
+    _deprecationColor.putIfAbsent(
+      element.className,
+      () => classQuantity == element.studentQuantity
+          ? Colors.green.shade100
+          : classQuantity < element.studentQuantity
+          ? Colors.yellow.shade100
+          : Colors.red.shade100,
+    );
+    _quantityInfo.putIfAbsent(
+      element.className,
+      () => classQuantity == element.studentQuantity
+          ? '人数已满'
+          : classQuantity < element.studentQuantity
+          ? '人数未满'
+          : '人数超员',
+    );
   }
 
   // student class数据发生改变
-  void changeStudentClass(List<StudentClassModel> newList) {
-    _studentClassList.clear();
-    _icon.clear();
-    _color.clear();
-    _string.clear();
+   void changeStudentClass(List<StudentClassModel> newList) {
+    // 清除所有信息重新设置
+    _clear();
     for (var element in newList) {
-      _icon.add(
-        element.classQuantity == element.studentQuantity
-            ? Icon(Icons.check_circle, color: Colors.green)
-            : element.classQuantity > element.studentQuantity
-            ? Icon(Icons.warning_amber, color: Colors.yellow)
-            : Icon(Icons.error, color: Colors.red),
+      _studentClass.putIfAbsent(
+        element.className,
+        () => element,
       );
-      _color.add(
-        element.classQuantity == element.studentQuantity
-            ? Colors.green
-            : element.classQuantity > element.studentQuantity
-            ? Colors.yellow
-            : Colors.red,
-      );
-      _string.add(
-        element.classQuantity == element.studentQuantity
-            ? '人数已满'
-            : element.classQuantity > element.studentQuantity
-            ? '人数未满'
-            : '人数超员',
-      );
+      _addIconColorQuantityInfo(element);
     }
-    _studentClassList.addAll(newList);
+    notifyListeners();
+  }
+
+  void addStudentClass(StudentClassModel studentClass) {
+    _studentClass.putIfAbsent(
+      studentClass.className,
+      () => studentClass,
+    );
+    _addIconColorQuantityInfo(studentClass);
+    notifyListeners();
+  }
+
+  Future<void> updateStudentClass(StudentClassModel studentClass) async {
+    _studentClass.update(
+      studentClass.className,
+      (value) => studentClass,
+    );
+    _updateIconColorQuantityInfo(studentClass);
+    notifyListeners();
+  }
+  
+  Future<void> _updateIconColorQuantityInfo(StudentClassModel studentClass) async {
+    int classQuantity = studentClass.classQuantity;
+
+    _icon.update(
+      studentClass.className,
+      (value) => classQuantity == studentClass.studentQuantity
+          ? Icon(Icons.check_circle, size: 16, color: Colors.green)
+          : classQuantity < studentClass.studentQuantity
+          ? Icon(Icons.warning_amber, size: 16, color: Colors.yellow)
+          : Icon(Icons.error, size: 16, color: Colors.red),
+    );
+    _color.update(
+      studentClass.className,
+      (value) => classQuantity == studentClass.studentQuantity
+          ? Colors.green
+          : classQuantity < studentClass.studentQuantity
+          ? Colors.yellow
+          : Colors.red,
+    );
+    _deprecationColor.update(
+      studentClass.className,
+      (value) => classQuantity == studentClass.studentQuantity
+          ? Colors.green.shade100
+          : classQuantity < studentClass.studentQuantity
+          ? Colors.yellow.shade100
+          : Colors.red.shade100,
+    );
+    _quantityInfo.update(
+      studentClass.className,
+      (value) => classQuantity == studentClass.studentQuantity
+          ? '人数已满'
+          : classQuantity < studentClass.studentQuantity
+          ? '人数未满'
+          : '人数超员',
+    );
+  }
+
+  void removeStudentClass(String className) {
+    _studentClass.remove(className);
+    _icon.remove(className);
+    _color.remove(className);
+    _quantityInfo.remove(className);
+    _deprecationColor.remove(className);
     notifyListeners();
   }
 }

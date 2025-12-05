@@ -1,11 +1,11 @@
 class StudentClassModel {
   int? id;
   String className;
-  int studentQuantity; // 学生人数,班级应该有的人数
+  int studentQuantity; // 学生人数，班级应该有的人数
   String teacherName;
   String notes;
   DateTime created;
-  int classQuantity = 0; // 班级实际人数
+  int classQuantity=0; // 班级人数
 
   StudentClassModel({
     required this.className,
@@ -13,7 +13,7 @@ class StudentClassModel {
     required this.teacherName,
     required this.notes,
     required this.created,
-    required this.classQuantity,
+    this.classQuantity=0,
   });
 
   factory StudentClassModel.fromMap(Map<String, dynamic> mapData) {
@@ -47,7 +47,7 @@ class StudentClassModel {
     return data;
   }
 
-  @override
+@override
   toString() {
     return 'StudentClassModel(id: $id, className: $className, studentQuantity: $studentQuantity, teacherName: $teacherName, notes: $notes, created: $created, classQuantity: $classQuantity)';
   }

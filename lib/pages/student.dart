@@ -279,6 +279,49 @@ class _StudentPageState extends State<StudentPage> {
                                                           color: Colors.grey,
                                                         ),
                                                         onPressed: () {
+                                                          final classOptions =
+                                                              Provider.of<
+                                                                    StudentClassProvider
+                                                                  >(
+                                                                    context,
+                                                                    listen:
+                                                                        false,
+                                                                  )
+                                                                  .studentClassesList
+                                                                  .map(
+                                                                    (e) => e
+                                                                        .className,
+                                                                  )
+                                                                  .toList();
+                                                          final selectedClasses =
+                                                              List<bool>.filled(
+                                                                classOptions
+                                                                    .length,
+                                                                false,
+                                                              );
+                                                          for (
+                                                            int i = 0;
+                                                            i <
+                                                                classOptions
+                                                                    .length;
+                                                            i++
+                                                          ) {
+                                                            selectedClasses[i] =
+                                                                ',${student.className},'
+                                                                    .contains(
+                                                                      ',${classOptions[i]},',
+                                                                    );
+                                                          }
+                                                          Provider.of<
+                                                                StudentClassSelectedProvider
+                                                              >(
+                                                                context,
+                                                                listen: false,
+                                                              )
+                                                              .changeSelectedClassesWithoutNotify(
+                                                                selectedClasses,
+                                                              );
+
                                                           // 编辑功能
                                                           showDialog(
                                                             context: context,
@@ -288,16 +331,9 @@ class _StudentPageState extends State<StudentPage> {
                                                                   context,
                                                                 ) {
                                                                   return _studentDialog(
-                                                                    '编辑学生',
-                                                                    studentNumber:
-                                                                        student
-                                                                            .studentNumber,
-                                                                    studentName:
-                                                                        student
-                                                                            .studentName,
-                                                                    className:
-                                                                        student
-                                                                            .className,
+                                                                    student,
+                                                                    title:
+                                                                        '编辑学生',
                                                                   );
                                                                 },
                                                           );
@@ -333,15 +369,17 @@ class _StudentPageState extends State<StudentPage> {
                                                                 ),
                                                                 TextButton(
                                                                   onPressed: () async {
-                                                                    await StudentDao(
-                                                                      DatabaseHelper(),
-                                                                    ).deleteStudentById(
-                                                                      student
-                                                                          .id,
-                                                                    );
-                                                                    Navigator.of(
-                                                                      context,
-                                                                    ).pop();
+                                                                    await StudentDao()
+                                                                        .deleteStudentById(
+                                                                          student
+                                                                              .id,
+                                                                        );
+                                                                    if (context
+                                                                        .mounted) {
+                                                                      Navigator.of(
+                                                                        context,
+                                                                      ).pop();
+                                                                    }
                                                                     // 刷新学生列表
                                                                     _refreshClassGroupData();
                                                                   },
@@ -383,9 +421,30 @@ class _StudentPageState extends State<StudentPage> {
       // 浮动添加按钮
       floatingActionButton: FloatingActionButton(
         onPressed: () => {
+          // 初始化添加学生班级选择列表值
+          Provider.of<StudentClassSelectedProvider>(
+            context,
+            listen: false,
+          ).changeSelectedClassesWithoutNotify(
+            List<bool>.filled(
+              Provider.of<StudentClassProvider>(
+                context,
+                listen: false,
+              ).studentClassesList.length,
+              false,
+            ),
+          ),
           showDialog(
             context: context,
-            builder: (context) => _studentDialog('创建学生'),
+            builder: (context) => _studentDialog(
+              StudentModel(
+                studentName: '',
+                studentNumber: '',
+                className: '',
+                created: DateTime.now(),
+              ),
+              title: '创建学生',
+            ),
           ),
         },
         child: const Icon(Icons.add),
@@ -393,26 +452,11 @@ class _StudentPageState extends State<StudentPage> {
     );
   }
 
-  AlertDialog _studentDialog(
-    String title, {
-    String studentName = '',
-    String studentNumber = '',
-    String className = '',
-  }) {
+  AlertDialog _studentDialog(StudentModel student, {required String title}) {
     // 判断是新增还是修改
     bool isAdd = title == '创建学生';
-    studentNameController.text = studentName;
-    studentNumberController.text = studentNumber;
-
-    Provider.of<StudentClassSelectedProvider>(
-      context,
-      listen: false,
-    ).changeSelectedClassesWithoutNotify(
-      List<bool>.filled(
-        Provider.of<StudentClassProvider>(context).studentClassesList.length,
-        false,
-      ),
-    );
+    studentNameController.text = student.studentName;
+    studentNumberController.text = student.studentNumber;
 
     final List<String> classOptions = Provider.of<StudentClassProvider>(
       context,
@@ -437,10 +481,7 @@ class _StudentPageState extends State<StudentPage> {
                 autovalidateMode: AutovalidateMode.onUnfocus,
                 onChanged: (value) {
                   WidgetsFlutterBinding.ensureInitialized(); // 确保初始化Flutter绑定。对于插件很重要。
-                  var dbHelper = DatabaseHelper(); // 创建DatabaseHelper实例。
-                  var studentDao = StudentDao(
-                    dbHelper,
-                  ); // 创建StudentstudentDao实例。
+                  var studentDao = StudentDao(); // 创建StudentstudentDao实例。
                   studentDao
                       .isStudentNumberExist(value)
                       .then(
@@ -449,7 +490,7 @@ class _StudentPageState extends State<StudentPage> {
                             {
                               if (!isAdd &&
                                   (studentNumberController.text ==
-                                      studentNumber))
+                                      student.studentNumber))
                                 _isStudentNumberUnique = true
                               else
                                 _isStudentNumberUnique = false,
@@ -489,17 +530,6 @@ class _StudentPageState extends State<StudentPage> {
               const Text('所在班级', style: TextStyle(fontSize: 16)),
               Consumer<StudentClassSelectedProvider>(
                 builder: (context, selectedClassProvider, child) {
-                  // ! 更新 selectedClassProvider 中的 selectedClasses 列表
-                  // * 1、拿到所有班级，使用 classOptions 中的班级
-                  // * 2、拿到学生班级，使用参数 className
-                  // * 3、判断更新
-                  for (int i = 0; i < classOptions.length; i++) {
-                    selectedClassProvider.setSelectedClassesWithoutNotify(
-                      i,
-                      ',$className,'.contains(',${classOptions[i]},'),
-                    );
-                  }
-
                   return Column(
                     children: List.generate(classOptions.length, (index) {
                       return CheckboxListTile(
@@ -511,7 +541,8 @@ class _StudentPageState extends State<StudentPage> {
                             value,
                           );
                           // 更新 className
-                          className = selectedClassProvider.selectedClasses
+                          student.className = selectedClassProvider
+                              .selectedClasses
                               .asMap()
                               .entries
                               .where((entry) => entry.value)
@@ -546,8 +577,7 @@ class _StudentPageState extends State<StudentPage> {
           onPressed: () async {
             if ((_formKey.currentState as FormState).validate()) {
               WidgetsFlutterBinding.ensureInitialized(); // 确保初始化Flutter绑定。对于插件很重要。
-              var dbHelper = DatabaseHelper(); // 创建DatabaseHelper实例。
-              var studentDao = StudentDao(dbHelper); // 创建StudentstudentDao实例。
+              var studentDao = StudentDao(); // 创建StudentstudentDao实例。
               String selectedClassListStr =
                   Provider.of<StudentClassSelectedProvider>(
                         context,
@@ -559,20 +589,18 @@ class _StudentPageState extends State<StudentPage> {
                       .map((entry) => classOptions[entry.key])
                       .toList()
                       .join(',');
-              var student = StudentModel.fromMap({
-                'class_name': selectedClassListStr,
-                'student_number': studentNumberController.text,
-                'student_name': studentNameController.text,
-              });
+              // 更新学生信息
+              student.studentNumber = studentNumberController.text;
+              student.studentName = studentNameController.text;
+              student.className = selectedClassListStr;
               // 判断是新增还是修改
               if (isAdd) {
                 // 新增学生
+                student.created = DateTime.now();
                 await studentDao.insertStudent(student);
               } else {
                 // 修改学生
-                await studentDao.updateStudentClassByClassName(
-                  student,
-                ); // 插入或者更新用户数据。
+                await studentDao.updateStudentClassById(student); // 插入或者更新用户数据。
               }
               log('${isAdd ? '新增' : '修改'}学生: $student');
               _refreshClassGroupData();
@@ -588,13 +616,12 @@ class _StudentPageState extends State<StudentPage> {
 
   Future<List<StudentClassGroup>> _getAllStudentsByClassNames() async {
     WidgetsFlutterBinding.ensureInitialized(); // 确保初始化Flutter绑定。对于插件很重要。
-    var dbHelper = DatabaseHelper(); // 创建DatabaseHelper实例。
-    var studentDao = StudentDao(dbHelper); // 创建StudentDao实例。
+    var studentDao = StudentDao(); // 创建StudentDao实例。
     List<StudentClassGroup> classGroups = [];
     final List<StudentClassModel> studentClasses = [];
     // 获取所有班级数据
     WidgetsFlutterBinding.ensureInitialized(); // 确保初始化Flutter绑定。对于插件很重要。
-    var classDao = StudentClassDao(dbHelper); // 创建StudentClassDao实例。
+    var classDao = StudentClassDao(); // 创建StudentClassDao实例。
     await classDao.getAllStudentClasses().then(
       (value) => studentClasses.addAll(
         value.map((e) => StudentClassModel.fromMap(e)).toList(),
@@ -611,7 +638,6 @@ class _StudentPageState extends State<StudentPage> {
         students: students.map((e) => StudentModel.fromMap(e)).toList(),
       );
       classGroups.add(classGroup);
-      log(classGroup.toString());
     }
     return classGroups;
   }

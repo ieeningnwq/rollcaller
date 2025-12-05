@@ -5,17 +5,20 @@ import '../models/student_model.dart';
 import './database_helper.dart';
 
 class StudentDao {
-  final DatabaseHelper dbHelper; // 使用单例数据库帮助类实例
+  static final StudentDao _instance = StudentDao._internal();
+  final DatabaseHelper dbHelper = DatabaseHelper(); // 使用单例数据库帮助类实例
   final String tableName = KString.studentTableName;
 
-  StudentDao(this.dbHelper);
+  StudentDao._internal();
+
+  factory StudentDao() => _instance;
 
   Future<int> insertStudent(StudentModel student) async {
     final db = await dbHelper.database;
     return await db.insert(
       tableName,
       student.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
+      conflictAlgorithm: ConflictAlgorithm.ignore,
     );
   }
 
@@ -46,18 +49,18 @@ class StudentDao {
     return response.isNotEmpty;
   }
 
-  Future<void> updateStudentClassByClassName(StudentModel student) async {
+  Future<void> deleteStudentById(int? id) async {
+    final db = await dbHelper.database;
+    await db.delete(tableName, where: 'id=?', whereArgs: [id]);
+  }
+
+  Future<void> updateStudentClassById(StudentModel student) async {
     final db = await dbHelper.database;
     await db.update(
       tableName,
       student.toMap(),
-      where: 'student_number=?',
-      whereArgs: [student.studentNumber],
+      where: 'id=?',
+      whereArgs: [student.id],
     );
-  }
-
-  Future<void> deleteStudentById(int? id) async {
-    final db = await dbHelper.database;
-    await db.delete(tableName, where: 'id=?', whereArgs: [id]);
   }
 }
