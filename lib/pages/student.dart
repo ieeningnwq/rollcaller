@@ -10,7 +10,6 @@ import 'package:rollcall/providers/student_class_provider.dart';
 import '../models/student_class_group.dart';
 import '../models/student_model.dart';
 import '../providers/class_selected_provider.dart';
-import '../utils/database_helper.dart';
 import '../utils/student_class_dao.dart';
 import '../utils/student_dao.dart';
 import '../widgets/student_view_dialog.dart';
