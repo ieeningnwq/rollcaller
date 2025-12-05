@@ -54,7 +54,6 @@ class ClassGroupsProvider with ChangeNotifier {
           students.add(student);
         }
       }
-      if (students.isNotEmpty) {
         StudentClassGroup newGroup = StudentClassGroup(
           studentClass: group.studentClass,
           students: students,
@@ -63,8 +62,6 @@ class ClassGroupsProvider with ChangeNotifier {
         _filterClassGroups.putIfAbsent(classId, () => newGroup);
       }
     }
-    log(filterClassGroups.toString());
-  }
 
   void changeFilterClassGroups(String filter) {
     _filterClassGroups.clear();

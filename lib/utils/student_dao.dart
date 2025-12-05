@@ -38,6 +38,14 @@ class StudentDao {
     );
   }
 
+  Future<List<Map<String, dynamic>>> getAllStudentsWithoutClassName() async {
+    final db = await dbHelper.database;
+    return await db.query(
+      tableName,
+      where: 'class_name IS NULL OR class_name = ""',
+    );
+  }
+
   Future<bool> isStudentNumberExist(String studentNumber) async {
     final db = await dbHelper.database;
     var response = await db.query(

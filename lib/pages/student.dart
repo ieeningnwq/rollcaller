@@ -61,28 +61,7 @@ class _StudentPageState extends State<StudentPage> {
               ),
             ),
             // 搜索栏
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.search),
-                  hintText: '搜索学号或姓名...',
-                  hintStyle: TextStyle(fontSize: 14),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 6,
-                    vertical: 4,
-                  ),
-                  filled: true,
-                ),
-              ),
-            ),
+            _searchWidget(),
             // 学生列表
             Expanded(
               child: Consumer<ClassGroupsProvider>(
@@ -630,14 +609,26 @@ class _StudentPageState extends State<StudentPage> {
       var students = await studentDao.getAllStudentsByClassName(
         classModel.className,
       );
-      var allStudents = await studentDao.getAllStudents();
-      log('allStudents: $allStudents');
       StudentClassGroup classGroup = StudentClassGroup(
         studentClass: classModel,
         students: students.map((e) => StudentModel.fromMap(e)).toList(),
       );
       classGroups.add(classGroup);
     }
+    // 查询有的学生没有班级
+    var allStudents = await studentDao.getAllStudentsWithoutClassName();
+    var studentClass=StudentClassModel(
+          className: '无班级学生',
+          studentQuantity: allStudents.length,
+          teacherName: '',
+          notes: '',
+          classQuantity: allStudents.length, created: DateTime.now(),);
+    studentClass.id=-1;
+    StudentClassGroup classGroup = StudentClassGroup(
+        studentClass: studentClass,
+        students: allStudents.map((e) => StudentModel.fromMap(e)).toList(),
+      );
+      classGroups.add(classGroup);
     return classGroups;
   }
 
@@ -645,6 +636,7 @@ class _StudentPageState extends State<StudentPage> {
   dispose() {
     studentNumberController.dispose();
     studentNameController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -672,4 +664,27 @@ class _StudentPageState extends State<StudentPage> {
     // 加载完成
     _refreshController.loadComplete();
   }
+  
+  Padding _searchWidget() =>Padding(
+              padding: const EdgeInsets.all(8),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.search),
+                  hintText: '搜索学号或姓名...',
+                  hintStyle: TextStyle(fontSize: 14),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 4,
+                  ),
+                  filled: true,
+                ),
+              ),
+            );
 }
