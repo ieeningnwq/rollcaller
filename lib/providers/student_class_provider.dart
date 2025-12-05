@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import '../models/student_class_model.dart';
 
 class StudentClassProvider with ChangeNotifier {
-  final Map<String,StudentClassModel> _studentClass = {};
+  final Map<int,StudentClassModel> _studentClass = {};
 
-  final Map<String,Icon> _icon = {};
-  final Map<String,Color> _color = {};
-  final Map<String,Color> _deprecationColor = {};
-  final Map<String,String> _quantityInfo = {};
+  final Map<int,Icon> _icon = {};
+  final Map<int,Color> _color = {};
+  final Map<int,Color> _deprecationColor = {};
+  final Map<int,String> _quantityInfo = {};
 
   List<Icon> get icon => _icon.values.toList();
   List<Color> get color => _color.values.toList();
@@ -32,7 +32,7 @@ class StudentClassProvider with ChangeNotifier {
     _clear();
     for (var element in newList) {
       _studentClass.putIfAbsent(
-        element.className,
+        element.id!,
         () => element,
       );
       _addIconColorQuantityInfo(element);
@@ -43,7 +43,7 @@ class StudentClassProvider with ChangeNotifier {
    void _addIconColorQuantityInfo(StudentClassModel element) {
     int classQuantity = element.classQuantity;
     _icon.putIfAbsent(
-      element.className,
+      element.id!,
       () => classQuantity == element.studentQuantity
           ? Icon(Icons.check_circle, size: 16, color: Colors.green)
           : classQuantity < element.studentQuantity
@@ -51,7 +51,7 @@ class StudentClassProvider with ChangeNotifier {
           : Icon(Icons.error, size: 16, color: Colors.red),
     );
     _color.putIfAbsent(
-      element.className,
+      element.id!,
       () => classQuantity == element.studentQuantity
           ? Colors.green
           : classQuantity < element.studentQuantity
@@ -59,7 +59,7 @@ class StudentClassProvider with ChangeNotifier {
           : Colors.red,
     );
     _deprecationColor.putIfAbsent(
-      element.className,
+      element.id!,
       () => classQuantity == element.studentQuantity
           ? Colors.green.shade100
           : classQuantity < element.studentQuantity
@@ -67,7 +67,7 @@ class StudentClassProvider with ChangeNotifier {
           : Colors.red.shade100,
     );
     _quantityInfo.putIfAbsent(
-      element.className,
+      element.id!,
       () => classQuantity == element.studentQuantity
           ? '人数已满'
           : classQuantity < element.studentQuantity
@@ -82,7 +82,7 @@ class StudentClassProvider with ChangeNotifier {
     _clear();
     for (var element in newList) {
       _studentClass.putIfAbsent(
-        element.className,
+        element.id!,
         () => element,
       );
       _addIconColorQuantityInfo(element);
@@ -92,7 +92,7 @@ class StudentClassProvider with ChangeNotifier {
 
   void addStudentClass(StudentClassModel studentClass) {
     _studentClass.putIfAbsent(
-      studentClass.className,
+      studentClass.id!,
       () => studentClass,
     );
     _addIconColorQuantityInfo(studentClass);
@@ -101,7 +101,7 @@ class StudentClassProvider with ChangeNotifier {
 
   Future<void> updateStudentClass(StudentClassModel studentClass) async {
     _studentClass.update(
-      studentClass.className,
+      studentClass.id!,
       (value) => studentClass,
     );
     _updateIconColorQuantityInfo(studentClass);
@@ -112,7 +112,7 @@ class StudentClassProvider with ChangeNotifier {
     int classQuantity = studentClass.classQuantity;
 
     _icon.update(
-      studentClass.className,
+      studentClass.id!,
       (value) => classQuantity == studentClass.studentQuantity
           ? Icon(Icons.check_circle, size: 16, color: Colors.green)
           : classQuantity < studentClass.studentQuantity
@@ -120,7 +120,7 @@ class StudentClassProvider with ChangeNotifier {
           : Icon(Icons.error, size: 16, color: Colors.red),
     );
     _color.update(
-      studentClass.className,
+      studentClass.id!,
       (value) => classQuantity == studentClass.studentQuantity
           ? Colors.green
           : classQuantity < studentClass.studentQuantity
@@ -128,7 +128,7 @@ class StudentClassProvider with ChangeNotifier {
           : Colors.red,
     );
     _deprecationColor.update(
-      studentClass.className,
+      studentClass.id!,
       (value) => classQuantity == studentClass.studentQuantity
           ? Colors.green.shade100
           : classQuantity < studentClass.studentQuantity
@@ -136,7 +136,7 @@ class StudentClassProvider with ChangeNotifier {
           : Colors.red.shade100,
     );
     _quantityInfo.update(
-      studentClass.className,
+      studentClass.id!,
       (value) => classQuantity == studentClass.studentQuantity
           ? '人数已满'
           : classQuantity < studentClass.studentQuantity
@@ -145,12 +145,12 @@ class StudentClassProvider with ChangeNotifier {
     );
   }
 
-  void removeStudentClass(String className) {
-    _studentClass.remove(className);
-    _icon.remove(className);
-    _color.remove(className);
-    _quantityInfo.remove(className);
-    _deprecationColor.remove(className);
+  void removeStudentClass(int id) {
+    _studentClass.remove(id);
+    _icon.remove(id);
+    _color.remove(id);
+    _quantityInfo.remove(id);
+    _deprecationColor.remove(id);
     notifyListeners();
   }
 }

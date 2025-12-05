@@ -100,7 +100,7 @@ class ClassItemCard extends StatelessWidget {
                                     studentClass.className,
                                   );
                                   studentClassProvider.removeStudentClass(
-                                    studentClass.className,
+                                    studentClass.id!,
                                   );
                                   if(context.mounted){
                                     Navigator.of(context).pop(); // 关闭确认弹窗
@@ -119,14 +119,15 @@ class ClassItemCard extends StatelessWidget {
                                           actions: [
                                             TextButton(
                                               onPressed: () =>
+                                                  {Navigator.of(context).pop(),
                                                   Navigator.of(context).pop(),
+},
                                               child: Text('确定'),
                                             ),
                                           ],
                                         );
                                       },
                                     );
-                                    Navigator.of(context).pop();
                                   }
                                    // 关闭确认弹窗
                                 }

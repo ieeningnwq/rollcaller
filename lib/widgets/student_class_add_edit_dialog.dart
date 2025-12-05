@@ -157,9 +157,10 @@ class StudentClassAddEditDialog extends StatelessWidget {
       if (isAdd) {
         // 添加操作
         studentClass.created=DateTime.now();
-        await classDao.insertStudentClass(
+        int id=await classDao.insertStudentClass(
                   studentClass
                 );
+        studentClass.id=id;
         // 添加班级列表
         studentClassProvider.addStudentClass(
           studentClass,
@@ -169,7 +170,7 @@ class StudentClassAddEditDialog extends StatelessWidget {
         await classDao.updateStudentClassById(
                   studentClass,
                 );
-                studentClassProvider.updateStudentClass(
+          studentClassProvider.updateStudentClass(
           studentClass,
         );
       }
