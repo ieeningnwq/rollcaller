@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:rollcall/providers/random_caller_provider.dart';
 import 'package:rollcall/providers/student_class_provider.dart';
 import './configs/color.dart';
-import './pages/index.dart';
+import 'pages/index_page.dart';
 import './providers/current_index_provider.dart';
 import 'providers/class_groups_provider.dart';
 import 'providers/class_selected_provider.dart';

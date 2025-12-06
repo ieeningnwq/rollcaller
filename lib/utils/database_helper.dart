@@ -63,7 +63,8 @@ class DatabaseHelper {
         random_caller_id INTEGER NOT NULL,
         student_id INTEGER NOT NULL,
         score INTEGER NOT NULL,
-        created TEXT NOT NULL
+        notes TEXT,
+        created TEXT NOT NULL,
       )
     ''');
   }

@@ -1,0 +1,146 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../configs/strings.dart';
+import '../providers/random_caller_provider.dart';
+import 'attendence_page.dart';
+import 'random_call_page.dart';
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  // 0表示随机点名，1表示签到点名
+  int _selectedIndex = 0;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // appBar: AppBar(title: const Text(KString.homeAppBarTitle)),
+      body: SafeArea(
+        child: Consumer<RandomCallerProvider>(
+          builder: (context, randomCallerProvider, child) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 顶部标题栏
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  child: Text(
+                    KString.homeAppBarTitle,
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // 随机点名按钮
+                    _buildRandomRollCallButton(),
+                    _buildAttendenceButton(),
+                  ],
+                ),
+                _selectedIndex == 0
+                    ? RandomCallPage()
+                    : AttendencePage(),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Expanded _buildRandomRollCallButton() {
+    return Expanded(
+      flex: 1,
+      child: Container(
+        margin: const EdgeInsets.only(left: 4, right: 3),
+        child: ElevatedButton(
+          onPressed: () {
+            setState(() {
+              _selectedIndex = 0;
+            });
+            // 随机点名功能
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _selectedIndex == 0 ? Colors.blue : Colors.white,
+            foregroundColor: _selectedIndex == 0 ? Colors.white : Colors.blue,
+            side: BorderSide(
+              color: _selectedIndex == 0 ? Colors.blue : Colors.blue,
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.shuffle,
+                color: _selectedIndex == 0 ? Colors.white : Colors.blue,
+              ),
+              const SizedBox(width: 8.0),
+              Text(
+                '随机点名',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  color: _selectedIndex == 0 ? Colors.white : Colors.blue,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Expanded _buildAttendenceButton() {
+    return Expanded(
+      flex: 1,
+      child: Container(
+        margin: const EdgeInsets.only(left: 3, right: 4),
+        child: ElevatedButton(
+          onPressed: () {
+            setState(() {
+              _selectedIndex = 1;
+            });
+            // 签到点名功能
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _selectedIndex == 1 ? Colors.blue : Colors.white,
+            foregroundColor: _selectedIndex == 1 ? Colors.white : Colors.blue,
+            side: BorderSide(
+              color: _selectedIndex == 1 ? Colors.blue : Colors.blue,
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.check_circle,
+                color: _selectedIndex == 1 ? Colors.white : Colors.blue,
+              ),
+              const SizedBox(width: 8.0),
+              Text(
+                '签到点名',
+                style: TextStyle(
+                  fontSize: 16.0,
+                  color: _selectedIndex == 1 ? Colors.white : Colors.blue,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

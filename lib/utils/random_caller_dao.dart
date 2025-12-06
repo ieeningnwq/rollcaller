@@ -44,9 +44,9 @@ class RandomCallerDao {
     );
   }
 
-  Future<void> deleteRandomCaller(int id) async {
+   Future<int> deleteRandomCaller(int id) async {
     final db = await dbHelper.database;
-    await db.delete(
+    return await db.delete(
       tableName,
       where: 'id = ?',
       whereArgs: [id],
