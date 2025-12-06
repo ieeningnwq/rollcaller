@@ -32,7 +32,9 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       // appBar: AppBar(title: const Text(KString.homeAppBarTitle)),
       body: SafeArea(
-        child: Column(
+        child: Consumer<RandomCallerProvider>(
+          builder: (context, randomCallerProvider, child) {
+            return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -54,7 +56,7 @@ class _HomePageState extends State<HomePage> {
             ),
             _buildRandomCallerInfoWidget(),
           ],
-        ),
+        );})
       ),
     );
   }
@@ -234,6 +236,42 @@ class _HomePageState extends State<HomePage> {
               IconButton(
                 onPressed: () {
                   // 删除点名器功能
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('确认删除'),
+                            content: const Text('确定要删除选中的点名器吗？'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text('取消'),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  if (context.mounted) {
+                                    await RandomCallerDao().deleteRandomCaller(
+                                      _selectedCaller!,
+                                    );
+                                    Provider.of<RandomCallerProvider>(
+                                      context,
+                                      listen: false,
+                                    ).removeRandomCaller(
+                                      _selectedCaller!,
+                                    );
+                                    setState(() {
+                                      _selectedCaller = null;
+                                    });
+                                    Navigator.of(context).pop();
+                                  }
+                                },
+                                child: const Text('删除'),
+                              ),
+                            ],
+                          
+                      );
+                    },
+                  );
                 },
                 icon: const Icon(Icons.delete, color: Colors.red),
               ),
@@ -255,7 +293,7 @@ class _HomePageState extends State<HomePage> {
                   Provider.of<RandomCallerProvider>(
                     context,
                     listen: false,
-                  ).updateRollCallerWithoutNotify(randomCaller);
+                  ).updateRandomCallerWithoutNotify(randomCaller);
                 }
                 _selectedCaller ??= randomCallers.first.id;
                 return DropdownButtonFormField<int>(

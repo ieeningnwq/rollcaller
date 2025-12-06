@@ -33,4 +33,23 @@ class RandomCallerDao {
         ? maps.map((map) => RandomCallerModel.fromMap(map)).toList()
         : [];
   }
+
+  Future<int> updateRandomCaller(RandomCallerModel randomCallerModel) async {
+    final db = await dbHelper.database;
+    return await db.update(
+      tableName,
+      randomCallerModel.toMap(),
+      where: 'id = ?',
+      whereArgs: [randomCallerModel.id],
+    );
+  }
+
+  Future<void> deleteRandomCaller(int id) async {
+    final db = await dbHelper.database;
+    await db.delete(
+      tableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
 }

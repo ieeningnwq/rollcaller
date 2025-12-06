@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../models/random_caller_model.dart';
 import '../providers/random_caller_is_duplicate_provider.dart';
+import '../providers/random_caller_provider.dart';
 import '../providers/random_caller_selected_class_id_provider.dart';
 import '../utils/random_caller_dao.dart';
 import '../utils/student_class_dao.dart';
@@ -149,18 +150,28 @@ class RandomCallerAddEditDialog extends StatelessWidget {
                 }
                 return RadioGroup<int>(
                   groupValue: randomCallerSelectedClassProvider.selectedClassId,
-                  onChanged:isAdd? (value) {
-                    randomCallerSelectedClassProvider.updateSelectedClassId(
-                      value!,
-                    );
-                  }:(value) {null;},
+                  onChanged: isAdd
+                      ? (value) {
+                          randomCallerSelectedClassProvider
+                              .updateSelectedClassId(value!);
+                        }
+                      : (value) {
+                          null;
+                        },
                   child: Column(
                     children: snapshot.data!
                         .map(
                           (e) => RadioListTile<int>(
                             value: e['id']!,
-                            title: Text(e['class_name']!,style: TextStyle(color: isAdd? Colors.black : Colors.grey,),),
-                            fillColor: WidgetStateProperty.all(isAdd? Colors.black : Colors.grey),
+                            title: Text(
+                              e['class_name']!,
+                              style: TextStyle(
+                                color: isAdd ? Colors.black : Colors.grey,
+                              ),
+                            ),
+                            fillColor: WidgetStateProperty.all(
+                              isAdd ? Colors.black : Colors.grey,
+                            ),
                           ),
                         )
                         .toList(),
@@ -183,28 +194,53 @@ class RandomCallerAddEditDialog extends StatelessWidget {
         context,
         listen: false,
       ).selectedClassId;
-      randomCaller.isDuplicate = Provider.of<RandomCallerIsDuplicateProvider>(
-        context,
-        listen: false,
-      ).isDuplicate ? 1 : 0;
+      randomCaller.isDuplicate =
+          Provider.of<RandomCallerIsDuplicateProvider>(
+            context,
+            listen: false,
+          ).isDuplicate
+          ? 1
+          : 0;
       randomCaller.notes = notesController.text;
       if (isAdd) {
         // 新增点名器
         randomCaller.created = DateTime.now();
         RandomCallerDao().insertRandomCaller(randomCaller).then((value) {
-          if (value != 0) {
-            ScaffoldMessenger.of(
+          if (context.mounted) {
+            if (value != 0) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('添加成功')));
+            } else {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('添加失败')));
+            }
+            randomCaller.id = value;
+            Provider.of<RandomCallerProvider>(
               context,
-            ).showSnackBar(const SnackBar(content: Text('添加成功')));
-          } else {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('添加失败')));
+              listen: false,
+            ).addRandomCaller(randomCaller);
           }
         });
       } else {
-        // RollCallerDao rollCallerDao = RollCallerDao();
-        // rollCallerDao.updateRollCaller(rollCaller);
+        RandomCallerDao().updateRandomCaller(randomCaller).then((value) {
+          if (context.mounted) {
+            if (value != 0) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('更新成功')));
+            } else {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('更新失败')));
+            }
+            Provider.of<RandomCallerProvider>(
+              context,
+              listen: false,
+            ).updateRandomCaller(randomCaller);
+          }
+        });
       }
       Navigator.of(context).pop();
     }
