@@ -214,6 +214,20 @@ class _HomePageState extends State<HomePage> {
               IconButton(
                 onPressed: () {
                   // 编辑点名器功能
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return RandomCallerAddEditDialog(
+                        title: '修改点名器',
+                        randomCaller: Provider.of<RandomCallerProvider>(
+                          context,
+                          listen: false,
+                        ).randomCallers[_selectedCaller!]!,
+                        randomCallerNameController: _randomCallerNameController,
+                        notesController: _notesController,
+                      );
+                    },
+                  );
                 },
                 icon: const Icon(Icons.edit, color: Colors.blue),
               ),
@@ -238,7 +252,10 @@ class _HomePageState extends State<HomePage> {
               } else {
                 final randomCallers = snapshot.data!;
                 for (var randomCaller in randomCallers) {
-                  Provider.of<RandomCallerProvider>(context, listen: false).updateRollCallerWithoutNotify(randomCaller);
+                  Provider.of<RandomCallerProvider>(
+                    context,
+                    listen: false,
+                  ).updateRollCallerWithoutNotify(randomCaller);
                 }
                 _selectedCaller ??= randomCallers.first.id;
                 return DropdownButtonFormField<int>(

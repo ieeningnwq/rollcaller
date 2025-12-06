@@ -149,17 +149,18 @@ class RandomCallerAddEditDialog extends StatelessWidget {
                 }
                 return RadioGroup<int>(
                   groupValue: randomCallerSelectedClassProvider.selectedClassId,
-                  onChanged: (value) {
+                  onChanged:isAdd? (value) {
                     randomCallerSelectedClassProvider.updateSelectedClassId(
                       value!,
                     );
-                  },
+                  }:(value) {null;},
                   child: Column(
                     children: snapshot.data!
                         .map(
                           (e) => RadioListTile<int>(
                             value: e['id']!,
-                            title: Text(e['class_name']!),
+                            title: Text(e['class_name']!,style: TextStyle(color: isAdd? Colors.black : Colors.grey,),),
+                            fillColor: WidgetStateProperty.all(isAdd? Colors.black : Colors.grey),
                           ),
                         )
                         .toList(),
@@ -215,9 +216,11 @@ class RandomCallerAddEditDialog extends StatelessWidget {
         return CheckboxListTile(
           title: const Text('是否允许重复点名'),
           value: randomCallerIsDuplicateProvider.isDuplicate,
-          onChanged: (value) {
-            randomCallerIsDuplicateProvider.updateIsDuplicate(value!);
-          },
+          onChanged: isAdd
+              ? (value) {
+                  randomCallerIsDuplicateProvider.updateIsDuplicate(value!);
+                }
+              : null,
         );
       },
     );
