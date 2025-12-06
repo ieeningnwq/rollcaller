@@ -16,12 +16,12 @@ class RandomCallerInfoWidget extends StatefulWidget {
 class _RandomCallerInfoWidgetState extends State<RandomCallerInfoWidget> {
   // 当前选中的班级
   int? _selectedCaller;
-    // 点名器名称控制器
+  // 点名器名称控制器
   final TextEditingController _randomCallerNameController =
       TextEditingController();
   // 点名器备注控制器
   final TextEditingController _notesController = TextEditingController();
-  
+
   @override
   Widget build(BuildContext context) {
     return _buildRandomCallerInfoWidget();
@@ -131,7 +131,14 @@ class _RandomCallerInfoWidgetState extends State<RandomCallerInfoWidget> {
               listen: false,
             ).updateRandomCallerWithoutNotify(randomCaller);
           }
-          _selectedCaller ??= randomCallers.first.id;
+          if (_selectedCaller == null) {
+            _selectedCaller = randomCallers.first.id;
+            Provider.of<RandomCallerProvider>(
+              context,
+              listen: false,
+            ).setCurrentSelectedCallerWithoutNotify(_selectedCaller!);
+          }
+
           return DropdownButtonFormField<int>(
             initialValue: _selectedCaller,
             decoration: InputDecoration(
@@ -163,6 +170,10 @@ class _RandomCallerInfoWidgetState extends State<RandomCallerInfoWidget> {
                 setState(() {
                   _selectedCaller = newValue;
                 });
+                Provider.of<RandomCallerProvider>(
+                  context,
+                  listen: false,
+                ).setCurrentSelectedCaller(newValue);
               }
             },
             style: const TextStyle(fontSize: 16.0, color: Colors.black),
@@ -231,8 +242,4 @@ class _RandomCallerInfoWidgetState extends State<RandomCallerInfoWidget> {
     _notesController.dispose();
     super.dispose();
   }
-
-  
-
-  
 }

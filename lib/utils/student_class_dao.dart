@@ -90,4 +90,14 @@ class StudentClassDao {
     mapData.remove('class_quantity');
     return mapData;
   }
+
+  Future<dynamic> getStudentClass(int id) async {
+    final db = await dbHelper.database;
+     var mapData = await db.query(
+      tableName,
+      where: 'id=?',
+      whereArgs: [id],
+    );
+    return StudentClassModel.fromMap(mapData.first);
+  }
 }
