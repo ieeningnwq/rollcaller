@@ -74,7 +74,9 @@ class StudentClassDao {
     await db.delete(tableName, where: 'class_name=?', whereArgs: [className]);
   }
 
-   Future<int> updateStudentClassById(StudentClassModel studentClassModel) async {
+  Future<int> updateStudentClassById(
+    StudentClassModel studentClassModel,
+  ) async {
     Map<String, dynamic> mapData = _processMap(studentClassModel);
     final db = await dbHelper.database;
     return await db.update(
@@ -93,11 +95,7 @@ class StudentClassDao {
 
   Future<dynamic> getStudentClass(int id) async {
     final db = await dbHelper.database;
-     var mapData = await db.query(
-      tableName,
-      where: 'id=?',
-      whereArgs: [id],
-    );
+    var mapData = await db.query(tableName, where: 'id=?', whereArgs: [id]);
     return StudentClassModel.fromMap(mapData.first);
   }
 }

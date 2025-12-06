@@ -43,9 +43,7 @@ class _HomePageState extends State<HomePage> {
                     _buildAttendenceButton(),
                   ],
                 ),
-                _selectedIndex == 0
-                    ? RandomCallPage()
-                    : AttendencePage(),
+                _selectedIndex == 0 ? RandomCallPage() : AttendencePage(),
               ],
             );
           },

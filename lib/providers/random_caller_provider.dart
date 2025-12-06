@@ -7,7 +7,6 @@ import '../models/random_caller_model.dart';
 import '../models/student_class_model.dart';
 import '../models/student_model.dart';
 import '../utils/random_call_record_dao.dart';
-import '../utils/random_caller_dao.dart';
 import '../utils/student_dao.dart';
 
 class RandomCallerProvider with ChangeNotifier {

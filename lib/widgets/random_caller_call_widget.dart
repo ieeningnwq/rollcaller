@@ -14,21 +14,22 @@ class RandomCallerCallWidget extends StatefulWidget {
   State<RandomCallerCallWidget> createState() => _RandomCallerCallWidgetState();
 }
 
-class _RandomCallerCallWidgetState extends State<RandomCallerCallWidget> with SingleTickerProviderStateMixin{
+class _RandomCallerCallWidgetState extends State<RandomCallerCallWidget>
+    with SingleTickerProviderStateMixin {
   // 是否正在抽取
   bool _isPicking = false;
   // 随机数生成器
   final Random _random = Random();
-    // 动画控制器
+  // 动画控制器
   late AnimationController _controller;
   late Animation<double> _animation;
 
-   @override
-    void initState() {
+  @override
+  void initState() {
     super.initState();
     // 初始化动画控制器 - 速度更快
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 100), 
+      duration: const Duration(milliseconds: 100),
       vsync: this,
     );
     // 初始化动画
@@ -40,7 +41,7 @@ class _RandomCallerCallWidgetState extends State<RandomCallerCallWidget> with Si
             // 如果还在抽取中，立即开始下一次动画
             _controller.reset();
             _controller.forward();
-            
+
             // 随机选择一个新的学生
             setState(() {
               // int index = _random.nextInt(_students.length);
@@ -54,7 +55,10 @@ class _RandomCallerCallWidgetState extends State<RandomCallerCallWidget> with Si
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<RandomCallerGroupModel>(
-      future: Provider.of<RandomCallerProvider>(context, listen: false).getSelectorCallerClassStudents(),
+      future: Provider.of<RandomCallerProvider>(
+        context,
+        listen: false,
+      ).getSelectorCallerClassStudents(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -78,6 +82,4 @@ class _RandomCallerCallWidgetState extends State<RandomCallerCallWidget> with Si
       },
     );
   }
-  
-
 }

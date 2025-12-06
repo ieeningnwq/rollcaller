@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import '../models/student_class_model.dart';
 
 class StudentClassProvider with ChangeNotifier {
-  final Map<int,StudentClassModel> _studentClass = {};
+  final Map<int, StudentClassModel> _studentClass = {};
 
-  final Map<int,Icon> _icon = {};
-  final Map<int,Color> _color = {};
-  final Map<int,Color> _deprecationColor = {};
-  final Map<int,String> _quantityInfo = {};
+  final Map<int, Icon> _icon = {};
+  final Map<int, Color> _color = {};
+  final Map<int, Color> _deprecationColor = {};
+  final Map<int, String> _quantityInfo = {};
 
   List<Icon> get icon => _icon.values.toList();
   List<Color> get color => _color.values.toList();
@@ -16,7 +16,8 @@ class StudentClassProvider with ChangeNotifier {
   List<Color> get deprecationColor => _deprecationColor.values.toList();
 
   // 获取student class列表
-  List<StudentClassModel> get studentClassesList => _studentClass.values.toList();
+  List<StudentClassModel> get studentClassesList =>
+      _studentClass.values.toList();
 
   // 清除所有信息重新设置
   void _clear() {
@@ -26,21 +27,21 @@ class StudentClassProvider with ChangeNotifier {
     _quantityInfo.clear();
     _deprecationColor.clear();
   }
+
   // student class数据发生改变
-  Future<void> changeStudentClassWithoutNotify(List<StudentClassModel> newList) async {
+  Future<void> changeStudentClassWithoutNotify(
+    List<StudentClassModel> newList,
+  ) async {
     // 清除所有信息重新设置
     _clear();
     for (var element in newList) {
-      _studentClass.putIfAbsent(
-        element.id!,
-        () => element,
-      );
+      _studentClass.putIfAbsent(element.id!, () => element);
       _addIconColorQuantityInfo(element);
     }
     log(_studentClass.toString());
   }
 
-   void _addIconColorQuantityInfo(StudentClassModel element) {
+  void _addIconColorQuantityInfo(StudentClassModel element) {
     int classQuantity = element.classQuantity;
     _icon.putIfAbsent(
       element.id!,
@@ -77,30 +78,26 @@ class StudentClassProvider with ChangeNotifier {
   }
 
   // student class数据发生改变
-   void changeStudentClass(List<StudentClassModel> newList) {
+  void changeStudentClass(List<StudentClassModel> newList) {
     changeStudentClassWithoutNotify(newList);
     notifyListeners();
   }
 
   void addStudentClass(StudentClassModel studentClass) {
-    _studentClass.putIfAbsent(
-      studentClass.id!,
-      () => studentClass,
-    );
+    _studentClass.putIfAbsent(studentClass.id!, () => studentClass);
     _addIconColorQuantityInfo(studentClass);
     notifyListeners();
   }
 
   Future<void> updateStudentClass(StudentClassModel studentClass) async {
-    _studentClass.update(
-      studentClass.id!,
-      (value) => studentClass,
-    );
+    _studentClass.update(studentClass.id!, (value) => studentClass);
     _updateIconColorQuantityInfo(studentClass);
     notifyListeners();
   }
-  
-  Future<void> _updateIconColorQuantityInfo(StudentClassModel studentClass) async {
+
+  Future<void> _updateIconColorQuantityInfo(
+    StudentClassModel studentClass,
+  ) async {
     int classQuantity = studentClass.classQuantity;
 
     _icon.update(

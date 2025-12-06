@@ -26,7 +26,6 @@ class _StudentPageState extends State<StudentPage> {
   final TextEditingController studentNumberController = TextEditingController();
   final TextEditingController studentNameController = TextEditingController();
 
-
   final RefreshController _refreshController = RefreshController(
     initialRefresh: false,
   );

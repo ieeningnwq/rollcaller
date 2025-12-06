@@ -10,14 +10,19 @@ class RandomCallRecordDao {
   static const String tableName = KString.randomCallerRecordTableName;
   factory RandomCallRecordDao() => _instance;
 
-
-  Future<List<RandomCallRecordModel>> getRecordsByCallerIdStudentId(int callerId, int studentId) async {
+  Future<List<RandomCallRecordModel>> getRecordsByCallerIdStudentId(
+    int callerId,
+    int studentId,
+  ) async {
     final db = await _databaseHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       tableName,
       where: 'random_caller_id = ? AND student_id = ?',
       whereArgs: [callerId, studentId],
     );
-    return List.generate(maps.length, (i) => RandomCallRecordModel.fromMap(maps[i]));
+    return List.generate(
+      maps.length,
+      (i) => RandomCallRecordModel.fromMap(maps[i]),
+    );
   }
 }

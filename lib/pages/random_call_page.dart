@@ -11,24 +11,11 @@ class RandomCallPage extends StatefulWidget {
 }
 
 class _RandomCallPageState extends State<RandomCallPage> {
-
-
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
-        RandomCallerInfoWidget(),
-        RandomCallerCallWidget(),
-      ],
+      children: [RandomCallerInfoWidget(), RandomCallerCallWidget()],
     );
     // return RandomCallerInfoWidget();
   }
-
-
-
-
-
-
-
-  
 }

@@ -19,5 +19,4 @@ class RandomCallerGroupModel {
   String toString() {
     return 'RandomCallerGroupModel(randomCallerModel: $randomCallerModel, studentClassModel: $studentClassModel, students: $students, randomCallRecords: $randomCallRecords)';
   }
-
 }

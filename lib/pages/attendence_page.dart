@@ -10,8 +10,6 @@ class AttendencePage extends StatefulWidget {
 class _AttendencePageState extends State<AttendencePage> {
   @override
   Widget build(BuildContext context) {
-    return Center(
-        child: Text('Attendence Page'),
-      );
+    return Center(child: Text('Attendence Page'));
   }
 }
