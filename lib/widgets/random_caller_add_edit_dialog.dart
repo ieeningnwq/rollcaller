@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 
-import '../models/roll_caller_model.dart';
-import '../providers/roll_caller_selected_class_id_provider.dart';
-import '../utils/roll_caller_dao.dart';
+import '../models/random_caller_model.dart';
+import '../providers/random_caller_is_duplicate_provider.dart';
+import '../providers/random_caller_selected_class_id_provider.dart';
+import '../utils/random_caller_dao.dart';
 import '../utils/student_class_dao.dart';
 
-class RollCallerAddEditDialog extends StatelessWidget {
-  final RollCallerModel rollCaller;
+class RandomCallerAddEditDialog extends StatelessWidget {
+  final RandomCallerModel randomCaller;
   final String title;
   late final bool isAdd;
 
@@ -16,9 +17,9 @@ class RollCallerAddEditDialog extends StatelessWidget {
   final TextEditingController notesController;
   final GlobalKey _formKey = GlobalKey<FormState>();
 
-  RollCallerAddEditDialog({
+  RandomCallerAddEditDialog({
     super.key,
-    required this.rollCaller,
+    required this.randomCaller,
     required this.title,
     required this.randomCallerNameController,
     required this.notesController,
@@ -28,8 +29,12 @@ class RollCallerAddEditDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    randomCallerNameController.text = rollCaller.randomCallerName;
-    notesController.text = rollCaller.notes;
+    randomCallerNameController.text = randomCaller.randomCallerName;
+    notesController.text = randomCaller.notes;
+    Provider.of<RandomCallerIsDuplicateProvider>(
+      context,
+      listen: false,
+    ).updateIsDuplicateWithoutNotify(randomCaller.isDuplicate == 1);
     return AlertDialog(
       title: Text(title),
       content: Form(
@@ -39,6 +44,7 @@ class RollCallerAddEditDialog extends StatelessWidget {
           children: [
             _buildRollCallerNameField(),
             _buildNotesField('备注（选填）'),
+            _buildIsDuplicateField(),
             _buildClassIdField(),
           ],
         ),
@@ -50,7 +56,7 @@ class RollCallerAddEditDialog extends StatelessWidget {
         ),
         TextButton(
           onPressed: () {
-            if (Provider.of<RollCallerSelectedClassIdProvider>(
+            if (Provider.of<RandomCallerSelectedClassIdProvider>(
                   context,
                   listen: false,
                 ).selectedClassId ==
@@ -66,7 +72,7 @@ class RollCallerAddEditDialog extends StatelessWidget {
               );
               return;
             }
-            _saveRollCaller(context);
+            _saveRandomCaller(context);
           },
           child: const Text('保存'),
         ),
@@ -83,11 +89,11 @@ class RollCallerAddEditDialog extends StatelessWidget {
       autovalidateMode: AutovalidateMode.onUnfocus,
       onChanged: (value) {
         WidgetsFlutterBinding.ensureInitialized(); // 确保初始化Flutter绑定。对于插件很重要。
-        RollCallerDao rollCallerDao = RollCallerDao();
-        rollCallerDao.isRollCallerNameExist(value).then((value) {
+        RandomCallerDao randomCallerDao = RandomCallerDao();
+        randomCallerDao.isRollCallerNameExist(value).then((value) {
           if (value) {
             if (!isAdd &&
-                rollCaller.randomCallerName !=
+                randomCaller.randomCallerName !=
                     randomCallerNameController.text) {
               isRollCallerNameUnique = true;
             } else {
@@ -122,9 +128,9 @@ class RollCallerAddEditDialog extends StatelessWidget {
     return await studentClassDao.getAllStudentClasses();
   }
 
-  Consumer<RollCallerSelectedClassIdProvider> _buildClassIdField() {
-    return Consumer<RollCallerSelectedClassIdProvider>(
-      builder: (context, rollCallerSelectedClassProvider, child) {
+  Consumer<RandomCallerSelectedClassIdProvider> _buildClassIdField() {
+    return Consumer<RandomCallerSelectedClassIdProvider>(
+      builder: (context, randomCallerSelectedClassProvider, child) {
         return FutureBuilder(
           future: _getClasses(),
           builder: (context, snapshot) {
@@ -133,20 +139,18 @@ class RollCallerAddEditDialog extends StatelessWidget {
                 return Text('Error: ${snapshot.error}');
               } else {
                 if (snapshot.data!.isEmpty) {
-                  rollCallerSelectedClassProvider.selectedClassIdWithoutNotify(
-                    -1,
-                  );
+                  randomCallerSelectedClassProvider
+                      .selectedClassIdWithoutNotify(-1);
                   return const Text('暂无班级，无法添加点名器，请先添加班级');
                 }
-                if (rollCallerSelectedClassProvider.selectedClassId == -1) {
-                  rollCallerSelectedClassProvider.selectedClassIdWithoutNotify(
-                    snapshot.data![0]['id']!,
-                  );
+                if (randomCallerSelectedClassProvider.selectedClassId == -1) {
+                  randomCallerSelectedClassProvider
+                      .selectedClassIdWithoutNotify(snapshot.data![0]['id']!);
                 }
                 return RadioGroup<int>(
-                  groupValue: rollCallerSelectedClassProvider.selectedClassId,
+                  groupValue: randomCallerSelectedClassProvider.selectedClassId,
                   onChanged: (value) {
-                    rollCallerSelectedClassProvider.updateSelectedClassId(
+                    randomCallerSelectedClassProvider.updateSelectedClassId(
                       value!,
                     );
                   },
@@ -171,18 +175,22 @@ class RollCallerAddEditDialog extends StatelessWidget {
     );
   }
 
-  void _saveRollCaller(BuildContext context) {
+  void _saveRandomCaller(BuildContext context) {
     if ((_formKey.currentState as FormState).validate()) {
-      rollCaller.randomCallerName = randomCallerNameController.text;
-      rollCaller.classId = Provider.of<RollCallerSelectedClassIdProvider>(
+      randomCaller.randomCallerName = randomCallerNameController.text;
+      randomCaller.classId = Provider.of<RandomCallerSelectedClassIdProvider>(
         context,
         listen: false,
-      ).selectedClassId!;
-      rollCaller.notes = notesController.text;
+      ).selectedClassId;
+      randomCaller.isDuplicate = Provider.of<RandomCallerIsDuplicateProvider>(
+        context,
+        listen: false,
+      ).isDuplicate ? 1 : 0;
+      randomCaller.notes = notesController.text;
       if (isAdd) {
-        rollCaller.created = DateTime.now();
-        var rollCallerDao = RollCallerDao();
-        rollCallerDao.insertRollCaller(rollCaller).then((value) {
+        // 新增点名器
+        randomCaller.created = DateTime.now();
+        RandomCallerDao().insertRandomCaller(randomCaller).then((value) {
           if (value != 0) {
             ScaffoldMessenger.of(
               context,
@@ -199,5 +207,19 @@ class RollCallerAddEditDialog extends StatelessWidget {
       }
       Navigator.of(context).pop();
     }
+  }
+
+  Consumer<RandomCallerIsDuplicateProvider> _buildIsDuplicateField() {
+    return Consumer<RandomCallerIsDuplicateProvider>(
+      builder: (context, randomCallerIsDuplicateProvider, child) {
+        return CheckboxListTile(
+          title: const Text('是否允许重复点名'),
+          value: randomCallerIsDuplicateProvider.isDuplicate,
+          onChanged: (value) {
+            randomCallerIsDuplicateProvider.updateIsDuplicate(value!);
+          },
+        );
+      },
+    );
   }
 }

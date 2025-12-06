@@ -50,6 +50,7 @@ class DatabaseHelper {
       CREATE TABLE ${KString.randomCallerTableName} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         random_caller_name TEXT NOT NULL,
+        is_duplicate INTEGER NOT NULL DEFAULT 0,
         class_id INTEGER NOT NULL,
         notes TEXT,
         created TEXT NOT NULL

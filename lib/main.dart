@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:rollcall/providers/roll_caller_provider.dart';
+import 'package:rollcall/providers/random_caller_provider.dart';
 import 'package:rollcall/providers/student_class_provider.dart';
 import './configs/color.dart';
 import './pages/index.dart';
 import './providers/current_index_provider.dart';
 import 'providers/class_groups_provider.dart';
 import 'providers/class_selected_provider.dart';
-import 'providers/roll_caller_selected_class_id_provider.dart';
+import 'providers/random_caller_is_duplicate_provider.dart';
+import 'providers/random_caller_selected_class_id_provider.dart';
 
 void main() {
   runApp(
@@ -26,11 +27,14 @@ void main() {
         ChangeNotifierProvider<ClassGroupsProvider>(
           create: (_) => ClassGroupsProvider(),
         ),
-        ChangeNotifierProvider<RollCallerProvider>(
-          create: (_) => RollCallerProvider(),
+        ChangeNotifierProvider<RandomCallerProvider>(
+          create: (_) => RandomCallerProvider(),
         ),
-        ChangeNotifierProvider<RollCallerSelectedClassIdProvider>(
-          create: (_) => RollCallerSelectedClassIdProvider(),
+        ChangeNotifierProvider<RandomCallerSelectedClassIdProvider>(
+          create: (_) => RandomCallerSelectedClassIdProvider(),
+        ),
+        ChangeNotifierProvider<RandomCallerIsDuplicateProvider>(
+          create: (_) => RandomCallerIsDuplicateProvider(),
         ),
       ],
       child: MyApp(),

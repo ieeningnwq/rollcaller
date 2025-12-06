@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../configs/strings.dart';
-import '../models/roll_caller_model.dart';
-import '../widgets/roll_caller_add_edit_dialog.dart';
+import '../models/random_caller_model.dart';
+import '../widgets/random_caller_add_edit_dialog.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,7 +16,8 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
   // 点名器名称控制器
-  final TextEditingController _randomCallerNameController = TextEditingController();
+  final TextEditingController _randomCallerNameController =
+      TextEditingController();
   // 点名器备注控制器
   final TextEditingController _notesController = TextEditingController();
 
@@ -58,117 +59,7 @@ class _HomePageState extends State<HomePage> {
                 _buildAttendenceButton(),
               ],
             ),
-            Container(
-              margin: const EdgeInsets.all(10.0),
-              padding: const EdgeInsets.all(14.0),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.0),
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withAlpha(10),
-                    blurRadius: 10.0,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // 顶部标题和管理链接
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        '选择点名器',
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      Spacer(),
-                      IconButton(
-                        onPressed: () => {
-                          // 新增点名器功能
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return RollCallerAddEditDialog(
-                                title: '添加点名器',
-                                rollCaller: RollCallerModel(
-                                  classId: -1,
-                                  randomCallerName: '',
-                                  notes: '',
-                                  created: DateTime.now(),
-                                ),
-                                randomCallerNameController: _randomCallerNameController,
-                                notesController: _notesController,
-                              );
-                            },
-                          ),
-                        },
-                        icon: Icon(Icons.add, color: Colors.green),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          // 管理班级功能
-                        },
-                        icon: const Icon(Icons.edit, color: Colors.blue),
-                      ),
-                      IconButton(
-                        onPressed: () {
-                          // 管理班级功能
-                        },
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  // 班级下拉选择框
-                  DropdownButtonFormField<String>(
-                    initialValue: _selectedClass,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: const BorderSide(color: Colors.blue),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                        vertical: 10.0,
-                      ),
-                    ),
-                    items: _classes.map((String className) {
-                      return DropdownMenuItem<String>(
-                        value: className,
-                        child: Text(className),
-                      );
-                    }).toList(),
-                    onChanged: (String? newValue) {
-                      if (newValue != null) {
-                        setState(() {
-                          _selectedClass = newValue;
-                        });
-                      }
-                    },
-                    style: const TextStyle(fontSize: 16.0, color: Colors.black),
-                    dropdownColor: Colors.white,
-                    icon: const Icon(Icons.arrow_drop_down),
-                    iconSize: 24.0,
-                    iconEnabledColor: Colors.grey,
-                  ),
-                ],
-              ),
-            ),
+            _buildRandomCallerInfoWidget(),
           ],
         ),
       ),
@@ -270,5 +161,120 @@ class _HomePageState extends State<HomePage> {
     _randomCallerNameController.dispose();
     _notesController.dispose();
     super.dispose();
+  }
+
+  Container _buildRandomCallerInfoWidget() {
+    return Container(
+      margin: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(14.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12.0),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(10),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // 顶部标题和管理链接
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                '选择点名器',
+                style: TextStyle(
+                  fontSize: 18.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+              Spacer(),
+              IconButton(
+                onPressed: () => {
+                  // 新增点名器功能
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return RandomCallerAddEditDialog(
+                        title: '添加点名器',
+                        randomCaller: RandomCallerModel(
+                          classId: -1,
+                          randomCallerName: '',
+                          isDuplicate: 0,
+                          notes: '',
+                          created: DateTime.now(),
+                        ),
+                        randomCallerNameController: _randomCallerNameController,
+                        notesController: _notesController,
+                      );
+                    },
+                  ),
+                },
+                icon: Icon(Icons.add, color: Colors.green),
+              ),
+              IconButton(
+                onPressed: () {
+                  // 编辑点名器功能
+                },
+                icon: const Icon(Icons.edit, color: Colors.blue),
+              ),
+              IconButton(
+                onPressed: () {
+                  // 删除点名器功能
+                },
+                icon: const Icon(Icons.delete, color: Colors.red),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          // 点名器下拉选择框
+          DropdownButtonFormField<String>(
+            initialValue: _selectedClass,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: BorderSide(color: Colors.grey.shade300),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: BorderSide(color: Colors.grey.shade300),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: const BorderSide(color: Colors.blue),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12.0,
+                vertical: 10.0,
+              ),
+            ),
+            items: _classes.map((String className) {
+              return DropdownMenuItem<String>(
+                value: className,
+                child: Text(className),
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              if (newValue != null) {
+                setState(() {
+                  _selectedClass = newValue;
+                });
+              }
+            },
+            style: const TextStyle(fontSize: 16.0, color: Colors.black),
+            dropdownColor: Colors.white,
+            icon: const Icon(Icons.arrow_drop_down),
+            iconSize: 24.0,
+            iconEnabledColor: Colors.grey,
+          ),
+        ],
+      ),
+    );
   }
 }

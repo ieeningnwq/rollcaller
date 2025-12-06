@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class RollCallerSelectedClassIdProvider extends ChangeNotifier {
+class RandomCallerSelectedClassIdProvider extends ChangeNotifier {
   int _selectedClassId=-1;
   int get selectedClassId => _selectedClassId;
 

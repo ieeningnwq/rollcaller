@@ -1,18 +1,18 @@
 import 'package:rollcall/configs/strings.dart';
 
-import '../models/roll_caller_model.dart';
+import '../models/random_caller_model.dart';
 import 'database_helper.dart';
 
-class RollCallerDao {
-  static final RollCallerDao _instance = RollCallerDao._internal();
-  RollCallerDao._internal();
+class RandomCallerDao {
+  static final RandomCallerDao _instance = RandomCallerDao._internal();
+  RandomCallerDao._internal();
   final DatabaseHelper dbHelper = DatabaseHelper(); // 使用单例数据库帮助类实例
   static const String tableName = KString.randomCallerTableName;
-  factory RollCallerDao() => _instance;
+  factory RandomCallerDao() => _instance;
 
-  Future<int> insertRollCaller(RollCallerModel rollCallerModel) async {
+  Future<int> insertRandomCaller(RandomCallerModel randomCallerModel) async {
     final db = await dbHelper.database;
-    return await db.insert(tableName, rollCallerModel.toMap());
+    return await db.insert(tableName, randomCallerModel.toMap());
   }
 
   Future<bool> isRollCallerNameExist(String value) async {
