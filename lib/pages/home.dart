@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:rollcall/utils/random_caller_dao.dart';
 
 import '../configs/strings.dart';
 import '../models/random_caller_model.dart';
+import '../providers/random_caller_provider.dart';
 import '../widgets/random_caller_add_edit_dialog.dart';
 
 class HomePage extends StatefulWidget {
@@ -21,18 +24,8 @@ class _HomePageState extends State<HomePage> {
   // 点名器备注控制器
   final TextEditingController _notesController = TextEditingController();
 
-  // 班级列表
-  final List<String> _classes = [
-    '高三(1)班',
-    '高三(2)班',
-    '高三(3)班',
-    '高二(1)班',
-    '高二(2)班',
-    '高一(1)班',
-  ];
-
   // 当前选中的班级
-  String _selectedClass = '高三(1)班';
+  int? _selectedCaller;
 
   @override
   Widget build(BuildContext context) {
@@ -233,45 +226,62 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           const SizedBox(height: 8),
-          // 点名器下拉选择框
-          DropdownButtonFormField<String>(
-            initialValue: _selectedClass,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-                borderSide: BorderSide(color: Colors.grey.shade300),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8.0),
-                borderSide: const BorderSide(color: Colors.blue),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12.0,
-                vertical: 10.0,
-              ),
-            ),
-            items: _classes.map((String className) {
-              return DropdownMenuItem<String>(
-                value: className,
-                child: Text(className),
-              );
-            }).toList(),
-            onChanged: (String? newValue) {
-              if (newValue != null) {
-                setState(() {
-                  _selectedClass = newValue;
-                });
+          FutureBuilder(
+            future: RandomCallerDao().getAllRandomCallers(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error: ${snapshot.error}'));
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return const Center(child: Text('No random callers found.'));
+              } else {
+                final randomCallers = snapshot.data!;
+                for (var randomCaller in randomCallers) {
+                  Provider.of<RandomCallerProvider>(context, listen: false).updateRollCallerWithoutNotify(randomCaller);
+                }
+                _selectedCaller ??= randomCallers.first.id;
+                return DropdownButtonFormField<int>(
+                  initialValue: _selectedCaller,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: const BorderSide(color: Colors.blue),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12.0,
+                      vertical: 10.0,
+                    ),
+                  ),
+                  items: randomCallers.map((RandomCallerModel randomCaller) {
+                    return DropdownMenuItem<int>(
+                      value: randomCaller.id,
+                      child: Text(randomCaller.randomCallerName),
+                    );
+                  }).toList(),
+                  onChanged: (newValue) {
+                    if (newValue != null) {
+                      setState(() {
+                        _selectedCaller = newValue;
+                      });
+                    }
+                  },
+                  style: const TextStyle(fontSize: 16.0, color: Colors.black),
+                  dropdownColor: Colors.white,
+                  icon: const Icon(Icons.arrow_drop_down),
+                  iconSize: 24.0,
+                  iconEnabledColor: Colors.grey,
+                );
               }
             },
-            style: const TextStyle(fontSize: 16.0, color: Colors.black),
-            dropdownColor: Colors.white,
-            icon: const Icon(Icons.arrow_drop_down),
-            iconSize: 24.0,
-            iconEnabledColor: Colors.grey,
           ),
         ],
       ),

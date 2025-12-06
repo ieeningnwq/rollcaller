@@ -41,4 +41,9 @@ class RandomCallerModel {
     data['created'] = created.toIso8601String();
     return data;
   }
+
+  @override
+  String toString() {
+    return 'RandomCallerModel{id: $id, randomCallerName: $randomCallerName, classId: $classId, isDuplicate: $isDuplicate, notes: $notes, created: $created}';
+  }
 }

@@ -7,4 +7,11 @@ class RandomCallerProvider with ChangeNotifier {
 
   // 获取random caller列表
   List<RandomCallerModel> get randomCallersList => _randomCallers.values.toList();
+
+  void updateRollCallerWithoutNotify(RandomCallerModel randomCallerModel) {
+    if (randomCallerModel.id == null) {
+      return;
+    }
+    _randomCallers[randomCallerModel.id!] = randomCallerModel;
+  }
 }
