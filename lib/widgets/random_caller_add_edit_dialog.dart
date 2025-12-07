@@ -152,8 +152,9 @@ class RandomCallerAddEditDialog extends StatelessWidget {
                   groupValue: randomCallerSelectedClassProvider.selectedClassId,
                   onChanged: isAdd
                       ? (value) {
-                          randomCallerSelectedClassProvider
-                              .updateSelectedClassId(value!);
+                          randomCallerSelectedClassProvider.setSelectedClassId(
+                            value!,
+                          );
                         }
                       : (value) {
                           null;

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../configs/strings.dart';
-import '../providers/random_caller_provider.dart';
 import 'attendence_page.dart';
 import 'random_call_page.dart';
 
@@ -21,32 +19,28 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       // appBar: AppBar(title: const Text(KString.homeAppBarTitle)),
       body: SafeArea(
-        child: Consumer<RandomCallerProvider>(
-          builder: (context, randomCallerProvider, child) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // 顶部标题栏
+            Container(
+              padding: const EdgeInsets.all(12),
+              child: Text(
+                KString.homeAppBarTitle,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // 顶部标题栏
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  child: Text(
-                    KString.homeAppBarTitle,
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    // 随机点名按钮
-                    _buildRandomRollCallButton(),
-                    _buildAttendenceButton(),
-                  ],
-                ),
-                _selectedIndex == 0 ? RandomCallPage() : AttendencePage(),
+                // 随机点名按钮
+                _buildRandomRollCallButton(),
+                _buildAttendenceButton(),
               ],
-            );
-          },
+            ),
+            _selectedIndex == 0 ? RandomCallPage() : AttendencePage(),
+          ],
         ),
       ),
     );

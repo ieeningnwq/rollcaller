@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 
 class RandomCallerSelectedClassIdProvider extends ChangeNotifier {
   int _selectedClassId = -1;
+
   int get selectedClassId => _selectedClassId;
 
-  void updateSelectedClassId(int value) {
-    _selectedClassId = value;
+  void setSelectedClassId(int classId) {
+    _selectedClassId = classId;
     notifyListeners();
   }
 
-  void selectedClassIdWithoutNotify(int value) {
-    _selectedClassId = value;
+  void selectedClassIdWithoutNotify(int classId) {
+    _selectedClassId = classId;
   }
 }

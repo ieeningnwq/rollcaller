@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/random_caller_group.dart';
-import '../models/random_caller_model.dart';
 import '../providers/random_caller_provider.dart';
 
 class RandomCallerCallWidget extends StatefulWidget {

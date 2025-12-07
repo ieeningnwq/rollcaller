@@ -15,6 +15,19 @@ class RandomCallerProvider with ChangeNotifier {
 
   RandomCallerModel? get selectedCaller => _selectedCaller;
 
+  int _selectedClassId = -1;
+  int get selectedClassId => _selectedClassId;
+
+
+  void updateSelectedClassId(int value) {
+    _selectedClassId = value;
+    notifyListeners();
+  }
+
+  void selectedClassIdWithoutNotify(int value) {
+    _selectedClassId = value;
+  }
+
   Future<RandomCallerModel?> getSelectorCallerAsyc() async {
     while (_selectedCaller == null) {
       await Future.delayed(const Duration(milliseconds: 100));

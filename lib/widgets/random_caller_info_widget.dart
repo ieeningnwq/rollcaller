@@ -5,6 +5,7 @@ import '../models/random_caller_model.dart';
 import '../providers/random_caller_provider.dart';
 import '../utils/random_caller_dao.dart';
 import 'random_caller_add_edit_dialog.dart';
+import 'random_caller_view_dialog.dart';
 
 class RandomCallerInfoWidget extends StatefulWidget {
   const RandomCallerInfoWidget({super.key});
@@ -14,8 +15,8 @@ class RandomCallerInfoWidget extends StatefulWidget {
 }
 
 class _RandomCallerInfoWidgetState extends State<RandomCallerInfoWidget> {
-  // 当前选中的班级
-  int? _selectedCaller;
+  // 当前选中的点名器
+  int? _selectedCallerId;
   // 点名器名称控制器
   final TextEditingController _randomCallerNameController =
       TextEditingController();
@@ -59,6 +60,7 @@ class _RandomCallerInfoWidgetState extends State<RandomCallerInfoWidget> {
                 ),
               ),
               Spacer(),
+              _buildViewIconButton(),
               _buildAddIconButton(),
               _buildEditIconButton(),
               _buildDeleteIconButton(),
@@ -89,15 +91,15 @@ class _RandomCallerInfoWidgetState extends State<RandomCallerInfoWidget> {
                 TextButton(
                   onPressed: () async {
                     await RandomCallerDao().deleteRandomCaller(
-                      _selectedCaller!,
+                      _selectedCallerId!,
                     );
                     if (context.mounted) {
                       Provider.of<RandomCallerProvider>(
                         context,
                         listen: false,
-                      ).removeRandomCaller(_selectedCaller!);
+                      ).removeRandomCaller(_selectedCallerId!);
                       setState(() {
-                        _selectedCaller = null;
+                        _selectedCallerId = null;
                       });
                       Navigator.of(context).pop();
                     }
@@ -131,16 +133,16 @@ class _RandomCallerInfoWidgetState extends State<RandomCallerInfoWidget> {
               listen: false,
             ).updateRandomCallerWithoutNotify(randomCaller);
           }
-          if (_selectedCaller == null) {
-            _selectedCaller = randomCallers.first.id;
+          if (_selectedCallerId == null) {
+            _selectedCallerId = randomCallers.first.id;
             Provider.of<RandomCallerProvider>(
               context,
               listen: false,
-            ).setCurrentSelectedCallerWithoutNotify(_selectedCaller!);
+            ).setCurrentSelectedCallerWithoutNotify(_selectedCallerId!);
           }
 
           return DropdownButtonFormField<int>(
-            initialValue: _selectedCaller,
+            initialValue: _selectedCallerId,
             decoration: InputDecoration(
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8.0),
@@ -168,7 +170,7 @@ class _RandomCallerInfoWidgetState extends State<RandomCallerInfoWidget> {
             onChanged: (newValue) {
               if (newValue != null) {
                 setState(() {
-                  _selectedCaller = newValue;
+                  _selectedCallerId = newValue;
                 });
                 Provider.of<RandomCallerProvider>(
                   context,
@@ -199,7 +201,7 @@ class _RandomCallerInfoWidgetState extends State<RandomCallerInfoWidget> {
               randomCaller: Provider.of<RandomCallerProvider>(
                 context,
                 listen: false,
-              ).randomCallers[_selectedCaller!]!,
+              ).randomCallers[_selectedCallerId!]!,
               randomCallerNameController: _randomCallerNameController,
               notesController: _notesController,
             );
@@ -241,5 +243,25 @@ class _RandomCallerInfoWidgetState extends State<RandomCallerInfoWidget> {
     _randomCallerNameController.dispose();
     _notesController.dispose();
     super.dispose();
+  }
+
+  IconButton _buildViewIconButton() {
+    return IconButton(
+      onPressed: () {
+        // 查看点名器功能
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return RandomCallerViewDialog(
+              randomCaller: Provider.of<RandomCallerProvider>(
+                context,
+                listen: false,
+              ).randomCallers[_selectedCallerId!]!,
+            );
+          },
+        );
+      },
+      icon: const Icon(Icons.remove_red_eye, color: Colors.grey),
+    );
   }
 }
