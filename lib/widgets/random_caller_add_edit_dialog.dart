@@ -48,6 +48,13 @@ class _RandomCallerAddEditDialogState extends State<RandomCallerAddEditDialog> {
   }
 
   @override
+  dispose() {
+    _randomCallerNameController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(widget.title),

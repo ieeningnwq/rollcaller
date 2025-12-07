@@ -8,9 +8,7 @@ import '../models/student_class_model.dart';
 import '../providers/random_caller_provider.dart';
 import '../utils/student_class_dao.dart';
 import '../widgets/random_caller_add_edit_dialog.dart';
-import '../widgets/random_caller_call_widget.dart';
-import '../widgets/random_caller_info_widget.dart';
-import '../widgets/student_score_widget.dart';
+import '../widgets/random_caller_view_dialog.dart';
 
 /// 随机点名器页面
 class RandomCallPage extends StatefulWidget {
@@ -21,21 +19,13 @@ class RandomCallPage extends StatefulWidget {
 }
 
 class _RandomCallPageState extends State<RandomCallPage> {
-  // 随机点名器新增/编辑TextFormField名称控制器
-  final TextEditingController _randomCallerNameController =
-      TextEditingController();
-  // 随机点名器新增/编辑TextFormField备注控制器
-  final TextEditingController _notesController = TextEditingController();
   // 全部随机点名器
   late Map<int, RandomCallerModel> _allRandomCallersMap = {};
   // 当前选择随机点名器
   int? _selectedCallerId;
   // 新建/编辑时当前学生班级id
-  int _selectedClassId = -1;
   // 添加dialog 是否重复点名状态
-  bool _isDuplicate = false;
 
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   // 全部班级
   Map<int, StudentClassModel> _allStudentClassesMap = {};
 
@@ -135,6 +125,17 @@ class _RandomCallPageState extends State<RandomCallPage> {
     return IconButton(
       onPressed: () {
         // 查看点名器功能
+        if (_selectedCallerId != null) {
+          showDialog(
+            context: context,
+            builder: (context) => RandomCallerViewDialog(
+              randomCaller: _allRandomCallersMap[_selectedCallerId!]!,
+              allStudentClassesMap: _allStudentClassesMap,
+            ),
+          );
+        } else {
+          Fluttertoast.showToast(msg: '请先选择点名器');
+        }
       },
       icon: const Icon(Icons.remove_red_eye, color: Colors.grey),
     );
@@ -158,7 +159,6 @@ class _RandomCallPageState extends State<RandomCallPage> {
           builder: (context) => RandomCallerAddEditDialog(
             title: '新增点名器',
             randomCaller: RandomCallerModel(
-              id: -1,
               classId: -1,
               randomCallerName: '',
               isDuplicate: 0,
