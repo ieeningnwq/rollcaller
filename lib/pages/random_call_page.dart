@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/random_caller_provider.dart';
 import '../widgets/random_caller_call_widget.dart';
 import '../widgets/random_caller_info_widget.dart';
+import '../widgets/student_score_widget.dart';
 
 class RandomCallPage extends StatefulWidget {
   const RandomCallPage({super.key});
@@ -14,15 +15,21 @@ class RandomCallPage extends StatefulWidget {
 
 class _RandomCallPageState extends State<RandomCallPage> {
 
+
   @override
   Widget build(BuildContext context) {
     return Consumer<RandomCallerProvider>(
       builder: (context, randomCallerProvider, child) {
-        return Column(
-          children: [
-            RandomCallerInfoWidget(),
-            RandomCallerCallWidget(),
-          ],
+        return Expanded(
+          child: SingleChildScrollView(
+            child:Column(
+                children: [
+                  RandomCallerInfoWidget(),
+                  RandomCallerCallWidget(),
+                  StudentScoreWidget(),
+                ],
+            ),
+          ),
         );
       },
     );

@@ -13,6 +13,8 @@ class RandomCallerProvider with ChangeNotifier {
   final Map<int, RandomCallerModel> _randomCallers = {};
   RandomCallerModel? _selectedCaller;
 
+  RandomCallerGroupModel? _selectedCallerGroup;
+
   RandomCallerModel? get selectedCaller => _selectedCaller;
 
   int _selectedClassId = -1;
@@ -112,5 +114,9 @@ class RandomCallerProvider with ChangeNotifier {
   void setCurrentSelectedCaller(int id) {
     setCurrentSelectedCallerWithoutNotify(id);
     notifyListeners();
+  }
+
+  void updateSelectedCallerGroupWithoutNotify(RandomCallerGroupModel randomCallerGroupModel) {
+    _selectedCallerGroup = randomCallerGroupModel;
   }
 }
