@@ -64,7 +64,7 @@ class DatabaseHelper {
         student_id INTEGER NOT NULL,
         score INTEGER NOT NULL,
         notes TEXT,
-        created TEXT NOT NULL,
+        created TEXT NOT NULL
       )
     ''');
   }

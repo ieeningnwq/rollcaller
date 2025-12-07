@@ -26,7 +26,7 @@ class RandomCallerDao {
     return maps.isNotEmpty;
   }
 
-  Future<List<RandomCallerModel>>? getAllRandomCallers() async {
+  Future<List<RandomCallerModel>> getAllRandomCallers() async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(tableName);
     return maps.isNotEmpty

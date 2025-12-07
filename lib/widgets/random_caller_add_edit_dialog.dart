@@ -1,43 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
 
 import '../models/random_caller_model.dart';
-import '../providers/random_caller_is_duplicate_provider.dart';
-import '../providers/random_caller_provider.dart';
-import '../providers/random_caller_selected_class_id_provider.dart';
+import '../models/student_class_model.dart';
 import '../utils/random_caller_dao.dart';
-import '../utils/student_class_dao.dart';
 
-class RandomCallerAddEditDialog extends StatelessWidget {
+class RandomCallerAddEditDialog extends StatefulWidget {
   final RandomCallerModel randomCaller;
   final String title;
-  late final bool isAdd;
+  final Map<int, StudentClassModel> allStudentClassesMap;
 
-  final TextEditingController randomCallerNameController;
-  final TextEditingController notesController;
-  final GlobalKey _formKey = GlobalKey<FormState>();
-
-  RandomCallerAddEditDialog({
+  const RandomCallerAddEditDialog({
     super.key,
     required this.randomCaller,
     required this.title,
-    required this.randomCallerNameController,
-    required this.notesController,
-  }) {
-    isAdd = title == '添加点名器';
+    required this.allStudentClassesMap,
+  });
+
+  @override
+  State<StatefulWidget> createState() {
+    return _RandomCallerAddEditDialogState();
+  }
+}
+
+class _RandomCallerAddEditDialogState extends State<RandomCallerAddEditDialog> {
+  final TextEditingController _randomCallerNameController =
+      TextEditingController();
+  final TextEditingController _notesController = TextEditingController();
+  final GlobalKey _formKey = GlobalKey<FormState>();
+  int _selectedStudentClassId = -1;
+  bool _isAdd = false;
+  bool _isDuplicate = false;
+
+  @override
+  initState() {
+    super.initState();
+    _selectedStudentClassId = widget.randomCaller.classId;
+    if (_selectedStudentClassId == -1) {
+      _selectedStudentClassId = widget.allStudentClassesMap.isNotEmpty
+          ? widget.allStudentClassesMap.keys.first
+          : -1;
+    }
+    _isDuplicate = widget.randomCaller.isDuplicate == 1;
+    _isAdd = widget.title == '新增点名器';
+    _randomCallerNameController.text = widget.randomCaller.randomCallerName;
+    _notesController.text = widget.randomCaller.notes;
   }
 
   @override
   Widget build(BuildContext context) {
-    randomCallerNameController.text = randomCaller.randomCallerName;
-    notesController.text = randomCaller.notes;
-    Provider.of<RandomCallerIsDuplicateProvider>(
-      context,
-      listen: false,
-    ).updateIsDuplicateWithoutNotify(randomCaller.isDuplicate == 1);
     return AlertDialog(
-      title: Text(title),
+      title: Text(widget.title),
       content: Form(
         key: _formKey,
         child: ListView(
@@ -52,16 +65,12 @@ class RandomCallerAddEditDialog extends StatelessWidget {
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.of(context).pop(false),
           child: const Text('取消'),
         ),
         TextButton(
           onPressed: () {
-            if (Provider.of<RandomCallerSelectedClassIdProvider>(
-                  context,
-                  listen: false,
-                ).selectedClassId ==
-                -1) {
+            if (widget.allStudentClassesMap.isEmpty) {
               Fluttertoast.showToast(
                 msg: '暂无班级，无法添加点名器，请先添加班级',
                 toastLength: Toast.LENGTH_SHORT,
@@ -85,7 +94,7 @@ class RandomCallerAddEditDialog extends StatelessWidget {
     bool isRollCallerNameUnique = true;
 
     return TextFormField(
-      controller: randomCallerNameController,
+      controller: _randomCallerNameController,
       decoration: const InputDecoration(labelText: '点名器名称'),
       autovalidateMode: AutovalidateMode.onUnfocus,
       onChanged: (value) {
@@ -93,9 +102,9 @@ class RandomCallerAddEditDialog extends StatelessWidget {
         RandomCallerDao randomCallerDao = RandomCallerDao();
         randomCallerDao.isRollCallerNameExist(value).then((value) {
           if (value) {
-            if (!isAdd &&
-                randomCaller.randomCallerName !=
-                    randomCallerNameController.text) {
+            if (!_isAdd &&
+                widget.randomCaller.randomCallerName !=
+                    _randomCallerNameController.text) {
               isRollCallerNameUnique = true;
             } else {
               isRollCallerNameUnique = false;
@@ -120,146 +129,100 @@ class RandomCallerAddEditDialog extends StatelessWidget {
   TextField _buildNotesField(String label) {
     return TextField(
       decoration: InputDecoration(labelText: label),
-      controller: notesController,
+      controller: _notesController,
     );
   }
 
-  Future<List<Map<String, dynamic>>> _getClasses() async {
-    StudentClassDao studentClassDao = StudentClassDao();
-    return await studentClassDao.getAllStudentClasses();
-  }
+  Widget _buildClassIdField() {
+    if (widget.allStudentClassesMap.isEmpty) {
+      return const Text('暂无班级，无法添加点名器，请先添加班级');
+    }
 
-  Consumer<RandomCallerSelectedClassIdProvider> _buildClassIdField() {
-    return Consumer<RandomCallerSelectedClassIdProvider>(
-      builder: (context, randomCallerSelectedClassProvider, child) {
-        return FutureBuilder(
-          future: _getClasses(),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.done) {
-              if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else {
-                if (snapshot.data!.isEmpty) {
-                  randomCallerSelectedClassProvider
-                      .selectedClassIdWithoutNotify(-1);
-                  return const Text('暂无班级，无法添加点名器，请先添加班级');
-                }
-                if (randomCallerSelectedClassProvider.selectedClassId == -1) {
-                  randomCallerSelectedClassProvider
-                      .selectedClassIdWithoutNotify(snapshot.data![0]['id']!);
-                }
-                return RadioGroup<int>(
-                  groupValue: randomCallerSelectedClassProvider.selectedClassId,
-                  onChanged: isAdd
-                      ? (value) {
-                          randomCallerSelectedClassProvider.setSelectedClassId(
-                            value!,
-                          );
-                        }
-                      : (value) {
-                          null;
-                        },
-                  child: Column(
-                    children: snapshot.data!
-                        .map(
-                          (e) => RadioListTile<int>(
-                            value: e['id']!,
-                            title: Text(
-                              e['class_name']!,
-                              style: TextStyle(
-                                color: isAdd ? Colors.black : Colors.grey,
-                              ),
-                            ),
-                            fillColor: WidgetStateProperty.all(
-                              isAdd ? Colors.black : Colors.grey,
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                );
-              }
-            } else {
-              return CircularProgressIndicator();
+    return RadioGroup<int>(
+      groupValue: _selectedStudentClassId,
+      onChanged: _isAdd
+          ? (value) {
+              setState(() {
+                _selectedStudentClassId = value!;
+              });
             }
-          },
-        );
-      },
+          : (value) {
+              null;
+            },
+      child: Column(
+        children: widget.allStudentClassesMap.values
+            .map(
+              (e) => RadioListTile<int>(
+                value: e.id!,
+                title: Text(
+                  e.className,
+                  style: TextStyle(color: _isAdd ? Colors.black : Colors.grey),
+                ),
+                fillColor: WidgetStateProperty.all(
+                  _isAdd ? Colors.black : Colors.grey,
+                ),
+              ),
+            )
+            .toList(),
+      ),
     );
   }
 
   void _saveRandomCaller(BuildContext context) {
     if ((_formKey.currentState as FormState).validate()) {
-      randomCaller.randomCallerName = randomCallerNameController.text;
-      randomCaller.classId = Provider.of<RandomCallerSelectedClassIdProvider>(
-        context,
-        listen: false,
-      ).selectedClassId;
-      randomCaller.isDuplicate =
-          Provider.of<RandomCallerIsDuplicateProvider>(
-            context,
-            listen: false,
-          ).isDuplicate
-          ? 1
-          : 0;
-      randomCaller.notes = notesController.text;
-      if (isAdd) {
+      widget.randomCaller.randomCallerName = _randomCallerNameController.text;
+      widget.randomCaller.classId = _selectedStudentClassId;
+      widget.randomCaller.isDuplicate = _isDuplicate ? 1 : 0;
+      widget.randomCaller.notes = _notesController.text;
+      if (_isAdd) {
         // 新增点名器
-        randomCaller.created = DateTime.now();
-        RandomCallerDao().insertRandomCaller(randomCaller).then((value) {
+        widget.randomCaller.created = DateTime.now();
+        RandomCallerDao().insertRandomCaller(widget.randomCaller).then((value) {
           if (context.mounted) {
             if (value != 0) {
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(const SnackBar(content: Text('添加成功')));
+              Navigator.of(context).pop(true);
             } else {
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(const SnackBar(content: Text('添加失败')));
+              Navigator.of(context).pop(false);
             }
-            randomCaller.id = value;
-            Provider.of<RandomCallerProvider>(
-              context,
-              listen: false,
-            ).addRandomCaller(randomCaller);
           }
         });
       } else {
-        RandomCallerDao().updateRandomCaller(randomCaller).then((value) {
+        RandomCallerDao().updateRandomCaller(widget.randomCaller).then((value) {
           if (context.mounted) {
             if (value != 0) {
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(const SnackBar(content: Text('更新成功')));
+              Navigator.of(context).pop(true);
             } else {
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(const SnackBar(content: Text('更新失败')));
+              Navigator.of(context).pop(false);
             }
-            Provider.of<RandomCallerProvider>(
-              context,
-              listen: false,
-            ).updateRandomCaller(randomCaller);
           }
         });
       }
-      Navigator.of(context).pop();
     }
   }
 
-  Consumer<RandomCallerIsDuplicateProvider> _buildIsDuplicateField() {
-    return Consumer<RandomCallerIsDuplicateProvider>(
-      builder: (context, randomCallerIsDuplicateProvider, child) {
-        return CheckboxListTile(
-          title: const Text('是否允许重复点名'),
-          value: randomCallerIsDuplicateProvider.isDuplicate,
-          onChanged: isAdd
-              ? (value) {
-                  randomCallerIsDuplicateProvider.updateIsDuplicate(value!);
-                }
-              : null,
-        );
-      },
+  CheckboxListTile _buildIsDuplicateField() {
+    return CheckboxListTile(
+      title: const Text('是否允许重复点名'),
+      value: _isDuplicate,
+      onChanged: _isAdd
+          ? (value) {
+              setState(() {
+                _isDuplicate = value!;
+              });
+            }
+          : null,
     );
   }
 }
