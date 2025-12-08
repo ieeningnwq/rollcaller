@@ -161,9 +161,7 @@ class _StudentPageState extends State<StudentPage> {
     WidgetsFlutterBinding.ensureInitialized(); // 确保初始化Flutter绑定。对于插件很重要。
     var classDao = StudentClassDao(); // 创建StudentClassDao实例。
     await classDao.getAllStudentClasses().then(
-      (value) => studentClasses.addAll(
-        value,
-      ),
+      (value) => studentClasses.addAll(value),
     );
     for (StudentClassModel classModel in studentClasses) {
       var students = await studentDao.getAllStudentsByClassName(
@@ -171,7 +169,7 @@ class _StudentPageState extends State<StudentPage> {
       );
       StudentClassGroup classGroup = StudentClassGroup(
         studentClass: classModel,
-        students: students.map((e) => StudentModel.fromMap(e)).toList(),
+        students: students,
       );
       classGroups.add(classGroup);
     }

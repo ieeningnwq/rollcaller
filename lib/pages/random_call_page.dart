@@ -107,9 +107,8 @@ class _RandomCallPageState extends State<RandomCallPage>
           return (StudentDao().getAllStudentsByClassName(
             studentClass.className,
           )).then((students) async {
-            List<StudentModel> studentModels = students
-                .map((e) => StudentModel.fromMap(e))
-                .toList();
+            List<StudentModel> studentModels = students;
+            ;
             // 初始选择第一个学生
             _currentStudent = studentModels.isNotEmpty
                 ? studentModels.first

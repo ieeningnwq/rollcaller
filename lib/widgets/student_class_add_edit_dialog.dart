@@ -2,43 +2,54 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../models/student_class_model.dart';
-import '../providers/student_class_provider.dart';
 import '../utils/student_class_dao.dart';
 
-class StudentClassAddEditDialog extends StatelessWidget {
+class StudentClassAddEditDialog extends StatefulWidget {
   final StudentClassModel studentClass;
   final String title;
-  late final bool isAdd;
-  final StudentClassProvider studentClassProvider;
 
-  final TextEditingController classNameController;
-  final TextEditingController studentQuantityController;
-  final TextEditingController teacherNameController;
-  final TextEditingController notesController;
-
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  StudentClassAddEditDialog({
+  const StudentClassAddEditDialog({
     super.key,
     required this.studentClass,
     required this.title,
-    required this.studentClassProvider,
-    required this.classNameController,
-    required this.teacherNameController,
-    required this.notesController,
-    required this.studentQuantityController,
-  }) {
-    isAdd = title == '添加班级';
+  });
+
+  @override
+  State<StatefulWidget> createState() {
+    return _StudentClassAddEditDialogState();
+  }
+}
+
+class _StudentClassAddEditDialogState extends State<StudentClassAddEditDialog> {
+  // 班级名称
+  final TextEditingController classNameController = TextEditingController();
+  // 学生人数
+  final TextEditingController studentQuantityController =
+      TextEditingController();
+  // 教师姓名
+  final TextEditingController teacherNameController = TextEditingController();
+  // 备注
+  final TextEditingController notesController = TextEditingController();
+  // 表单验证键
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  bool isAdd = false;
+
+  @override
+  initState() {
+    super.initState();
+    isAdd = widget.title == '添加班级';
+    classNameController.text = widget.studentClass.className;
+    studentQuantityController.text = widget.studentClass.studentQuantity
+        .toString();
+    teacherNameController.text = widget.studentClass.teacherName;
+    notesController.text = widget.studentClass.notes;
   }
 
   @override
   Widget build(BuildContext context) {
-    classNameController.text = studentClass.className;
-    studentQuantityController.text = studentClass.studentQuantity.toString();
-    teacherNameController.text = studentClass.teacherName;
-    notesController.text = studentClass.notes;
     return AlertDialog(
-      title: Text(title),
+      title: Text(widget.title),
       content: Form(
         key: _formKey,
         child: Column(
@@ -64,10 +75,7 @@ class StudentClassAddEditDialog extends StatelessWidget {
           onPressed: () async {
             if (_formKey.currentState!.validate()) {
               // 处理添加/编辑学生班级的逻辑
-              await _saveOnPressed();
-              if (context.mounted) {
-                Navigator.of(context).pop();
-              }
+              _saveOnPressed();
             }
           },
           child: const Text('确定'),
@@ -88,7 +96,6 @@ class StudentClassAddEditDialog extends StatelessWidget {
 
   Padding _buildClassNameInfoRow(String label) {
     bool isClassNameUnique = true;
-
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
@@ -105,7 +112,8 @@ class StudentClassAddEditDialog extends StatelessWidget {
                   if (onValue)
                     {
                       if (!isAdd &&
-                          (classNameController.text == studentClass.className))
+                          (classNameController.text ==
+                              widget.studentClass.className))
                         isClassNameUnique = true
                       else
                         isClassNameUnique = false,
@@ -153,31 +161,64 @@ class StudentClassAddEditDialog extends StatelessWidget {
 
   Future<void> _saveOnPressed() async {
     // 表单验证通过，执行添加/编辑操作
-    studentClass.className = classNameController.text;
-    studentClass.studentQuantity = int.parse(studentQuantityController.text);
-    studentClass.teacherName = teacherNameController.text;
-    studentClass.notes = notesController.text;
+    widget.studentClass.className = classNameController.text;
+    widget.studentClass.studentQuantity = int.parse(
+      studentQuantityController.text,
+    );
+    widget.studentClass.teacherName = teacherNameController.text;
+    widget.studentClass.notes = notesController.text;
     // 获取数据库dao
     var classDao = StudentClassDao(); // 创建StudentClassDao实例。
 
     if (isAdd) {
       // 添加操作
-      studentClass.created = DateTime.now();
-      int id = await classDao.insertStudentClass(studentClass);
-      studentClass.id = id;
-      // 添加班级列表
-      studentClassProvider.addStudentClass(studentClass);
+      widget.studentClass.created = DateTime.now();
+      classDao.insertStudentClass(widget.studentClass).then((id) {
+        if (id != 0) {
+          widget.studentClass.id = id;
+          if (context.mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('添加成功')));
+            Navigator.of(context).pop(true);
+          }
+        } else {
+          if (context.mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('添加失败')));
+            Navigator.of(context).pop(false);
+          }
+        }
+      });
     } else {
       // 更新操作
-      await classDao.updateStudentClassById(studentClass);
-      studentClassProvider.updateStudentClass(studentClass);
+      classDao.updateStudentClassById(widget.studentClass).then((onValue) {
+        if (onValue != 0) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('更新成功')));
+            Navigator.of(context).pop(true);
+          }
+        } else {
+          if (context.mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('更新失败')));
+            Navigator.of(context).pop(false);
+          }
+        }
+      });
     }
   }
 
+  @override
   void dispose() {
     classNameController.dispose();
     studentQuantityController.dispose();
     teacherNameController.dispose();
     notesController.dispose();
+    super.dispose();
   }
 }

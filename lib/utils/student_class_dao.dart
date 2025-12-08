@@ -60,9 +60,9 @@ class StudentClassDao {
     );
   }
 
-  Future<void> deleteStudentClassByClassName(String className) async {
+   Future<int> deleteStudentClassByClassName(String className) async {
     final db = await dbHelper.database;
-    await db.delete(tableName, where: 'class_name=?', whereArgs: [className]);
+    return await db.delete(tableName, where: 'class_name=?', whereArgs: [className]);
   }
 
   Future<int> updateStudentClassById(

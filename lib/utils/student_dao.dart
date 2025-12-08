@@ -27,15 +27,16 @@ class StudentDao {
     return await db.query(tableName);
   }
 
-  Future<List<Map<String, dynamic>>> getAllStudentsByClassName(
-    String className,
-  ) async {
+  Future<List<StudentModel>> getAllStudentsByClassName(String className) async {
     final db = await dbHelper.database;
-    return await db.query(
+    List<Map<String, dynamic>> result = await db.query(
       tableName,
       where: 'INSTR("," || class_name || ",", ?) > 0',
       whereArgs: [',$className,'],
     );
+    return result.isNotEmpty
+        ? result.map((map) => StudentModel.fromMap(map)).toList()
+        : [];
   }
 
   Future<List<Map<String, dynamic>>> getAllStudentsWithoutClassName() async {
