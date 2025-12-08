@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:rollcall/models/student_class_model.dart';
 
@@ -375,33 +374,30 @@ class _StudentPageState extends State<StudentPage> {
                 icon: const Icon(Icons.delete, color: Colors.grey),
                 onPressed: () {
                   // 删除功能
-                  // showDialog(
-                  //   context: context,
-                  //   builder: (context) => AlertDialog(
-                  //     title: const Text('确认删除'),
-                  //     content: const Text('确定删除该学生吗？'),
-                  //     actions: [
-                  //       TextButton(
-                  //         onPressed: () => Navigator.of(context).pop(),
-                  //         child: const Text('取消'),
-                  //       ),
-                  //       TextButton(
-                  //         onPressed: () async {
-                  //           await StudentDao().deleteStudentById(student.id);
-                  //           if (context.mounted) {
-                  //             // 刷新学生列表
-                  //             Provider.of<ClassGroupsProvider>(
-                  //               context,
-                  //               listen: false,
-                  //             ).removeStudent(student);
-                  //             Navigator.of(context).pop();
-                  //           }
-                  //         },
-                  //         child: const Text('删除'),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // );
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('确认删除'),
+                      content: const Text('确定删除该学生吗？'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('取消'),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            await StudentDao().deleteStudentById(student.id);
+                            if (context.mounted) {
+                              // 刷新学生列表
+                              _refreshClassGroupData();
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          child: const Text('删除'),
+                        ),
+                      ],
+                    ),
+                  );
                 },
               ),
             ],
