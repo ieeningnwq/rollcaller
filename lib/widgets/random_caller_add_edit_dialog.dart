@@ -72,6 +72,9 @@ class _RandomCallerAddEditDialogState extends State<RandomCallerAddEditDialog> {
             return Text('Error: ${snapshot.error}');
           } else if (snapshot.hasData) {
             _allStudentClassesMap = snapshot.data;
+            if(_selectedStudentClassId == -1 && _allStudentClassesMap!.isNotEmpty){
+              _selectedStudentClassId = _allStudentClassesMap!.keys.first;
+            }
             return AlertDialog(
               title: Text(widget.title),
               content: Form(
@@ -128,10 +131,10 @@ class _RandomCallerAddEditDialogState extends State<RandomCallerAddEditDialog> {
       onChanged: (value) {
         WidgetsFlutterBinding.ensureInitialized(); // 确保初始化Flutter绑定。对于插件很重要。
         RandomCallerDao randomCallerDao = RandomCallerDao();
-        randomCallerDao.isRollCallerNameExist(value).then((value) {
-          if (value) {
+        randomCallerDao.isRollCallerNameExist(value).then((v) {
+          if (v) {
             if (!_isAdd &&
-                widget.randomCaller.randomCallerName !=
+                widget.randomCaller.randomCallerName ==
                     _randomCallerNameController.text) {
               isRollCallerNameUnique = true;
             } else {

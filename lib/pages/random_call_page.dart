@@ -29,9 +29,7 @@ class _RandomCallPageState extends State<RandomCallPage> {
   // 新建/编辑时当前学生班级id
   // 添加dialog 是否重复点名状态
 
-  // 全部班级
-  Map<int, StudentClassModel> _allStudentClassesMap = {};
-
+  // 选择点名器、班级、学生、点名记录信息
   RandomCallerGroupModel? _randomCallerGroup;
 
   Future<RandomCallerGroupModel?> _getRandomCallerPageInfo() async {
@@ -79,6 +77,14 @@ class _RandomCallPageState extends State<RandomCallPage> {
       } else {
         return null;
       }
+    });
+  }
+
+  Future<void> _refreshPageData() async {
+    await _getRandomCallerPageInfo().then((value) {
+      setState(() {
+        _randomCallerGroup = value;
+      });
     });
   }
 
@@ -185,7 +191,12 @@ class _RandomCallPageState extends State<RandomCallPage> {
               title: '编辑点名器',
               randomCaller: _allRandomCallersMap[_selectedCallerId!]!,
             ),
-          );
+          ).then((value) {
+            if (value == true) {
+              // 刷新随机点名器列表
+              _refreshPageData();
+            }
+          });
         } else {
           Fluttertoast.showToast(msg: '请先选择点名器');
         }
@@ -214,17 +225,7 @@ class _RandomCallPageState extends State<RandomCallPage> {
         ).then((value) {
           if (value == true) {
             // 刷新随机点名器列表
-            RandomCallerDao().getAllRandomCallers().then((allRandomCallers) {
-              setState(() {
-                _allRandomCallersMap = {
-                  for (var randomCaller in allRandomCallers)
-                    randomCaller.id!: randomCaller,
-                };
-                _selectedCallerId = allRandomCallers.isNotEmpty
-                    ? allRandomCallers.first.id
-                    : null;
-              });
-            });
+            _refreshPageData();
           }
         }),
       },

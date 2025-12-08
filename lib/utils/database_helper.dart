@@ -49,7 +49,7 @@ class DatabaseHelper {
     await db.execute('''
       CREATE TABLE ${KString.randomCallerTableName} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        random_caller_name TEXT NOT NULL,
+        random_caller_name TEXT NOT NULL UNIQUE,
         is_duplicate INTEGER NOT NULL DEFAULT 0,
         class_id INTEGER NOT NULL,
         is_archive INTEGER NOT NULL DEFAULT 0,
