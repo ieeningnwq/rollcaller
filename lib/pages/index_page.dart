@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import '../configs/strings.dart';
 import 'home_page.dart';
-import '../pages/record.dart';
+import 'records.dart';
 import '../pages/settings.dart';
 import 'student_class_page.dart';
 import '../providers/current_index_provider.dart';

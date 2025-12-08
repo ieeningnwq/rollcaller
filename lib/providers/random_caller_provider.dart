@@ -37,45 +37,45 @@ class RandomCallerProvider with ChangeNotifier {
     return _selectedCaller;
   }
 
-  Future<RandomCallerGroupModel> getSelectorCallerClassStudents() async {
-    while (_selectedCaller == null) {
-      await Future.delayed(const Duration(milliseconds: 100));
-    }
-    final RandomCallerModel randomCallerModel;
-    StudentClassModel studentClassModel;
-    List<StudentModel> studentList;
-    Map<int, List<RandomCallRecordModel>> randomCallRecords = {};
-    randomCallerModel = _selectedCaller!;
-    return await StudentClassDao()
-        .getStudentClass(_selectedCaller!.classId)
-        .then((studentClass) async {
-          studentClassModel = studentClass;
-          return (StudentDao().getAllStudentsByClassName(
-            studentClassModel.className,
-          )).then((students) {
-            List<StudentModel> studentModels = students
-                .map((e) => StudentModel.fromMap(e))
-                .toList();
-            studentList = studentModels;
-            for (var element in studentModels) {
-              RandomCallRecordDao()
-                  .getRecordsByCallerIdStudentId(
-                    randomCallerModel.id!,
-                    element.id!,
-                  )
-                  .then((records) {
-                    randomCallRecords[element.id!] = records;
-                  });
-            }
-            return RandomCallerGroupModel(
-              randomCallerModel: randomCallerModel,
-              students: studentList,
-              studentClassModel: studentClassModel,
-              randomCallRecords: randomCallRecords,
-            );
-          });
-        });
-  }
+  // Future<RandomCallerGroupModel> getSelectorCallerClassStudents() async {
+  //   while (_selectedCaller == null) {
+  //     await Future.delayed(const Duration(milliseconds: 100));
+  //   }
+  //   final RandomCallerModel randomCallerModel;
+  //   StudentClassModel studentClassModel;
+  //   List<StudentModel> studentList;
+  //   Map<int, List<RandomCallRecordModel>> randomCallRecords = {};
+  //   randomCallerModel = _selectedCaller!;
+  //   return await StudentClassDao()
+  //       .getStudentClass(_selectedCaller!.classId)
+  //       .then((studentClass) async {
+  //         studentClassModel = studentClass;
+  //         return (StudentDao().getAllStudentsByClassName(
+  //           studentClassModel.className,
+  //         )).then((students) {
+  //           List<StudentModel> studentModels = students
+  //               .map((e) => StudentModel.fromMap(e))
+  //               .toList();
+  //           studentList = studentModels;
+  //           for (var element in studentModels) {
+  //             RandomCallRecordDao()
+  //                 .getRecordsByCallerIdStudentId(
+  //                   randomCallerModel.id!,
+  //                   element.id!,
+  //                 )
+  //                 .then((records) {
+  //                   randomCallRecords[element.id!] = records;
+  //                 });
+  //           }
+  //           return RandomCallerGroupModel(
+  //             randomCallerModel: randomCallerModel,
+  //             students: studentList.toMap((e) => e.id!, (e) => e),
+  //             studentClassModel: studentClassModel,
+  //             randomCallRecords: randomCallRecords,
+  //           );
+  //         });
+  //       });
+  // }
 
   Map<int, RandomCallerModel> get randomCallers => _randomCallers;
 

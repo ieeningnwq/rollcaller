@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rollcall/utils/random_caller_dao.dart';
@@ -5,7 +7,6 @@ import 'package:rollcall/utils/random_caller_dao.dart';
 import '../models/random_call_record.dart';
 import '../models/random_caller_group.dart';
 import '../models/random_caller_model.dart';
-import '../models/student_class_model.dart';
 import '../models/student_model.dart';
 import '../utils/random_call_record_dao.dart';
 import '../utils/student_class_dao.dart';
@@ -21,16 +22,67 @@ class RandomCallPage extends StatefulWidget {
   State<RandomCallPage> createState() => _RandomCallPageState();
 }
 
-class _RandomCallPageState extends State<RandomCallPage> {
+class _RandomCallPageState extends State<RandomCallPage>
+    with SingleTickerProviderStateMixin {
   // 全部随机点名器
   late Map<int, RandomCallerModel> _allRandomCallersMap = {};
   // 当前选择随机点名器
   int? _selectedCallerId;
-  // 新建/编辑时当前学生班级id
-  // 添加dialog 是否重复点名状态
-
   // 选择点名器、班级、学生、点名记录信息
   RandomCallerGroupModel? _randomCallerGroup;
+  // 随机点名器选择组件初始选择第一个学生
+  StudentModel? _currentStudent;
+  // 随机点名器抽取动画控制器
+  late AnimationController _controller;
+  late Animation<double> _animation;
+  // 随机点名器是否正在抽取
+  bool _isPicking = false;
+  // 随机点名器随机数生成器
+  final Random _random = Random();
+  // 滚动控制器，用于点击学生后滚动到抽取区域
+  final ScrollController _scrollController = ScrollController();
+  // 存储Future对象，避免每次build都创建新的Future
+  Future<RandomCallerGroupModel?>? _randomCallerFuture;
+  // 评分组件分数
+  int _score = 5;
+  // 学生组折叠状态
+  bool _isPickedGroupExpanded = true; // 已抽取学生组默认展开
+  bool _isUnpickedGroupExpanded = true; // 未抽取学生组默认展开
+
+  @override
+  initState() {
+    super.initState();
+    // 初始化动画控制器 - 速度更快
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 100),
+      vsync: this,
+    );
+
+    // 初始化动画
+    _animation = Tween<double>(begin: 0, end: 1).animate(_controller)
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          // 动画完成后，检查是否还在抽取中
+          if (_isPicking) {
+            // 如果还在抽取中，立即开始下一次动画
+            _controller.reset();
+            _controller.forward();
+
+            // 随机选择一个新的学生
+            setState(() {
+              int studentId =
+                  _randomCallerGroup!.students.keys.toList()[_random.nextInt(
+                    _randomCallerGroup!.students.length,
+                  )];
+              _currentStudent = _randomCallerGroup!.students[studentId];
+            });
+          }
+        }
+      });
+
+    // 初始化时创建Future对象
+    _randomCallerFuture = _getRandomCallerPageInfo();
+  }
 
   Future<RandomCallerGroupModel?> _getRandomCallerPageInfo() async {
     Map<int, List<RandomCallRecordModel>> randomCallRecords = {};
@@ -38,42 +90,66 @@ class _RandomCallPageState extends State<RandomCallPage> {
     return RandomCallerDao().getAllRandomCallers().then((
       allRandomCallers,
     ) async {
+      // 保存全部随机点名器
       _allRandomCallersMap = {
         for (var randomCaller in allRandomCallers)
           randomCaller.id!: randomCaller,
       };
+      // 初始选择第一个随机点名器
       _selectedCallerId ??= allRandomCallers.isNotEmpty
           ? allRandomCallers.first.id
           : null;
       if (_selectedCallerId != null) {
         var selectedCaller = _allRandomCallersMap[_selectedCallerId!]!;
-        return await StudentClassDao()
-            .getStudentClass(selectedCaller.classId)
-            .then((studentClass) async {
-              return (StudentDao().getAllStudentsByClassName(
-                studentClass!.className,
-              )).then((students) {
-                List<StudentModel> studentModels = students
-                    .map((e) => StudentModel.fromMap(e))
-                    .toList();
-                for (var element in studentModels) {
-                  RandomCallRecordDao()
-                      .getRecordsByCallerIdStudentId(
-                        selectedCaller.id!,
-                        element.id!,
-                      )
-                      .then((records) {
-                        randomCallRecords[element.id!] = records;
-                      });
-                }
-                return RandomCallerGroupModel(
-                  randomCallerModel: selectedCaller,
-                  students: studentModels,
-                  studentClassModel: studentClass,
-                  randomCallRecords: randomCallRecords,
-                );
-              });
-            });
+        return StudentClassDao().getStudentClass(selectedCaller.classId).then((
+          studentClass,
+        ) async {
+          return (StudentDao().getAllStudentsByClassName(
+            studentClass.className,
+          )).then((students) async {
+            List<StudentModel> studentModels = students
+                .map((e) => StudentModel.fromMap(e))
+                .toList();
+            // 初始选择第一个学生
+            _currentStudent = studentModels.isNotEmpty
+                ? studentModels.first
+                : null;
+            var conditions = [
+              'random_caller_id = ?',
+              'AND',
+              '(',
+              'student_id = ?',
+            ];
+            for (var i = 0; i < studentModels.length - 1; i++) {
+              conditions.add('OR');
+              conditions.add('student_id = ?');
+            }
+            conditions.add(')');
+            var whereArgs = [selectedCaller.id];
+            whereArgs.addAll(
+              studentModels.map((toElement) => toElement.id!).toList(),
+            );
+            return RandomCallRecordDao()
+                .getRecordsByCallerIdByConditions(
+                  conditions: conditions,
+                  whereArgs: whereArgs,
+                )
+                .then((value) async {
+                  for (var record in value) {
+                    randomCallRecords[record.studentId] ??= [];
+                    randomCallRecords[record.studentId]!.add(record);
+                  }
+                  return RandomCallerGroupModel(
+                    randomCallerModel: selectedCaller,
+                    students: {
+                      for (var student in studentModels) student.id!: student,
+                    },
+                    studentClassModel: studentClass,
+                    randomCallRecords: randomCallRecords,
+                  );
+                });
+          });
+        });
       } else {
         return null;
       }
@@ -81,17 +157,16 @@ class _RandomCallPageState extends State<RandomCallPage> {
   }
 
   Future<void> _refreshPageData() async {
-    await _getRandomCallerPageInfo().then((value) {
-      setState(() {
-        _randomCallerGroup = value;
-      });
+    setState(() {
+      // 更新Future对象，触发FutureBuilder重新构建
+      _randomCallerFuture = _getRandomCallerPageInfo();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _getRandomCallerPageInfo(),
+      future: _randomCallerFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -101,12 +176,14 @@ class _RandomCallPageState extends State<RandomCallPage> {
           _randomCallerGroup = snapshot.data;
           return Expanded(
             child: SingleChildScrollView(
+              controller: _scrollController, // 添加滚动控制器
+              padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
                   _buildRandomCallerInfoWidget(),
-                  // RandomCallerInfoWidget(),
-                  // RandomCallerCallWidget(),
-                  // StudentScoreWidget(),
+                  _buildCallerCallWidget(),
+                  _buildStudentScoreWidget(),
+                  _buildStudentCardsWidget(),
                 ],
               ),
             ),
@@ -114,6 +191,108 @@ class _RandomCallPageState extends State<RandomCallPage> {
         }
       },
     );
+  }
+
+  Column _buildCallerCallWidget() {
+    return Column(
+      children: [
+        // 学生抽取卡片
+        Card(
+          elevation: 4.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Column(
+              children: [
+                // 学生姓名显示
+                Text(
+                  _currentStudent?.studentName ?? '没有学生',
+                  style: const TextStyle(
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+
+                const SizedBox(height: 4.0),
+
+                // 学号显示
+                AnimatedBuilder(
+                  animation: _animation,
+                  builder: (context, child) {
+                    return Opacity(
+                      opacity: 0.7 + (_animation.value * 0.3), // 添加透明度动画
+                      child: child,
+                    );
+                  },
+                  child: Text(
+                    _currentStudent == null
+                        ? '没有学生'
+                        : _currentStudent?.studentNumber ?? '没有学号',
+                    style: const TextStyle(
+                      fontSize: 18.0,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 8.0),
+
+                // 开始随机抽取按钮
+                SizedBox(
+                  width: double.infinity,
+                  height: 40.0,
+                  child: ElevatedButton(
+                    onPressed: _toggleRandomPick,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6C4AB6), // 紫色背景
+                      foregroundColor: Colors.white, // 白色文字
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      elevation: 4.0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.shuffle, size: 20.0),
+                        const SizedBox(width: 8.0),
+                        Text(_isPicking ? '停止抽取' : '开始随机抽取'),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // 开始/停止随机抽取
+  void _toggleRandomPick() {
+    setState(() {
+      if (_isPicking) {
+        // 停止抽取
+        _isPicking = false;
+        _controller.stop();
+        _controller.reset();
+
+        // 抽取停止后，重置分数为默认值5分
+        _score = 5;
+      } else {
+        // 开始抽取
+        _isPicking = true;
+        _controller.forward();
+      }
+    });
   }
 
   Container _buildRandomCallerInfoWidget() {
@@ -322,6 +501,368 @@ class _RandomCallPageState extends State<RandomCallPage> {
       icon: const Icon(Icons.arrow_drop_down),
       iconSize: 24.0,
       iconEnabledColor: Colors.grey,
+    );
+  }
+
+  Padding _buildStudentScoreWidget() {
+    // 评分组件 - 一直显示
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Card(
+        elevation: 4.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            children: [
+              // 分数范围和滑动条
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: const [
+                      Text('1分', style: TextStyle(color: Colors.black54)),
+                      Text('10分', style: TextStyle(color: Colors.black54)),
+                    ],
+                  ),
+                  const SizedBox(height: 8.0),
+                  Slider(
+                    value: _score.toDouble(),
+                    min: 1,
+                    max: 10,
+                    divisions: 9,
+                    label: '$_score分',
+                    activeColor: const Color(0xFF6C4AB6),
+                    inactiveColor: Colors.grey.shade300,
+                    onChanged: (value) {
+                      setState(() {
+                        _score = value.round();
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 4.0),
+                  Text(
+                    '$_score分',
+                    style: const TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF6C4AB6),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4.0),
+
+              // 评分按钮组
+              SizedBox(
+                width: double.infinity,
+                height: 40.0,
+                child: ElevatedButton(
+                  onPressed: _currentStudent != null ? _saveScore : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF6C4AB6), // 紫色背景
+                    foregroundColor: Colors.white, // 白色文字
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    textStyle: const TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    elevation: 4.0,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: const [
+                      Icon(Icons.save, size: 20.0),
+                      SizedBox(width: 8.0),
+                      Text('保存评分'),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // 保存评分按钮，添加随机点名记录
+  void _saveScore() {
+    // 获取 RandomCallRecordModel对象
+    RandomCallRecordModel randomCallRecordModel = RandomCallRecordModel(
+      randomCallerId: _selectedCallerId!,
+      studentId: _currentStudent!.id!,
+      score: _score,
+      notes: '',
+      created: DateTime.now(),
+    );
+    RandomCallRecordDao().insertRandomCallRecord(randomCallRecordModel).then((
+      value,
+    ) {
+      if (value > 0) {
+        // 插入成功
+        randomCallRecordModel.id = value;
+        setState(() {
+          // 更新选中的随机点名记录
+          _randomCallerGroup!.randomCallRecords[_currentStudent!.id!]!.add(
+            randomCallRecordModel,
+          );
+          // 保存评分后，重置分数为默认值5分
+          _score = 5;
+        });
+      }
+    });
+  }
+
+  // 计算学生平均分
+  double _calculateAverageScore(List<int> scores) {
+    if (scores.isEmpty) return 0.0;
+    double sum = scores.fold(0, (sum, score) => sum + score);
+    return sum / scores.length;
+  }
+
+  // 构建学生组列表
+  Widget _buildStudentGroup({required bool isPickedGroup}) {
+    if (_randomCallerGroup!.students.isEmpty) {
+      return const Text(
+        '暂无学生',
+        style: TextStyle(color: Colors.black54, fontStyle: FontStyle.italic),
+      );
+    }
+    List<Map<StudentModel, List<RandomCallRecordModel>>> studentRecords = [];
+    for (StudentModel student in _randomCallerGroup!.students.values) {
+      if (_randomCallerGroup!.randomCallRecords.containsKey(student.id!)) {
+        if (_randomCallerGroup!.randomCallRecords[student.id!]!.isNotEmpty &&
+            isPickedGroup) {
+          studentRecords.add({
+            student: _randomCallerGroup!.randomCallRecords[student.id!] ?? [],
+          });
+        }
+        if (_randomCallerGroup!.randomCallRecords[student.id!]!.isEmpty &&
+            !isPickedGroup) {
+          studentRecords.add({
+            student: _randomCallerGroup!.randomCallRecords[student.id!] ?? [],
+          });
+        }
+      }
+    }
+
+    // 对学生进行排序：已抽取学生按抽取次数降序，未抽取学生按学号升序
+    studentRecords.sort((a, b) {
+      if (a.values.first.isNotEmpty && b.values.first.isNotEmpty) {
+        // 已抽取学生按抽取次数降序
+        return b.values.first.length.compareTo(a.values.first.length);
+      } else {
+        // 未抽取学生按学号升序
+        return a.keys.first.studentNumber.compareTo(b.keys.first.studentNumber);
+      }
+    });
+
+    return Column(
+      children: studentRecords.map((studentRecord) {
+        double average = _calculateAverageScore(
+          List<int>.from(studentRecord.values.first.map((e) => e.score)),
+        );
+        return GestureDetector(
+          onTap: () {
+            // 实现手动抽取功能
+            setState(() {
+              // 设置当前学生为被点击的学生
+              _currentStudent = studentRecord.keys.first;
+              // 重置分数为默认值5分
+              _score = 5;
+            });
+
+            // 滚动到抽取学生区域
+            _scrollController.animateTo(
+              0, // 滚动到页面顶部（抽取学生区域在顶部）
+              duration: const Duration(milliseconds: 500), // 滚动动画持续时间
+              curve: Curves.easeInOut, // 滚动曲线
+            );
+          },
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12.0),
+            padding: const EdgeInsets.all(16.0),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade50,
+              borderRadius: BorderRadius.circular(8.0),
+              border: Border.all(
+                color: studentRecord.values.first.isNotEmpty
+                    ? Color(0xFF6C4AB6)
+                    : Colors.grey.shade200,
+                width: 1.0,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      studentRecord.keys.first.studentName,
+                      style: const TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 4.0),
+                    Text(
+                      studentRecord.keys.first.studentNumber,
+                      style: const TextStyle(
+                        fontSize: 14.0,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '抽取: ${studentRecord.values.first.length}次',
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold,
+                            color: studentRecord.values.first.isNotEmpty
+                                ? Color(0xFF6C4AB6)
+                                : Colors.black54,
+                          ),
+                        ),
+                        const SizedBox(height: 4.0),
+                        Text(
+                          '平均分: ${average > 0 ? average.toStringAsFixed(1) : '—'}',
+                          style: TextStyle(
+                            fontSize: 14.0,
+                            fontWeight: FontWeight.bold,
+                            color: average > 0
+                                ? Color(0xFF6C4AB6)
+                                : Colors.black54,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Padding _buildStudentCardsWidget() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 8.0),
+      child: Card(
+        elevation: 4.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '学生列表',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+              const SizedBox(height: 16.0),
+
+              // 已抽取学生组
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _isPickedGroupExpanded = !_isPickedGroupExpanded;
+                  });
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      '已抽取学生',
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF6C4AB6),
+                      ),
+                    ),
+                    Icon(
+                      _isPickedGroupExpanded
+                          ? Icons.expand_less
+                          : Icons.expand_more,
+                      color: Color(0xFF6C4AB6),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 4.0),
+              AnimatedCrossFade(
+                firstChild: Container(height: 0),
+                secondChild: _buildStudentGroup(isPickedGroup: true),
+                crossFadeState: _isPickedGroupExpanded
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
+                duration: const Duration(milliseconds: 300),
+                sizeCurve: Curves.easeInOut,
+              ),
+
+              const SizedBox(height: 8.0),
+
+              // 未抽取学生组
+              GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _isUnpickedGroupExpanded = !_isUnpickedGroupExpanded;
+                  });
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      '未抽取学生',
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF6C4AB6),
+                      ),
+                    ),
+                    Icon(
+                      _isUnpickedGroupExpanded
+                          ? Icons.expand_less
+                          : Icons.expand_more,
+                      color: Color(0xFF6C4AB6),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12.0),
+              AnimatedCrossFade(
+                firstChild: Container(height: 0),
+                secondChild: _buildStudentGroup(isPickedGroup: false),
+                crossFadeState: _isUnpickedGroupExpanded
+                    ? CrossFadeState.showSecond
+                    : CrossFadeState.showFirst,
+                duration: const Duration(milliseconds: 300),
+                sizeCurve: Curves.easeInOut,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

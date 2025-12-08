@@ -6,7 +6,7 @@ import 'student_model.dart';
 class RandomCallerGroupModel {
   final RandomCallerModel randomCallerModel;
   final StudentClassModel studentClassModel;
-  List<StudentModel> students = [];
+  Map<int, StudentModel> students = {};
   Map<int, List<RandomCallRecordModel>> randomCallRecords = {};
   RandomCallerGroupModel({
     required this.randomCallerModel,

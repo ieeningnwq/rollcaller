@@ -25,4 +25,32 @@ class RandomCallRecordDao {
       (i) => RandomCallRecordModel.fromMap(maps[i]),
     );
   }
+
+  Future<List<RandomCallRecordModel>> getRecordsByCallerIdByConditions({
+    required List<String> conditions,
+    required List<dynamic> whereArgs,
+  }) async {
+    final db = await _databaseHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+      where: conditions.join(' '),
+      whereArgs: whereArgs,
+    );
+    List<RandomCallRecordModel> randomCallRecords = [];
+    for (var map in maps) {
+      randomCallRecords.add(RandomCallRecordModel.fromMap(map));
+    }
+    return randomCallRecords;
+    // return List.generate(
+    //   maps.length,
+    //   (i) => RandomCallRecordModel.fromMap(maps[i]),
+    // );
+  }
+
+  Future<int> insertRandomCallRecord(
+    RandomCallRecordModel randomCallRecordModel,
+  ) async {
+    final db = await _databaseHelper.database;
+    return await db.insert(tableName, randomCallRecordModel.toMap());
+  }
 }

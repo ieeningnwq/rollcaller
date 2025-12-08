@@ -1,6 +1,6 @@
 class RandomCallRecordModel {
   int? id;
-  int randomCallerGroupId;
+  int randomCallerId;
   int studentId;
   int score;
   String notes;
@@ -8,7 +8,7 @@ class RandomCallRecordModel {
 
   RandomCallRecordModel({
     this.id,
-    required this.randomCallerGroupId,
+    required this.randomCallerId,
     required this.studentId,
     required this.score,
     required this.notes,
@@ -17,7 +17,7 @@ class RandomCallRecordModel {
 
   factory RandomCallRecordModel.fromMap(Map<String, dynamic> map) {
     RandomCallRecordModel randomCallRecordModel = RandomCallRecordModel(
-      randomCallerGroupId: map['random_caller_group_id'],
+      randomCallerId: map['random_caller_id'],
       studentId: map['student_id'],
       score: map['score'],
       notes: map['notes'],
@@ -34,7 +34,7 @@ class RandomCallRecordModel {
     if (id != null) {
       data['id'] = id;
     }
-    data['random_caller_group_id'] = randomCallerGroupId;
+    data['random_caller_id'] = randomCallerId;
     data['student_id'] = studentId;
     data['score'] = score;
     data['notes'] = notes;
@@ -44,6 +44,6 @@ class RandomCallRecordModel {
 
   @override
   String toString() {
-    return 'RandomCallRecordModel(id: $id, randomCallerGroupId: $randomCallerGroupId, studentId: $studentId, score: $score, notes: $notes, created: $created)';
+    return 'RandomCallRecordModel(id: $id, randomCallerId: $randomCallerId, studentId: $studentId, score: $score, notes: $notes, created: $created)';
   }
 }
