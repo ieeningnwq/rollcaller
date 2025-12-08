@@ -162,7 +162,7 @@ class _StudentPageState extends State<StudentPage> {
     var classDao = StudentClassDao(); // 创建StudentClassDao实例。
     await classDao.getAllStudentClasses().then(
       (value) => studentClasses.addAll(
-        value.map((e) => StudentClassModel.fromMap(e)).toList(),
+        value,
       ),
     );
     for (StudentClassModel classModel in studentClasses) {

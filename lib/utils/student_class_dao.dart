@@ -23,21 +23,12 @@ class StudentClassDao {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getAllStudentClasses() async {
+  Future<List<StudentClassModel>> getAllStudentClasses() async {
     final db = await dbHelper.database;
-    return await db.query(tableName);
-  }
-
-  Future<List<Map<String, dynamic>>> getStudentClassesByName(
-    String className,
-  ) async {
-    final db = await dbHelper.database;
-    return await db.query(
-      tableName,
-      columns: ['class_name'],
-      where: 'class_name=?',
-      whereArgs: [className],
-    );
+    List<Map<String, dynamic>> result = await db.query(tableName);
+    return result.isNotEmpty
+        ? result.map((map) => StudentClassModel.fromMap(map)).toList()
+        : [];
   }
 
   Future<bool> isStudentClassesNameExist(String className) async {

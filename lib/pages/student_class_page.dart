@@ -30,16 +30,23 @@ class _StudentClassState extends State<StudentClassPage> {
     initialRefresh: false,
   );
 
+  // 存储Future对象，避免每次build都创建新的Future
+  late Future<List<StudentClassModel>> _studentClassFuture;
+
+  @override
+  initState() {
+    _studentClassFuture = _getStudentClassList();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<StudentClassProvider>(
       builder: (context, studentClassProvider, child) {
         return Scaffold(
-          // appBar: AppBar(title: const Text(KString.studentClassAppBarTitle)),
           body: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-
               children: [
                 // 顶部标题栏
                 Container(
@@ -51,18 +58,17 @@ class _StudentClassState extends State<StudentClassPage> {
                 ),
                 Expanded(
                   child: FutureBuilder(
-                    future: _getStudentClassList(),
+                    future: _studentClassFuture,
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.done) {
                         if (snapshot.hasError) {
                           return Text('Error: ${snapshot.error}');
                         } else {
-                          List<Map<String, dynamic>>? data = snapshot.data;
-                          log(data.toString());
+                          List<StudentClassModel>? data = snapshot.data;
                           List<StudentClassModel> studentClassList = [];
-                          for (Map<String, dynamic> item in data!) {
+                          for (StudentClassModel item in data!) {
                             studentClassList.add(
-                              StudentClassModel.fromMap(item),
+                              item,
                             );
                           }
                           studentClassProvider.changeStudentClassWithoutNotify(
@@ -139,20 +145,19 @@ class _StudentClassState extends State<StudentClassPage> {
     );
   }
 
-  Future<List<Map<String, dynamic>>> _getStudentClassList() async {
+  Future<List<StudentClassModel>> _getStudentClassList() async {
     WidgetsFlutterBinding.ensureInitialized(); // 确保初始化Flutter绑定。对于插件很重要。
     var classDao = StudentClassDao(); // 创建StudentClassDao实例。
     StudentDao studentDao = StudentDao();
-    List<Map<String, dynamic>> data = [];
-    List<Map<String, dynamic>> studentClasses = await classDao
+    List<StudentClassModel> data = [];
+    List<StudentClassModel> studentClasses = await classDao
         .getAllStudentClasses();
     if (studentClasses.isNotEmpty) {
-      for (Map<String, dynamic> item in studentClasses) {
-        Map<String, dynamic> copyItem = Map.from(item);
+      for (StudentClassModel item in studentClasses) {
         List<Map<String, dynamic>> number = await studentDao
-            .getAllStudentsByClassName(item['class_name']);
-        copyItem['class_quantity'] = number.length;
-        data.add(copyItem);
+            .getAllStudentsByClassName(item.className);
+        item.classQuantity = number.length;
+        data.add(item);
       }
     }
     return data;
@@ -174,16 +179,9 @@ class _StudentClassState extends State<StudentClassPage> {
   }
 
   Future<void> _refreshClassData() async {
-    var classes = await _getStudentClassList();
-    if (mounted) {
-      // 更新列表
-      Provider.of<StudentClassProvider>(
-        context,
-        listen: false,
-      ).changeStudentClass(
-        classes.map((e) => StudentClassModel.fromMap(e)).toList(),
-      );
-    }
+    setState(() {
+      _studentClassFuture = _getStudentClassList();
+    });
   }
 
   void _onLoading() async {

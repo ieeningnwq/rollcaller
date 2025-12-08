@@ -54,9 +54,7 @@ class _RandomCallerAddEditDialogState extends State<RandomCallerAddEditDialog> {
     StudentClassDao studentClassDao = StudentClassDao();
     return await studentClassDao.getAllStudentClasses().then((value) {
       for (var element in value) {
-        allStudentClassesMap[element['id']!] = StudentClassModel.fromMap(
-          element,
-        );
+        allStudentClassesMap[element.id!] = element;
       }
       return allStudentClassesMap;
     });
@@ -72,7 +70,8 @@ class _RandomCallerAddEditDialogState extends State<RandomCallerAddEditDialog> {
             return Text('Error: ${snapshot.error}');
           } else if (snapshot.hasData) {
             _allStudentClassesMap = snapshot.data;
-            if(_selectedStudentClassId == -1 && _allStudentClassesMap!.isNotEmpty){
+            if (_selectedStudentClassId == -1 &&
+                _allStudentClassesMap!.isNotEmpty) {
               _selectedStudentClassId = _allStudentClassesMap!.keys.first;
             }
             return AlertDialog(
