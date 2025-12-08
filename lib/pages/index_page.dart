@@ -57,7 +57,7 @@ class IndexPage extends StatelessWidget {
                 type: BottomNavigationBarType.fixed,
                 currentIndex: currentIndex,
                 items: bottomTabs,
-                onTap: (index) => {currentIndexProvider.changeIndex(index)},
+                onTap: (index) => {currentIndexProvider.currentIndex = index},
               ),
               body: tabBodies[currentIndex],
             );

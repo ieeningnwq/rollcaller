@@ -89,4 +89,10 @@ class StudentClassDao {
     var mapData = await db.query(tableName, where: 'id=?', whereArgs: [id]);
     return StudentClassModel.fromMap(mapData.first);
   }
+
+  Future<StudentClassModel> getStudentClassByClassName(String className) async {
+    final db = await dbHelper.database;
+    var mapData = await db.query(tableName, where: 'class_name=?', whereArgs: [className]);
+    return StudentClassModel.fromMap(mapData.first);
+  }
 }

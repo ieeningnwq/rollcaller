@@ -19,10 +19,8 @@ class _StudentClassState extends State<StudentClassPage> {
   final RefreshController _refreshController = RefreshController(
     initialRefresh: false,
   );
-
   // 存储Future对象，避免每次build都创建新的Future
   late Future<Map<int, StudentClassModel>> _studentClassFuture;
-
   // 所有班级对象
   late Map<int, StudentClassModel> _studentClassMap;
 

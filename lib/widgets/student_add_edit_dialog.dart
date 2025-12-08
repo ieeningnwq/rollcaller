@@ -1,71 +1,118 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
+import '../models/student_class_model.dart';
 import '../models/student_model.dart';
-import '../providers/class_groups_provider.dart';
-import '../providers/class_selected_provider.dart';
-import '../providers/student_class_provider.dart';
+import '../utils/student_class_dao.dart';
 import '../utils/student_dao.dart';
 
-class StudentAddEditDialog extends StatelessWidget {
+class StudentAddEditDialog extends StatefulWidget {
   final StudentModel student;
   final String title;
-  late final bool isAdd;
 
-  final TextEditingController studentNameController;
-  final TextEditingController studentNumberController;
-  final GlobalKey _formKey = GlobalKey<FormState>();
-
-  StudentAddEditDialog({
+  const StudentAddEditDialog({
     super.key,
     required this.student,
     required this.title,
-    required this.studentNameController,
-    required this.studentNumberController,
-  }) {
-    isAdd = title == '添加学生';
+  });
+
+  @override
+  State<StatefulWidget> createState() {
+    return _StudentAddEditDialogState();
+  }
+}
+
+class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
+  final TextEditingController _studentNameController = TextEditingController();
+  final TextEditingController _studentNumberController =
+      TextEditingController();
+  final GlobalKey _formKey = GlobalKey<FormState>();
+
+  Future<Map<String, StudentClassModel>>? _allStudentClassesMapFuture;
+
+  // 选中的班级{id:bool}
+  Map<String, bool>? _selectedClasses;
+  // 所有班级消息
+  late Map<String, StudentClassModel> _allStudentClassesMap;
+
+  bool isAdd = false;
+  @override
+  void initState() {
+    super.initState();
+    _allStudentClassesMapFuture = _getAllStudentClassesMap();
+    isAdd = widget.title == '添加学生';
+    _studentNameController.text = widget.student.studentName;
+    _studentNumberController.text = widget.student.studentNumber;
+  }
+
+  Future<Map<String, StudentClassModel>> _getAllStudentClassesMap() async {
+    Map<String, StudentClassModel> allStudentClassesMap = {};
+    StudentClassDao studentClassDao = StudentClassDao();
+    return await studentClassDao.getAllStudentClasses().then((value) {
+      for (var element in value) {
+        allStudentClassesMap[element.className] = element;
+      }
+      return allStudentClassesMap;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    studentNameController.text = student.studentName;
-    studentNumberController.text = student.studentNumber;
-    final List<String> classOptions = Provider.of<StudentClassProvider>(
-      context,
-      listen: false,
-    ).studentClassesList.map((e) => e.className).toList();
-    return AlertDialog(
-      title: Text(title),
-      content: Form(
-        key: _formKey,
-        child: SizedBox(
-          width: double.maxFinite,
-          child: ListView(
-            shrinkWrap: true,
-            padding: const EdgeInsets.symmetric(vertical: 4),
-            children: [
-              // 学生学号
-              _buildStudentNumberField(),
-              // 学生姓名
-              _buildStudengNameField(),
-              const SizedBox(height: 4),
-              // 班级选择
-              const Text('所在班级', style: TextStyle(fontSize: 16)),
-              _buildClassSelectField(classOptions),
-            ],
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text('取消'),
-        ),
-        TextButton(
-          onPressed: () => _saveOnPressed(context, classOptions),
-          child: Text('保存'),
-        ),
-      ],
+    return FutureBuilder<Map<String, StudentClassModel>>(
+      future: _allStudentClassesMapFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else {
+            _allStudentClassesMap = snapshot.data!;
+            if (_selectedClasses == null) {
+              _selectedClasses = {};
+              for (var element in _allStudentClassesMap.keys) {
+                _selectedClasses![element] = false;
+              }
+              if (widget.student.className.isNotEmpty) {
+                for (String element in widget.student.className.split(',')) {
+                  _selectedClasses![element] = true;
+                }
+              }
+            }
+            return AlertDialog(
+              title: Text(widget.title),
+              content: Form(
+                key: _formKey,
+                child: SizedBox(
+                  width: double.maxFinite,
+                  child: ListView(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    children: [
+                      // 学生学号
+                      _buildStudentNumberField(),
+                      // 学生姓名
+                      _buildStudengNameField(),
+                      const SizedBox(height: 4),
+                      // 班级选择
+                      const Text('所在班级', style: TextStyle(fontSize: 16)),
+                      _buildClassSelectField(),
+                    ],
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text('取消'),
+                ),
+                TextButton(
+                  onPressed: () => _saveOnPressed(context),
+                  child: Text('保存'),
+                ),
+              ],
+            );
+          }
+        }
+        return const CircularProgressIndicator();
+      },
     );
   }
 
@@ -73,7 +120,7 @@ class StudentAddEditDialog extends StatelessWidget {
     bool isStudentNumberUnique = true;
     return TextFormField(
       decoration: InputDecoration(labelText: '学生学号', hintText: '请输入学生学号（必填）'),
-      controller: studentNumberController,
+      controller: _studentNumberController,
       autovalidateMode: AutovalidateMode.onUnfocus,
       onChanged: (value) {
         WidgetsFlutterBinding.ensureInitialized(); // 确保初始化Flutter绑定。对于插件很重要。
@@ -85,7 +132,8 @@ class StudentAddEditDialog extends StatelessWidget {
                 if (onValue)
                   {
                     if (!isAdd &&
-                        (studentNumberController.text == student.studentNumber))
+                        (_studentNumberController.text ==
+                            widget.student.studentNumber))
                       isStudentNumberUnique = true
                     else
                       isStudentNumberUnique = false,
@@ -110,7 +158,7 @@ class StudentAddEditDialog extends StatelessWidget {
   TextFormField _buildStudengNameField() {
     return TextFormField(
       decoration: InputDecoration(labelText: '学生姓名', hintText: '请输入学生姓名（必填）'),
-      controller: studentNameController,
+      controller: _studentNameController,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: (value) {
         if (value == null || value.isEmpty) {
@@ -121,99 +169,94 @@ class StudentAddEditDialog extends StatelessWidget {
     );
   }
 
-  Consumer<StudentClassSelectedProvider> _buildClassSelectField(
-    List<String> classOptions,
-  ) {
-    return Consumer<StudentClassSelectedProvider>(
-      builder: (context, selectedClassProvider, child) {
-        return Column(
-          children: List.generate(classOptions.length, (index) {
-            return CheckboxListTile(
-              value: selectedClassProvider.selectedClasses[index],
-              title: Text(classOptions[index]),
-              onChanged: (value) {
-                selectedClassProvider.setSelectedClasses(index, value);
-                // 更新 className
-                student.className = selectedClassProvider.selectedClasses
-                    .asMap()
-                    .entries
-                    .where((entry) => entry.value)
-                    .map((entry) => classOptions[entry.key])
-                    .toList()
-                    .join(',');
-              },
-              controlAffinity: ListTileControlAffinity.leading,
-              contentPadding: EdgeInsets.zero,
-              dense: true,
-            );
-          }),
+  Column _buildClassSelectField() {
+    return Column(
+      children: List.generate(_allStudentClassesMap.length, (index) {
+        return CheckboxListTile(
+          value: _selectedClasses![_allStudentClassesMap.keys.toList()[index]],
+          title: Text(
+            _allStudentClassesMap[_allStudentClassesMap.keys.toList()[index]]!
+                .className,
+          ),
+          onChanged: (value) {
+            setState(() {
+              _selectedClasses![_allStudentClassesMap.keys.toList()[index]] =
+                  value!;
+            });
+          },
+          controlAffinity: ListTileControlAffinity.leading,
+          contentPadding: EdgeInsets.zero,
+          dense: true,
         );
-      },
+      }),
     );
   }
 
-  void _saveOnPressed(BuildContext context, List<String> classOptions) async {
+  void _saveOnPressed(BuildContext context) async {
     if ((_formKey.currentState as FormState).validate()) {
       WidgetsFlutterBinding.ensureInitialized(); // 确保初始化Flutter绑定。对于插件很重要。
       var studentDao = StudentDao(); // 创建StudentstudentDao实例。
-      String selectedClassListStr =
-          Provider.of<StudentClassSelectedProvider>(context, listen: false)
-              .selectedClasses
-              .asMap()
-              .entries
-              .where((entry) => entry.value)
-              .map((entry) => classOptions[entry.key])
-              .toList()
-              .join(',');
-      StudentModel oldStudent = StudentModel(
-        studentName: student.studentName,
-        studentNumber: student.studentNumber,
-        className: student.className,
-        created: student.created,
-      );
       // 更新学生信息
-      student.studentNumber = studentNumberController.text;
-      student.studentName = studentNameController.text;
-      student.className = selectedClassListStr;
+      widget.student.studentNumber = _studentNumberController.text;
+      widget.student.studentName = _studentNameController.text;
+      List<String> classNames = [];
+      _selectedClasses!.forEach((key, value) {
+        if (value) {
+          classNames.add(key);
+        }
+      });
+      widget.student.className = classNames.join(',');
       // 判断是新增还是修改
       if (isAdd) {
         // 新增学生
-        student.created = DateTime.now();
+        widget.student.created = DateTime.now();
         studentDao
-            .insertStudent(student)
+            .insertStudent(widget.student)
             .then(
               (id) => {
-                student.id = id,
-                // 添加学生列表，刷新数据
-                if (context.mounted)
+                if (id != 0)
                   {
-                    Provider.of<ClassGroupsProvider>(
-                      context,
-                      listen: false,
-                    ).addStudent(student),
+                    // 添加学生列表，刷新数据
+                    if (context.mounted)
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(const SnackBar(content: Text('新增成功'))),
+                  }
+                else
+                  {
+                    if (context.mounted)
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(const SnackBar(content: Text('新增失败'))),
                   },
               },
             );
       } else {
         // 修改学生
         studentDao
-            .updateStudentClassById(student)
+            .updateStudentClassById(widget.student)
             .then(
               (value) => {
-                // 更新学生列表，刷新数据
-                if (context.mounted)
+                if (value != 0)
                   {
-                    Provider.of<ClassGroupsProvider>(
-                      context,
-                      listen: false,
-                    ).updateStudent(student, oldStudent),
+                    if (context.mounted)
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(const SnackBar(content: Text('修改成功'))),
+                  }
+                else
+                  {
+                    if (context.mounted)
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(const SnackBar(content: Text('修改失败'))),
                   },
               },
             );
       }
-    }
-    if (context.mounted) {
-      Navigator.of(context).pop(); // 关闭弹窗
+      if (context.mounted) {
+        Navigator.of(context).pop(true); // 关闭弹窗
+      }
     }
   }
 }

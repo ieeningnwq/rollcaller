@@ -39,12 +39,15 @@ class StudentDao {
         : [];
   }
 
-  Future<List<Map<String, dynamic>>> getAllStudentsWithoutClassName() async {
+   Future<List<StudentModel>> getAllStudentsWithoutClassName() async {
     final db = await dbHelper.database;
-    return await db.query(
+    List<Map<String, dynamic>> result = await db.query(
       tableName,
       where: 'class_name IS NULL OR class_name = ""',
     );
+    return result.isNotEmpty
+        ? result.map((map) => StudentModel.fromMap(map)).toList()
+        : [];
   }
 
   Future<bool> isStudentNumberExist(String studentNumber) async {
@@ -63,9 +66,9 @@ class StudentDao {
     await db.delete(tableName, where: 'id=?', whereArgs: [id]);
   }
 
-  Future<void> updateStudentClassById(StudentModel student) async {
+  Future<int> updateStudentClassById(StudentModel student) async {
     final db = await dbHelper.database;
-    await db.update(
+    return await db.update(
       tableName,
       student.toMap(),
       where: 'id=?',

@@ -108,11 +108,13 @@ class _RandomCallPageState extends State<RandomCallPage>
             studentClass.className,
           )).then((students) async {
             List<StudentModel> studentModels = students;
-            ;
             // 初始选择第一个学生
             _currentStudent = studentModels.isNotEmpty
                 ? studentModels.first
                 : null;
+            for (var student in studentModels) {
+              randomCallRecords[student.id!] = [];
+            }
             var conditions = [
               'random_caller_id = ?',
               'AND',
@@ -135,7 +137,6 @@ class _RandomCallPageState extends State<RandomCallPage>
                 )
                 .then((value) async {
                   for (var record in value) {
-                    randomCallRecords[record.studentId] ??= [];
                     randomCallRecords[record.studentId]!.add(record);
                   }
                   return RandomCallerGroupModel(
@@ -244,7 +245,9 @@ class _RandomCallPageState extends State<RandomCallPage>
                   width: double.infinity,
                   height: 40.0,
                   child: ElevatedButton(
-                    onPressed: _toggleRandomPick,
+                    onPressed: _currentStudent != null
+                        ? _toggleRandomPick
+                        : null,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF6C4AB6), // 紫色背景
                       foregroundColor: Colors.white, // 白色文字
@@ -492,6 +495,7 @@ class _RandomCallPageState extends State<RandomCallPage>
         if (newValue != null) {
           setState(() {
             _selectedCallerId = newValue;
+            _refreshPageData();
           });
         }
       },

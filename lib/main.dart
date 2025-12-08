@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:rollcall/providers/random_caller_provider.dart';
-import 'package:rollcall/providers/student_class_provider.dart';
 import './configs/color.dart';
 import 'pages/index_page.dart';
 import './providers/current_index_provider.dart';
-import 'providers/class_groups_provider.dart';
-import 'providers/class_selected_provider.dart';
-import 'providers/random_caller_is_duplicate_provider.dart';
-import 'providers/random_caller_selected_class_id_provider.dart';
 
 void main() {
   runApp(
@@ -17,24 +11,6 @@ void main() {
       providers: [
         ChangeNotifierProvider<CurrentIndexProvider>(
           create: (_) => CurrentIndexProvider(),
-        ),
-        ChangeNotifierProvider<StudentClassProvider>(
-          create: (_) => StudentClassProvider(),
-        ),
-        ChangeNotifierProvider<StudentClassSelectedProvider>(
-          create: (_) => StudentClassSelectedProvider(),
-        ),
-        ChangeNotifierProvider<ClassGroupsProvider>(
-          create: (_) => ClassGroupsProvider(),
-        ),
-        ChangeNotifierProvider<RandomCallerProvider>(
-          create: (_) => RandomCallerProvider(),
-        ),
-        ChangeNotifierProvider<RandomCallerSelectedClassIdProvider>(
-          create: (_) => RandomCallerSelectedClassIdProvider(),
-        ),
-        ChangeNotifierProvider<RandomCallerIsDuplicateProvider>(
-          create: (_) => RandomCallerIsDuplicateProvider(),
         ),
       ],
       child: MyApp(),

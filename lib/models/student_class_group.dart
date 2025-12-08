@@ -36,6 +36,6 @@ class StudentClassGroup {
 
   @override
   toString() {
-    return 'StudentClassGroup(studentClass: $studentClass, students: $students)';
+    return 'StudentClassGroup(studentClass: $studentClass, students: $students, isExpanded: $isExpanded)';
   }
 }
