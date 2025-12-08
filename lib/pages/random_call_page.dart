@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:provider/provider.dart';
 import 'package:rollcall/utils/random_caller_dao.dart';
 
 import '../models/random_call_record.dart';
@@ -8,7 +7,6 @@ import '../models/random_caller_group.dart';
 import '../models/random_caller_model.dart';
 import '../models/student_class_model.dart';
 import '../models/student_model.dart';
-import '../providers/random_caller_provider.dart';
 import '../utils/random_call_record_dao.dart';
 import '../utils/student_class_dao.dart';
 import '../utils/student_dao.dart';
@@ -35,32 +33,6 @@ class _RandomCallPageState extends State<RandomCallPage> {
   Map<int, StudentClassModel> _allStudentClassesMap = {};
 
   RandomCallerGroupModel? _randomCallerGroup;
-
-  @override
-  initState() {
-    super.initState();
-    // 获取所有随机点名器数据
-    RandomCallerDao().getAllRandomCallers().then((allRandomCallers) {
-      setState(() {
-        _allRandomCallersMap = {
-          for (var randomCaller in allRandomCallers)
-            randomCaller.id!: randomCaller,
-        };
-        _selectedCallerId = allRandomCallers.isNotEmpty
-            ? allRandomCallers.first.id
-            : null;
-      });
-    });
-    // 获取所有班级数据
-    StudentClassDao().getAllStudentClasses().then((allStudentClasses) {
-      setState(() {
-        _allStudentClassesMap = {
-          for (var studentClass in allStudentClasses)
-            studentClass['id']!: StudentClassModel.fromMap(studentClass),
-        };
-      });
-    });
-  }
 
   Future<RandomCallerGroupModel?> _getRandomCallerPageInfo() async {
     Map<int, List<RandomCallRecordModel>> randomCallRecords = {};
@@ -192,7 +164,6 @@ class _RandomCallPageState extends State<RandomCallPage> {
             context: context,
             builder: (context) => RandomCallerViewDialog(
               randomCaller: _allRandomCallersMap[_selectedCallerId!]!,
-              allStudentClassesMap: _allStudentClassesMap,
             ),
           );
         } else {
@@ -207,6 +178,17 @@ class _RandomCallPageState extends State<RandomCallPage> {
     return IconButton(
       onPressed: () {
         // 编辑点名器功能
+        if (_selectedCallerId != null) {
+          showDialog(
+            context: context,
+            builder: (context) => RandomCallerAddEditDialog(
+              title: '编辑点名器',
+              randomCaller: _allRandomCallersMap[_selectedCallerId!]!,
+            ),
+          );
+        } else {
+          Fluttertoast.showToast(msg: '请先选择点名器');
+        }
       },
       icon: const Icon(Icons.edit, color: Colors.blue),
     );
