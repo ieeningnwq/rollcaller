@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:rollcall/utils/student_class_dao.dart';
 
 import '../models/random_caller_model.dart';
 import '../models/student_class_model.dart';
@@ -8,13 +9,11 @@ import '../utils/random_caller_dao.dart';
 class RandomCallerAddEditDialog extends StatefulWidget {
   final RandomCallerModel randomCaller;
   final String title;
-  final Map<int, StudentClassModel> allStudentClassesMap;
 
   const RandomCallerAddEditDialog({
     super.key,
     required this.randomCaller,
     required this.title,
-    required this.allStudentClassesMap,
   });
 
   @override
@@ -31,16 +30,12 @@ class _RandomCallerAddEditDialogState extends State<RandomCallerAddEditDialog> {
   int _selectedStudentClassId = -1;
   bool _isAdd = false;
   bool _isDuplicate = false;
+  Map<int, StudentClassModel>? _allStudentClassesMap = {};
 
   @override
   initState() {
     super.initState();
     _selectedStudentClassId = widget.randomCaller.classId;
-    if (_selectedStudentClassId == -1) {
-      _selectedStudentClassId = widget.allStudentClassesMap.isNotEmpty
-          ? widget.allStudentClassesMap.keys.first
-          : -1;
-    }
     _isDuplicate = widget.randomCaller.isDuplicate == 1;
     _isAdd = widget.title == '新增点名器';
     _randomCallerNameController.text = widget.randomCaller.randomCallerName;
@@ -54,46 +49,72 @@ class _RandomCallerAddEditDialogState extends State<RandomCallerAddEditDialog> {
     super.dispose();
   }
 
+  Future<Map<int, StudentClassModel>> _getAllStudentClassesMap() async {
+    Map<int, StudentClassModel> allStudentClassesMap = {};
+    StudentClassDao studentClassDao = StudentClassDao();
+    return await studentClassDao.getAllStudentClasses().then((value) {
+      for (var element in value) {
+        allStudentClassesMap[element['id']!] = StudentClassModel.fromMap(
+          element,
+        );
+      }
+      return allStudentClassesMap;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(widget.title),
-      content: Form(
-        key: _formKey,
-        child: ListView(
-          shrinkWrap: true,
-          children: [
-            _buildRollCallerNameField(),
-            _buildNotesField('备注（选填）'),
-            _buildIsDuplicateField(),
-            _buildClassIdField(),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('取消'),
-        ),
-        TextButton(
-          onPressed: () {
-            if (widget.allStudentClassesMap.isEmpty) {
-              Fluttertoast.showToast(
-                msg: '暂无班级，无法添加点名器，请先添加班级',
-                toastLength: Toast.LENGTH_SHORT,
-                gravity: ToastGravity.BOTTOM,
-                timeInSecForIosWeb: 1,
-                backgroundColor: Colors.grey,
-                textColor: Colors.white,
-                fontSize: 16.0,
-              );
-              return;
-            }
-            _saveRandomCaller(context);
-          },
-          child: const Text('保存'),
-        ),
-      ],
+    return FutureBuilder<Map<int, StudentClassModel>>(
+      future: _getAllStudentClassesMap(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else if (snapshot.hasData) {
+            _allStudentClassesMap = snapshot.data;
+            return AlertDialog(
+              title: Text(widget.title),
+              content: Form(
+                key: _formKey,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    _buildRollCallerNameField(),
+                    _buildNotesField('备注（选填）'),
+                    _buildIsDuplicateField(),
+                    _buildClassIdField(),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('取消'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    if (_allStudentClassesMap!.isEmpty) {
+                      Fluttertoast.showToast(
+                        msg: '暂无班级，无法添加点名器，请先添加班级',
+                        toastLength: Toast.LENGTH_SHORT,
+                        gravity: ToastGravity.BOTTOM,
+                        timeInSecForIosWeb: 1,
+                        backgroundColor: Colors.grey,
+                        textColor: Colors.white,
+                        fontSize: 16.0,
+                      );
+                      return;
+                    }
+                    _saveRandomCaller(context);
+                  },
+                  child: const Text('保存'),
+                ),
+              ],
+            );
+          }
+        }
+        return const CircularProgressIndicator();
+      },
     );
   }
 
@@ -141,7 +162,7 @@ class _RandomCallerAddEditDialogState extends State<RandomCallerAddEditDialog> {
   }
 
   Widget _buildClassIdField() {
-    if (widget.allStudentClassesMap.isEmpty) {
+    if (_allStudentClassesMap!.isEmpty) {
       return const Text('暂无班级，无法添加点名器，请先添加班级');
     }
 
@@ -157,7 +178,7 @@ class _RandomCallerAddEditDialogState extends State<RandomCallerAddEditDialog> {
               null;
             },
       child: Column(
-        children: widget.allStudentClassesMap.values
+        children: _allStudentClassesMap!.values
             .map(
               (e) => RadioListTile<int>(
                 value: e.id!,

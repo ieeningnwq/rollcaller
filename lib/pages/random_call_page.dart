@@ -3,10 +3,15 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:rollcall/utils/random_caller_dao.dart';
 
+import '../models/random_call_record.dart';
+import '../models/random_caller_group.dart';
 import '../models/random_caller_model.dart';
 import '../models/student_class_model.dart';
+import '../models/student_model.dart';
 import '../providers/random_caller_provider.dart';
+import '../utils/random_call_record_dao.dart';
 import '../utils/student_class_dao.dart';
+import '../utils/student_dao.dart';
 import '../widgets/random_caller_add_edit_dialog.dart';
 import '../widgets/random_caller_view_dialog.dart';
 
@@ -28,6 +33,8 @@ class _RandomCallPageState extends State<RandomCallPage> {
 
   // 全部班级
   Map<int, StudentClassModel> _allStudentClassesMap = {};
+
+  RandomCallerGroupModel? _randomCallerGroup;
 
   @override
   initState() {
@@ -55,25 +62,80 @@ class _RandomCallPageState extends State<RandomCallPage> {
     });
   }
 
+  Future<RandomCallerGroupModel?> _getRandomCallerPageInfo() async {
+    Map<int, List<RandomCallRecordModel>> randomCallRecords = {};
+
+    return RandomCallerDao().getAllRandomCallers().then((
+      allRandomCallers,
+    ) async {
+      _allRandomCallersMap = {
+        for (var randomCaller in allRandomCallers)
+          randomCaller.id!: randomCaller,
+      };
+      _selectedCallerId ??= allRandomCallers.isNotEmpty
+          ? allRandomCallers.first.id
+          : null;
+      if (_selectedCallerId != null) {
+        var selectedCaller = _allRandomCallersMap[_selectedCallerId!]!;
+        return await StudentClassDao()
+            .getStudentClass(selectedCaller.classId)
+            .then((studentClass) async {
+              return (StudentDao().getAllStudentsByClassName(
+                studentClass!.className,
+              )).then((students) {
+                List<StudentModel> studentModels = students
+                    .map((e) => StudentModel.fromMap(e))
+                    .toList();
+                for (var element in studentModels) {
+                  RandomCallRecordDao()
+                      .getRecordsByCallerIdStudentId(
+                        selectedCaller.id!,
+                        element.id!,
+                      )
+                      .then((records) {
+                        randomCallRecords[element.id!] = records;
+                      });
+                }
+                return RandomCallerGroupModel(
+                  randomCallerModel: selectedCaller,
+                  students: studentModels,
+                  studentClassModel: studentClass!,
+                  randomCallRecords: randomCallRecords,
+                );
+              });
+            });
+      } else {
+        return null;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<RandomCallerProvider>(
-      builder: (context, randomCallerProvider, child) {
-        return Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                _buildRandomCallerInfoWidget(),
-                // RandomCallerInfoWidget(),
-                // RandomCallerCallWidget(),
-                // StudentScoreWidget(),
-              ],
+    return FutureBuilder(
+      future: _getRandomCallerPageInfo(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else {
+          _randomCallerGroup = snapshot.data;
+          return Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _buildRandomCallerInfoWidget(),
+                  // RandomCallerInfoWidget(),
+                  // RandomCallerCallWidget(),
+                  // StudentScoreWidget(),
+                ],
+              ),
             ),
-          ),
-        );
+          );
+        }
       },
     );
-    // return RandomCallerInfoWidget();
   }
 
   Container _buildRandomCallerInfoWidget() {
@@ -166,7 +228,6 @@ class _RandomCallPageState extends State<RandomCallPage> {
               notes: '',
               created: DateTime.now(),
             ),
-            allStudentClassesMap: _allStudentClassesMap,
           ),
         ).then((value) {
           if (value == true) {

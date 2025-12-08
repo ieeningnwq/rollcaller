@@ -59,7 +59,7 @@ class IndexPage extends StatelessWidget {
                 items: bottomTabs,
                 onTap: (index) => {currentIndexProvider.changeIndex(index)},
               ),
-              body: IndexedStack(index: currentIndex, children: tabBodies),
+              body: tabBodies[currentIndex],
             );
           },
     );
