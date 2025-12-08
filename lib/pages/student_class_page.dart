@@ -309,7 +309,7 @@ class _StudentClassState extends State<StudentClassPage> {
               );
             },
           ).then((onValue) {
-            if (onValue) {
+            if (onValue != null && onValue == true) {
               _refreshClassData();
             }
           });

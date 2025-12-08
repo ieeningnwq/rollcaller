@@ -370,7 +370,7 @@ class _RandomCallPageState extends State<RandomCallPage>
               randomCaller: _allRandomCallersMap[_selectedCallerId!]!,
             ),
           ).then((value) {
-            if (value == true) {
+            if (value != null && value == true) {
               // 刷新随机点名器列表
               _refreshPageData();
             }
@@ -401,7 +401,7 @@ class _RandomCallPageState extends State<RandomCallPage>
             ),
           ),
         ).then((value) {
-          if (value == true) {
+          if (value != null && value == true) {
             // 刷新随机点名器列表
             _refreshPageData();
           }
