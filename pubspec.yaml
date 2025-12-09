@@ -38,13 +38,13 @@ dependencies:
   fluttertoast: ^9.0.0
   pull_to_refresh: ^2.0.0
   syncfusion_flutter_datepicker: ^31.2.16
+  excel: ^4.0.6
+  file_picker: ^10.3.7
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
-  excel: ^4.0.6
-  file_picker: ^10.3.7
-
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
