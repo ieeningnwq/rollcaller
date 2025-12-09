@@ -13,4 +13,6 @@ class KString {
   static const String studentTableName = 'student';
   static const String randomCallerTableName = 'random_caller';
   static const String randomCallerRecordTableName = 'random_caller_record';
+  static const String attendanceCallerTableName = 'attendance_caller';
+  static const String attendanceCallerRecordTableName = 'attendance_caller_record';
 }

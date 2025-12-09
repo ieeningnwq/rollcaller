@@ -26,6 +26,19 @@ class RandomCallRecordDao {
     );
   }
 
+  Future<List<RandomCallRecordModel>> getRecordsByCallerId(int callerId) async {
+    final db = await _databaseHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+      where: 'random_caller_id = ?',
+      whereArgs: [callerId],
+    );
+    return List.generate(
+      maps.length,
+      (i) => RandomCallRecordModel.fromMap(maps[i]),
+    );
+  }
+
   Future<List<RandomCallRecordModel>> getRecordsByCallerIdByConditions({
     required List<String> conditions,
     required List<dynamic> whereArgs,

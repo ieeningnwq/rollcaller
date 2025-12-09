@@ -2,13 +2,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:rollcall/utils/roll_caller_dao.dart';
+import 'package:rollcall/utils/random_caller_dao.dart';
 
 import '../models/random_call_record.dart';
 import '../models/random_caller_group.dart';
 import '../models/random_caller_model.dart';
 import '../models/student_model.dart';
-import '../utils/roll_call_record_dao.dart';
+import '../utils/random_call_record_dao.dart';
 import '../utils/student_class_dao.dart';
 import '../utils/student_dao.dart';
 import '../widgets/random_caller_add_edit_dialog.dart';
@@ -47,9 +47,9 @@ class _RandomCallPageState extends State<RandomCallPage>
   int _score = 5;
   // 学生组折叠状态
   bool _isPickedGroupExpanded = true; // 已抽取学生组默认展开
-  bool _isUnpickedGroupExpanded = true;
-
-  bool _isRandomCallerInfoWidgetExpanded = false; // 未抽取学生组默认展开
+  bool _isUnpickedGroupExpanded = true; // 未抽取学生组默认展开
+  // 选择点名器折叠
+  bool _isRandomCallerInfoWidgetExpanded = false;
 
   @override
   initState() {
@@ -117,26 +117,8 @@ class _RandomCallPageState extends State<RandomCallPage>
             for (var student in studentModels) {
               randomCallRecords[student.id!] = [];
             }
-            var conditions = [
-              'random_caller_id = ?',
-              'AND',
-              '(',
-              'student_id = ?',
-            ];
-            for (var i = 0; i < studentModels.length - 1; i++) {
-              conditions.add('OR');
-              conditions.add('student_id = ?');
-            }
-            conditions.add(')');
-            var whereArgs = [selectedCaller.id];
-            whereArgs.addAll(
-              studentModels.map((toElement) => toElement.id!).toList(),
-            );
             return RandomCallRecordDao()
-                .getRecordsByCallerIdByConditions(
-                  conditions: conditions,
-                  whereArgs: whereArgs,
-                )
+                .getRecordsByCallerId(selectedCaller.id!)
                 .then((value) async {
                   for (var record in value) {
                     randomCallRecords[record.studentId]!.add(record);
@@ -179,7 +161,7 @@ class _RandomCallPageState extends State<RandomCallPage>
           return Expanded(
             child: SingleChildScrollView(
               controller: _scrollController, // 添加滚动控制器
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(4.0),
               child: Column(
                 children: [
                   _buildRandomCallerInfoWidget(),
@@ -309,8 +291,8 @@ class _RandomCallPageState extends State<RandomCallPage>
         });
       },
       child: Container(
-        margin: const EdgeInsets.all(10.0),
-        padding: const EdgeInsets.all(14.0),
+        margin: const EdgeInsets.all(4.0),
+        padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12.0),
           color: Colors.white,
