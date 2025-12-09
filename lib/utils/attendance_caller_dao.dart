@@ -50,4 +50,13 @@ class AttendanceCallerDao {
       whereArgs: [attendanceCaller.id],
     );
   }
+
+  Future<int> deleteAttendanceCaller(int id) async {
+    final db = await _databaseHelper.database;
+    return await db.delete(
+      tableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
 }

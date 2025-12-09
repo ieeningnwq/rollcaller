@@ -186,8 +186,8 @@ class _AttendencePageState extends State<AttendencePage> {
                         _buildDeleteIconButton(),
                       ],
                     ),
-                    const SizedBox(height: 8),_buildDropdownButton(),
-                    
+                    const SizedBox(height: 8),
+                    _buildDropdownButton(),
                   ],
                 ),
               ),
@@ -245,18 +245,18 @@ class _AttendencePageState extends State<AttendencePage> {
       onPressed: () {
         // 编辑点名器功能
         if (_selectedCallerId != null) {
-          // showDialog(
-          //   context: context,
-          //   builder: (context) => RandomCallerAddEditDialog(
-          //     title: '编辑点名器',
-          //     randomCaller: _allAttendaceCallersMap[_selectedCallerId!]!,
-          //   ),
-          // ).then((value) {
-          //   if (value != null && value == true) {
-          //     // 刷新随机点名器列表
-          //     _refreshPageData();
-          //   }
-          // });
+          showDialog(
+            context: context,
+            builder: (context) => AttendanceCallerAddEditDialog(
+              title: '编辑点名器',
+              attendanceCaller: _allAttendaceCallersMap[_selectedCallerId!]!,
+            ),
+          ).then((value) {
+            if (value != null && value == true) {
+              // 刷新点名器列表
+              _refreshPageData();
+            }
+          });
         } else {
           Fluttertoast.showToast(msg: '请先选择点名器');
         }
@@ -290,47 +290,51 @@ class _AttendencePageState extends State<AttendencePage> {
     return IconButton(
       onPressed: () {
         // 删除点名器功能
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('确认删除'),
-              content: const Text('确定要删除选中的点名器吗？此操作不可撤销。'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('取消'),
-                ),
-                TextButton(
-                  onPressed: () async {
-                    // await RandomCallerDao()
-                    //     .deleteRandomCaller(_selectedCallerId!)
-                    //     .then((value) {
-                    //       if (value > 0) {
-                    //         _selectedCallerId = null;
-                    //         if (context.mounted) {
-                    //           // 删除后的处理
-                    //           _refreshPageData();
-                    //           Navigator.of(context).pop();
-                    //           ScaffoldMessenger.of(context).showSnackBar(
-                    //             const SnackBar(content: Text('删除成功')),
-                    //           );
-                    //         }
-                    //       } else {
-                    //         if (context.mounted) {
-                    //           ScaffoldMessenger.of(context).showSnackBar(
-                    //             const SnackBar(content: Text('删除失败')),
-                    //           );
-                    //         }
-                    //       }
-                    //     });
-                  },
-                  child: const Text('删除'),
-                ),
-              ],
-            );
-          },
-        );
+        if (_selectedCallerId != null) {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text('确认删除'),
+                content: const Text('确定要删除选中的点名器吗？此操作不可撤销。'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('取消'),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      await AttendanceCallerDao()
+                          .deleteAttendanceCaller(_selectedCallerId!)
+                          .then((value) {
+                            if (value > 0) {
+                              _selectedCallerId = null;
+                              if (context.mounted) {
+                                // 删除后的处理
+                                _refreshPageData();
+                                Navigator.of(context).pop();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('删除成功')),
+                                );
+                              }
+                            } else {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('删除失败')),
+                                );
+                              }
+                            }
+                          });
+                    },
+                    child: const Text('删除'),
+                  ),
+                ],
+              );
+            },
+          );
+        } else {
+          Fluttertoast.showToast(msg: '请先选择点名器');
+        }
       },
       icon: const Icon(Icons.delete, color: Colors.red),
     );
