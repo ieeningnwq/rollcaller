@@ -78,13 +78,16 @@ class _AttendanceCallerAddEditDialogState
               title: Text(widget.title),
               content: Form(
                 key: _formKey,
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    _buildAttendanceCallerNameField(),
-                    _buildNotesField('备注（选填）'),
-                    _buildClassIdField(),
-                  ],
+                child: SizedBox(
+                  width: double.maxFinite,
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      _buildAttendanceCallerNameField(),
+                      _buildNotesField('备注（选填）'),
+                      _buildClassIdField(),
+                    ],
+                  ),
                 ),
               ),
               actions: [

@@ -78,16 +78,20 @@ class _RandomCallerAddEditDialogState extends State<RandomCallerAddEditDialog> {
               title: Text(widget.title),
               content: Form(
                 key: _formKey,
-                child: ListView(
-                  shrinkWrap: true,
-                  children: [
-                    _buildRollCallerNameField(),
-                    _buildNotesField('备注（选填）'),
-                    _buildIsDuplicateField(),
-                    _buildClassIdField(),
-                  ],
+                child: SizedBox(
+                  width: double.maxFinite,
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      _buildRollCallerNameField(),
+                      _buildNotesField('备注（选填）'),
+                      _buildIsDuplicateField(),
+                      _buildClassIdField(),
+                    ],
+                  ),
                 ),
               ),
+
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),

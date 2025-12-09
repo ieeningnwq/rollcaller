@@ -17,30 +17,32 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(title: const Text(KString.homeAppBarTitle)),
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 顶部标题栏
-            Container(
-              padding: const EdgeInsets.all(12),
-              child: Text(
-                KString.homeAppBarTitle,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        child: Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // 顶部标题栏
+              Container(
+                padding: const EdgeInsets.all(12),
+                child: Text(
+                  KString.homeAppBarTitle,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // 随机点名按钮
-                _buildRandomRollCallButton(),
-                _buildAttendenceButton(),
-              ],
-            ),
-            _selectedIndex == 0 ? RandomCallPage() : AttendencePage(),
-          ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // 随机点名按钮
+                  _buildRandomRollCallButton(),
+                  _buildAttendenceButton(),
+                ],
+              ),
+              _selectedIndex == 0 ? RandomCallPage() : AttendencePage(),
+            ],
+          ),
         ),
       ),
     );

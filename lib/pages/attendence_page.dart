@@ -205,41 +205,44 @@ class _AttendencePageState extends State<AttendencePage> {
                 ? (presentCount / totalCount) * 100
                 : 0;
 
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildAttendanceCallerInfoWidget(),
-                // 搜索框 - 固定在顶部
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withAlpha(20),
-                        spreadRadius: 1,
-                        blurRadius: 3,
-                        offset: const Offset(0, 1),
+            return SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildAttendanceCallerInfoWidget(),
+                  // 搜索框 - 固定在顶部
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withAlpha(20),
+                          spreadRadius: 1,
+                          blurRadius: 3,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (value) {
+                        setState(() {});
+                      },
+                      decoration: InputDecoration(
+                        prefixIcon: const Icon(Icons.search),
+                        hintText: '搜索学生',
+                        border: InputBorder.none,
+                        contentPadding: EdgeInsets.all(8),
                       ),
-                    ],
-                  ),
-                  child: TextField(
-                    controller: _searchController,
-                    onChanged: (value) {
-                      setState(() {});
-                    },
-                    decoration: InputDecoration(
-                      prefixIcon: const Icon(Icons.search),
-                      hintText: '搜索学生',
-                      border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(8),
                     ),
                   ),
-                ),
-                SizedBox(height: 4),
-                // 签到状态列表 - 扩展以填充剩余空间
-                Expanded(
-                  child: Container(
+                  SizedBox(height: 4),
+                  // 签到状态列表
+                  Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
@@ -286,181 +289,177 @@ class _AttendencePageState extends State<AttendencePage> {
                         Divider(height: 1, color: Colors.grey.withAlpha(20)),
 
                         // 学生列表 - 可滚动
-                        Expanded(
-                          child: _filteredStudents.isNotEmpty
-                              ? ListView.builder(
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
-                                  itemCount: _filteredStudents.length,
-                                  itemBuilder: (context, index) {
-                                    final StudentModel student =
-                                        _filteredStudents[index];
-                                    return Column(
-                                      children: [
-                                        ListTile(
-                                          onTap: () =>
-                                              _toggleAttendanceStatus(index),
-                                          title: Text(
-                                            student.studentName,
-                                            style: TextStyle(fontSize: 16),
+                        _filteredStudents.isNotEmpty
+                            ? ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: _filteredStudents.length,
+                                itemBuilder: (context, index) {
+                                  final StudentModel student =
+                                      _filteredStudents[index];
+                                  return Column(
+                                    children: [
+                                      ListTile(
+                                        onTap: () =>
+                                            _toggleAttendanceStatus(index),
+                                        title: Text(
+                                          student.studentName,
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        subtitle: Text(
+                                          '学号: ${student.studentNumber}',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey,
                                           ),
-                                          subtitle: Text(
-                                            '学号: ${student.studentNumber}',
+                                        ),
+                                        trailing: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: _attendanceCallerGroup!
+                                                .attendanceCallRecords[student
+                                                    .id!]!
+                                                .present
+                                                .statusColor,
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: Text(
+                                            _attendanceCallerGroup!
+                                                .attendanceCallRecords[student
+                                                    .id!]!
+                                                .present
+                                                .statusText,
                                             style: TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                          trailing: Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 12,
-                                              vertical: 4,
-                                            ),
-                                            decoration: BoxDecoration(
-                                              color: _attendanceCallerGroup!
-                                                  .attendanceCallRecords[student
-                                                      .id!]!
-                                                  .present
-                                                  .statusColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                            child: Text(
-                                              _attendanceCallerGroup!
-                                                  .attendanceCallRecords[student
-                                                      .id!]!
-                                                  .present
-                                                  .statusText,
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                              fontSize: 12,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                         ),
-                                        if (index <
-                                            _filteredStudents.length - 1)
-                                          Divider(
-                                            height: 1,
-                                            color: Colors.grey.withAlpha(20),
-                                          ),
-                                      ],
-                                    );
-                                  },
-                                )
-                              : Center(
-                                  child: Text(
-                                    '暂无学生',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.grey,
+                                      ),
+                                      if (index < _filteredStudents.length - 1)
+                                        Divider(
+                                          height: 1,
+                                          color: Colors.grey.withAlpha(20),
+                                        ),
+                                    ],
+                                  );
+                                },
+                              )
+                            : Center(
+                                child: Text(
+                                  '暂无学生',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 8),
+
+                  // 签到统计 - 固定在底部
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withAlpha(20),
+                          spreadRadius: 1,
+                          blurRadius: 3,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 标题和出勤率
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                '签到统计',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                '${attendanceRate.round()}%',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: const Color(0xFF6200EE),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8),
+
+                          // 进度条
+                          Container(
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.withAlpha(20),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: FractionallySizedBox(
+                              widthFactor: attendanceRate / 100,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF6200EE),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 12),
+
+                          // 各状态统计
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: stats.entries.map((entry) {
+                              return Row(
+                                children: [
+                                  Container(
+                                    width: 12,
+                                    height: 12,
+                                    decoration: BoxDecoration(
+                                      color: entry.key.statusColor,
+                                      borderRadius: BorderRadius.circular(2),
                                     ),
                                   ),
-                                ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                SizedBox(height: 16),
-
-                // 签到统计 - 固定在底部
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withAlpha(20),
-                        spreadRadius: 1,
-                        blurRadius: 3,
-                        offset: const Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(12),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // 标题和出勤率
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '签到统计',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              '${attendanceRate.round()}%',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: const Color(0xFF6200EE),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-
-                        // 进度条
-                        Container(
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.withAlpha(20),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: FractionallySizedBox(
-                            widthFactor: attendanceRate / 100,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF6200EE),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 12),
-
-                        // 各状态统计
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: stats.entries.map((entry) {
-                            return Row(
-                              children: [
-                                Container(
-                                  width: 12,
-                                  height: 12,
-                                  decoration: BoxDecoration(
-                                    color: entry.key.statusColor,
-                                    borderRadius: BorderRadius.circular(2),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    entry.key.statusText,
+                                    style: TextStyle(fontSize: 12),
                                   ),
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  entry.key.statusText,
-                                  style: TextStyle(fontSize: 12),
-                                ),
-                                SizedBox(width: 4),
-                                Text(
-                                  '${entry.value}',
-                                  style: TextStyle(fontSize: 12),
-                                ),
-                              ],
-                            );
-                          }).toList(),
-                        ),
-                      ],
+                                  SizedBox(width: 4),
+                                  Text(
+                                    '${entry.value}',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                ],
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: 8),
-              ],
+                  SizedBox(height: 8),
+                ],
+              ),
             );
           }
         },
