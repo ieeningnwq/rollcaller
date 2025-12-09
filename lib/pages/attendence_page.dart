@@ -124,6 +124,8 @@ class _AttendencePageState extends State<AttendencePage> {
           attendanceCallRecords: attendanceCallRecords,
         );
       } else {
+        _students = [];
+        _filteredStudents = [];
         return null;
       }
     } catch (e) {

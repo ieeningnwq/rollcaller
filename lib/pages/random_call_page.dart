@@ -135,6 +135,7 @@ class _RandomCallPageState extends State<RandomCallPage>
           });
         });
       } else {
+        _currentStudent = null;
         return null;
       }
     });
@@ -479,9 +480,9 @@ class _RandomCallPageState extends State<RandomCallPage>
                           .deleteRandomCaller(_selectedCallerId!)
                           .then((value) {
                             if (value > 0) {
-                              _selectedCallerId = null;
                               if (context.mounted) {
                                 // 删除后的处理
+                                _selectedCallerId = null;
                                 _refreshPageData();
                                 Navigator.of(context).pop();
                                 ScaffoldMessenger.of(context).showSnackBar(
