@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '../configs/attendance_status.dart';
 import '../models/attendance_call_record.dart';
 import '../models/attendance_caller_group.dart';
 import '../models/attendance_caller_model.dart';
@@ -31,7 +32,15 @@ class _AttendencePageState extends State<AttendencePage> {
   AttendanceCallerGroupModel? _attendanceCallerGroup;
   // 获取当前点名器所有信息Future
   Future<AttendanceCallerGroupModel?>? _attendanceCallerFuture;
+  // 搜索框控制器
+  final TextEditingController _searchController = TextEditingController();
 
+  final stats = {
+    AttendanceStatus.present: 0,
+    AttendanceStatus.late: 0,
+    AttendanceStatus.excused: 0,
+    AttendanceStatus.absent: 0,
+  };
   @override
   initState() {
     super.initState();
@@ -97,23 +106,286 @@ class _AttendencePageState extends State<AttendencePage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<AttendanceCallerGroupModel?>(
-      future: _attendanceCallerFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else {
-          _attendanceCallerGroup = snapshot.data;
-          return Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(4.0),
-              child: Column(children: [_buildAttendanceCallerInfoWidget()]),
-            ),
-          );
-        }
-      },
+    return Expanded(
+      child: FutureBuilder<AttendanceCallerGroupModel?>(
+        future: _attendanceCallerFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator();
+          } else if (snapshot.hasError) {
+            return Text('Error: ${snapshot.error}');
+          } else {
+            _attendanceCallerGroup = snapshot.data;
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildAttendanceCallerInfoWidget(),
+                // 搜索框 - 固定在顶部
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withAlpha(20),
+                        spreadRadius: 1,
+                        blurRadius: 3,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (value) {
+                      setState(() {});
+                    },
+                    decoration: InputDecoration(
+                      prefixIcon: const Icon(Icons.search),
+                      hintText: '搜索学生',
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.all(12),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 4),
+
+                Expanded(
+                  child: // 签到状态列表 - 扩展以填充剩余空间
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withAlpha(20),
+                          spreadRadius: 1,
+                          blurRadius: 3,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // 标题行 - 固定在顶部
+                        Padding(
+                          padding: EdgeInsets.all(12),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    '签到状态',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    '共${12}人',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              // 保存按钮
+                              SizedBox(
+                                height: 32,
+                                child: ElevatedButton(
+                                  onPressed: () {},
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(6),
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 12,
+                                      vertical: 4,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(
+                                        Icons.save,
+                                        size: 16,
+                                        color: Colors.white,
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        '保存',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Divider(height: 1, color: Colors.grey.withAlpha(20)),
+
+                        // 学生列表 - 可滚动
+                        // Expanded(
+                        //   child: ListView.builder(
+                        //     physics: const AlwaysScrollableScrollPhysics(),
+                        //     itemCount: _filteredStudents.length,
+                        //     itemBuilder: (context, index) {
+                        //       final student = _filteredStudents[index];
+                        //       return Column(
+                        //         children: [
+                        //           ListTile(
+                        //             onTap: () => _toggleAttendanceStatus(index),
+                        //             title: Text(
+                        //               student.name,
+                        //               style: TextStyle(fontSize: 16.sp),
+                        //             ),
+                        //             subtitle: Text(
+                        //               '学号: ${student.studentId}',
+                        //               style: TextStyle(
+                        //                 fontSize: 14.sp,
+                        //                 color: Colors.grey,
+                        //               ),
+                        //             ),
+                        //             trailing: Container(
+                        //               padding: EdgeInsets.symmetric(
+                        //                 horizontal: 12.w,
+                        //                 vertical: 4.h,
+                        //               ),
+                        //               decoration: BoxDecoration(
+                        //                 color: student.status.statusColor,
+                        //                 borderRadius: BorderRadius.circular(12.r),
+                        //               ),
+                        //               child: Text(
+                        //                 student.status.statusText,
+                        //                 style: TextStyle(
+                        //                   fontSize: 12.sp,
+                        //                   color: Colors.white,
+                        //                   fontWeight: FontWeight.bold,
+                        //                 ),
+                        //               ),
+                        //             ),
+                        //           ),
+                        //           if (index < _filteredStudents.length - 1)
+                        //             Divider(height: 1, color: Colors.grey.withOpacity(0.2)),
+                        //         ],
+                        //       );
+                        //     },
+                        //   ),
+                        // ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                SizedBox(height: 16),
+
+                // 签到统计 - 固定在底部
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withAlpha(20),
+                        spreadRadius: 1,
+                        blurRadius: 3,
+                        offset: const Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 标题和出勤率
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              '签到统计',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              '12%',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: const Color(0xFF6200EE),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+
+                        // 进度条
+                        Container(
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withAlpha(20),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: FractionallySizedBox(
+                            widthFactor: 20 / 100,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF6200EE),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 12),
+
+                        // 各状态统计
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: stats.entries.map((entry) {
+                            return Row(
+                              children: [
+                                Container(
+                                  width: 12,
+                                  height: 12,
+                                  decoration: BoxDecoration(
+                                    color: entry.key.statusColor,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                                SizedBox(width: 4),
+                                Text(
+                                  '${entry.key.statusText}',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                                SizedBox(width: 4),
+                                Text(
+                                  '${entry.value}',
+                                  style: TextStyle(fontSize: 12),
+                                ),
+                              ],
+                            );
+                          }).toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(height: 8),
+              ],
+            );
+          }
+        },
+      ),
     );
   }
 
