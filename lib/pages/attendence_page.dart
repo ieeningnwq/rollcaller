@@ -11,6 +11,7 @@ import '../utils/attendance_caller_dao.dart';
 import '../utils/student_class_dao.dart';
 import '../utils/student_dao.dart';
 import '../widgets/attendance_caller_add_edit_dialog.dart';
+import '../widgets/attendance_caller_view_dialog.dart';
 
 class AttendencePage extends StatefulWidget {
   const AttendencePage({super.key});
@@ -225,12 +226,12 @@ class _AttendencePageState extends State<AttendencePage> {
       onPressed: () {
         // 查看点名器功能
         if (_selectedCallerId != null) {
-          // showDialog(
-          //   context: context,
-          //   builder: (context) => RandomCallerViewDialog(
-          //     randomCaller: _allAttendaceCallersMap[_selectedCallerId!]!,
-          //   ),
-          // );
+          showDialog(
+            context: context,
+            builder: (context) => AttendanceCallerViewDialog(
+              attendanceCaller: _allAttendaceCallersMap[_selectedCallerId!]!,
+            ),
+          );
         } else {
           Fluttertoast.showToast(msg: '请先选择点名器');
         }
