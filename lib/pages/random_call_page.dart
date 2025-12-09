@@ -317,18 +317,18 @@ class _RandomCallPageState extends State<RandomCallPage>
         mainAxisSize: MainAxisSize.min,
         children: [
           // 顶部标题和管理链接
+          const Text(
+            '选择点名器',
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                '选择点名器',
-                style: TextStyle(
-                  fontSize: 18.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-              Spacer(),
+              _buildArchiveIconButton(),
               _buildViewIconButton(),
               _buildAddIconButton(),
               _buildEditIconButton(),
@@ -339,6 +339,25 @@ class _RandomCallPageState extends State<RandomCallPage>
           _buildDropdownButton(),
         ],
       ),
+    );
+  }
+
+  IconButton _buildArchiveIconButton() {
+    return IconButton(
+      onPressed: () {
+        // 点名器归档功能
+        if (_selectedCallerId != null) {
+          // showDialog(
+          //   context: context,
+          //   builder: (context) => RandomCallerViewDialog(
+          //     randomCaller: _allRandomCallersMap[_selectedCallerId!]!,
+          //   ),
+          // );
+        } else {
+          Fluttertoast.showToast(msg: '请先选择点名器');
+        }
+      },
+      icon: const Icon(Icons.archive, color: Colors.grey),
     );
   }
 

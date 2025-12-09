@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:rollcall/models/student_model.dart';
-import 'package:rollcall/utils/student_dao.dart';
-import 'package:rollcall/widgets/student_class_add_edit_dialog.dart';
 
 import '../configs/strings.dart';
 import '../models/student_class_model.dart';
 import '../utils/student_class_dao.dart';
+import '../utils/student_dao.dart';
+import '../widgets/student_class_add_edit_dialog.dart';
 
 class StudentClassPage extends StatefulWidget {
   const StudentClassPage({super.key});
