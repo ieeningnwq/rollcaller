@@ -23,6 +23,19 @@ extension AttendanceStatusExtension on AttendanceStatus {
     }
   }
 
+  int get toInt {
+    switch (this) {
+      case AttendanceStatus.present:
+        return 1;
+      case AttendanceStatus.late:
+        return 2;
+      case AttendanceStatus.excused:
+        return 3;
+      case AttendanceStatus.absent:
+        return 4;
+    }
+  }
+
   Color get statusColor {
     switch (this) {
       case AttendanceStatus.present:
@@ -33,6 +46,21 @@ extension AttendanceStatusExtension on AttendanceStatus {
         return const Color(0xFF64B5F6); // 蓝色
       case AttendanceStatus.absent:
         return const Color(0xFFEF5350); // 红色
+    }
+  }
+
+  static AttendanceStatus fromInt(int value) {
+    switch (value) {
+      case 1:
+        return AttendanceStatus.present;
+      case 2:
+        return AttendanceStatus.late;
+      case 3:
+        return AttendanceStatus.excused;
+      case 4:
+        return AttendanceStatus.absent;
+      default:
+        return AttendanceStatus.absent;
     }
   }
 }

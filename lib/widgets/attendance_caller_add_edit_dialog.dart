@@ -22,7 +22,8 @@ class AttendanceCallerAddEditDialog extends StatefulWidget {
   }
 }
 
-class _AttendanceCallerAddEditDialogState extends State<AttendanceCallerAddEditDialog> {
+class _AttendanceCallerAddEditDialogState
+    extends State<AttendanceCallerAddEditDialog> {
   final TextEditingController _attendanceCallerNameController =
       TextEditingController();
   final TextEditingController _notesController = TextEditingController();
@@ -36,7 +37,8 @@ class _AttendanceCallerAddEditDialogState extends State<AttendanceCallerAddEditD
     super.initState();
     _selectedStudentClassId = widget.attendanceCaller.classId;
     _isAdd = widget.title == '新增点名器';
-    _attendanceCallerNameController.text = widget.attendanceCaller.attendanceCallerName;
+    _attendanceCallerNameController.text =
+        widget.attendanceCaller.attendanceCallerName;
     _notesController.text = widget.attendanceCaller.notes;
   }
 
@@ -104,7 +106,7 @@ class _AttendanceCallerAddEditDialogState extends State<AttendanceCallerAddEditD
                       );
                       return;
                     }
-                    _saveRandomCaller(context);
+                    _saveAttendanceCaller(context);
                   },
                   child: const Text('保存'),
                 ),
@@ -195,47 +197,51 @@ class _AttendanceCallerAddEditDialogState extends State<AttendanceCallerAddEditD
     );
   }
 
-  void _saveRandomCaller(BuildContext context) {
+  void _saveAttendanceCaller(BuildContext context) {
     if ((_formKey.currentState as FormState).validate()) {
-      widget.attendanceCaller.attendanceCallerName = _attendanceCallerNameController.text;
+      widget.attendanceCaller.attendanceCallerName =
+          _attendanceCallerNameController.text;
       widget.attendanceCaller.classId = _selectedStudentClassId;
       widget.attendanceCaller.notes = _notesController.text;
       if (_isAdd) {
         // 新增点名器
         widget.attendanceCaller.created = DateTime.now();
-        AttendanceCallerDao().insertAttendanceCaller(widget.attendanceCaller).then((value) {
-          if (context.mounted) {
-            if (value != 0) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('添加成功')));
-              Navigator.of(context).pop(true);
-            } else {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('添加失败')));
-              Navigator.of(context).pop(false);
-            }
-          }
-        });
+        AttendanceCallerDao()
+            .insertAttendanceCaller(widget.attendanceCaller)
+            .then((value) {
+              if (context.mounted) {
+                if (value != 0) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text('添加成功')));
+                  Navigator.of(context).pop(true);
+                } else {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text('添加失败')));
+                  Navigator.of(context).pop(false);
+                }
+              }
+            });
       } else {
-        AttendanceCallerDao().updateAttendanceCaller(widget.attendanceCaller).then((value) {
-          if (context.mounted) {
-            if (value != 0) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('更新成功')));
-              Navigator.of(context).pop(true);
-            } else {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('更新失败')));
-              Navigator.of(context).pop(false);
-            }
-          }
-        });
+        AttendanceCallerDao()
+            .updateAttendanceCaller(widget.attendanceCaller)
+            .then((value) {
+              if (context.mounted) {
+                if (value != 0) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text('更新成功')));
+                  Navigator.of(context).pop(true);
+                } else {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text('更新失败')));
+                  Navigator.of(context).pop(false);
+                }
+              }
+            });
       }
     }
   }
-
 }

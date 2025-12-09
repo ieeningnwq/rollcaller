@@ -1,8 +1,10 @@
+import '../configs/attendance_status.dart';
+
 class AttendanceCallRecordModel {
-  int id = -1;
+  int? id;
   int attendanceCallerId = -1;
   int studentId = -1;
-  int present = 0;
+  AttendanceStatus present = AttendanceStatus.absent;
   String notes = '';
   DateTime created = DateTime.now();
 
@@ -12,24 +14,30 @@ class AttendanceCallRecordModel {
     AttendanceCallRecordModel model = AttendanceCallRecordModel()
       ..attendanceCallerId = map['attendance_caller_id']
       ..studentId = map['student_id']
-      ..present = map['present']
-      ..notes = map['notes']
-      ..created = DateTime.parse(map['created']);
-
+      ..present = map['present'] == null
+          ? AttendanceStatus.absent
+          : AttendanceStatusExtension.fromInt(map['present'])
+      ..notes = map['notes'] ?? ''
+      ..created = map['created'] == null
+          ? DateTime.now()
+          : DateTime.parse(map['created']);
     if (map['id'] != null) {
       model.id = map['id'];
     }
     return model;
   }
 
-  Map<String, Object> toMap() {
-    return {
-      'id': id,
+  Map<String, dynamic> toMap() {
+    var result = {
       'attendance_caller_id': attendanceCallerId,
       'student_id': studentId,
-      'present': present,
+      'present': present.toInt,
       'notes': notes,
       'created': created.toIso8601String(),
     };
+    if (id != null) {
+      result['id'] = id!;
+    }
+    return result;
   }
 }

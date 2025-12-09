@@ -27,68 +27,95 @@ class _AttendencePageState extends State<AttendencePage> {
   // 当前选择随机点名器
   int? _selectedCallerId;
   // 所有签到点名器
-  late Map<int, AttendanceCallerModel> _allAttendaceCallersMap;
+  Map<int, AttendanceCallerModel> _allAttendaceCallersMap = {};
   // 签到点名器、班级、学生、点名记录信息
   AttendanceCallerGroupModel? _attendanceCallerGroup;
   // 获取当前点名器所有信息Future
   Future<AttendanceCallerGroupModel?>? _attendanceCallerFuture;
   // 搜索框控制器
   final TextEditingController _searchController = TextEditingController();
-
+  // 签到状态
   final stats = {
     AttendanceStatus.present: 0,
     AttendanceStatus.late: 0,
     AttendanceStatus.excused: 0,
     AttendanceStatus.absent: 0,
   };
+  List<StudentModel> _students = [];
+  // 过滤后的学生列表{'studentName+Number':studentModel}
+  List<StudentModel> _filteredStudents = [];
   @override
   initState() {
     super.initState();
+    _searchController.addListener(() {
+      // 更新筛选列表
+      if (_searchController.text.isEmpty) {
+        _filteredStudents = _students;
+      } else {
+        _filteredStudents = _students.where((student) {
+          return student.studentName.contains(_searchController.text) ||
+              student.studentNumber.contains(_searchController.text);
+        }).toList();
+      }
+    });
+
     _attendanceCallerFuture = _getAttendanceCallerPageInfo();
   }
 
   Future<AttendanceCallerGroupModel?> _getAttendanceCallerPageInfo() async {
     try {
       Map<int, AttendanceCallRecordModel> attendanceCallRecords = {};
-
       // 获取全部签到点名器
       List<AttendanceCallerModel> allAttendanceCallers =
           await AttendanceCallerDao().getAllAttendanceCallers();
-
       // 保存全部签到点名器
       _allAttendaceCallersMap = {
         for (var attendanceCaller in allAttendanceCallers)
           attendanceCaller.id: attendanceCaller,
       };
-
       // 初始选择第一个签到点名器
       _selectedCallerId ??= allAttendanceCallers.isNotEmpty
           ? allAttendanceCallers.first.id
           : null;
-
       if (_selectedCallerId != null) {
         AttendanceCallerModel selectedCaller =
             _allAttendaceCallersMap[_selectedCallerId!]!;
-
         // 获取班级信息
         StudentClassModel studentClass = await StudentClassDao()
             .getStudentClass(selectedCaller.classId);
-
         // 获取班级学生
         List<StudentModel> students = await StudentDao()
             .getAllStudentsByClassName(studentClass.className);
-
+        // 学生列表
+        _students = students;
+        _sortStudents();
+        // 过滤后的学生列表
+        _filteredStudents = students;
         // 获取签到记录
         List<AttendanceCallRecordModel> records =
             await AttendanceCallRecordDao().getRecordsByCallerId(
               callerId: selectedCaller.id,
             );
-
         // 构建签到记录映射
         for (AttendanceCallRecordModel record in records) {
           attendanceCallRecords[record.studentId] = record;
         }
-
+        // 如果有学生没有状态，那么添加默认值
+        for (StudentModel student in students) {
+          if (!attendanceCallRecords.containsKey(student.id)) {
+            var attendanceCallRecord = AttendanceCallRecordModel.fromMap({
+              'attendance_caller_id': selectedCaller.id,
+              'student_id': student.id,
+            });
+            // 将没有签到记录的学生插入记录数据库
+            int id = await AttendanceCallRecordDao().insertAttendanceCallRecord(
+              attendanceCallRecord,
+            );
+            // 赋值id
+            attendanceCallRecord.id = id;
+            attendanceCallRecords[student.id!] = attendanceCallRecord;
+          }
+        }
         // 构建并返回分组模型
         return AttendanceCallerGroupModel(
           attendanceCallerModel: selectedCaller,
@@ -104,6 +131,57 @@ class _AttendencePageState extends State<AttendencePage> {
     }
   }
 
+  // 学生排序方法：按学号排序
+  void _sortStudents() {
+    _students.sort((a, b) {
+      // 直接按学号排序
+      return a.studentNumber.compareTo(b.studentNumber);
+    });
+  }
+
+  // 获取签到统计数据
+  Map<AttendanceStatus, int> _getAttendanceStats() {
+    final stats = {
+      AttendanceStatus.present: 0,
+      AttendanceStatus.late: 0,
+      AttendanceStatus.excused: 0,
+      AttendanceStatus.absent: 0,
+    };
+    // 遍历学生，如果没有签到记录则添加插入默认值
+    for (StudentModel student
+        in _attendanceCallerGroup?.students.values ?? []) {
+      var record = _attendanceCallerGroup!.attendanceCallRecords[student.id!]!;
+      stats[record.present] = (stats[record.present] ?? 0) + 1;
+    }
+    return stats;
+  }
+
+  // 切换签到状态
+  void _toggleAttendanceStatus(int index) {
+    final currentStatus = _attendanceCallerGroup!
+        .attendanceCallRecords[_filteredStudents[index].id!]!
+        .present;
+    final statuses = [
+      AttendanceStatus.present,
+      AttendanceStatus.late,
+      AttendanceStatus.excused,
+      AttendanceStatus.absent,
+    ];
+    final currentIndex = statuses.indexOf(currentStatus);
+    final nextIndex = (currentIndex + 1) % statuses.length;
+    setState(() {
+      _attendanceCallerGroup!
+              .attendanceCallRecords[_filteredStudents[index].id!]!
+              .present =
+          statuses[nextIndex];
+    });
+    // 更新数据库
+    AttendanceCallRecordDao().updateAttendanceCallRecord(
+      _attendanceCallerGroup!.attendanceCallRecords[_filteredStudents[index]
+          .id!]!,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -116,6 +194,17 @@ class _AttendencePageState extends State<AttendencePage> {
             return Text('Error: ${snapshot.error}');
           } else {
             _attendanceCallerGroup = snapshot.data;
+            // 更新签到数据
+            final stats = _getAttendanceStats();
+            // 签到人数
+            final presentCount = stats[AttendanceStatus.present] ?? 0;
+            // 总的人数
+            final totalCount = _attendanceCallerGroup?.students.length ?? 0;
+            //签到率
+            final attendanceRate = totalCount > 0
+                ? (presentCount / totalCount) * 100
+                : 0;
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -143,15 +232,14 @@ class _AttendencePageState extends State<AttendencePage> {
                       prefixIcon: const Icon(Icons.search),
                       hintText: '搜索学生',
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(12),
+                      contentPadding: EdgeInsets.all(8),
                     ),
                   ),
                 ),
                 SizedBox(height: 4),
-
+                // 签到状态列表 - 扩展以填充剩余空间
                 Expanded(
-                  child: // 签到状态列表 - 扩展以填充剩余空间
-                  Container(
+                  child: Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
@@ -184,7 +272,7 @@ class _AttendencePageState extends State<AttendencePage> {
                                   ),
                                   SizedBox(width: 8),
                                   Text(
-                                    '共${12}人',
+                                    '共$totalCount人',
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey,
@@ -192,94 +280,85 @@ class _AttendencePageState extends State<AttendencePage> {
                                   ),
                                 ],
                               ),
-                              // 保存按钮
-                              SizedBox(
-                                height: 32,
-                                child: ElevatedButton(
-                                  onPressed: () {},
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 4,
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.save,
-                                        size: 16,
-                                        color: Colors.white,
-                                      ),
-                                      SizedBox(width: 4),
-                                      Text(
-                                        '保存',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
                             ],
                           ),
                         ),
                         Divider(height: 1, color: Colors.grey.withAlpha(20)),
 
                         // 学生列表 - 可滚动
-                        // Expanded(
-                        //   child: ListView.builder(
-                        //     physics: const AlwaysScrollableScrollPhysics(),
-                        //     itemCount: _filteredStudents.length,
-                        //     itemBuilder: (context, index) {
-                        //       final student = _filteredStudents[index];
-                        //       return Column(
-                        //         children: [
-                        //           ListTile(
-                        //             onTap: () => _toggleAttendanceStatus(index),
-                        //             title: Text(
-                        //               student.name,
-                        //               style: TextStyle(fontSize: 16.sp),
-                        //             ),
-                        //             subtitle: Text(
-                        //               '学号: ${student.studentId}',
-                        //               style: TextStyle(
-                        //                 fontSize: 14.sp,
-                        //                 color: Colors.grey,
-                        //               ),
-                        //             ),
-                        //             trailing: Container(
-                        //               padding: EdgeInsets.symmetric(
-                        //                 horizontal: 12.w,
-                        //                 vertical: 4.h,
-                        //               ),
-                        //               decoration: BoxDecoration(
-                        //                 color: student.status.statusColor,
-                        //                 borderRadius: BorderRadius.circular(12.r),
-                        //               ),
-                        //               child: Text(
-                        //                 student.status.statusText,
-                        //                 style: TextStyle(
-                        //                   fontSize: 12.sp,
-                        //                   color: Colors.white,
-                        //                   fontWeight: FontWeight.bold,
-                        //                 ),
-                        //               ),
-                        //             ),
-                        //           ),
-                        //           if (index < _filteredStudents.length - 1)
-                        //             Divider(height: 1, color: Colors.grey.withOpacity(0.2)),
-                        //         ],
-                        //       );
-                        //     },
-                        //   ),
-                        // ),
+                        Expanded(
+                          child: _filteredStudents.isNotEmpty
+                              ? ListView.builder(
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  itemCount: _filteredStudents.length,
+                                  itemBuilder: (context, index) {
+                                    final StudentModel student =
+                                        _filteredStudents[index];
+                                    return Column(
+                                      children: [
+                                        ListTile(
+                                          onTap: () =>
+                                              _toggleAttendanceStatus(index),
+                                          title: Text(
+                                            student.studentName,
+                                            style: TextStyle(fontSize: 16),
+                                          ),
+                                          subtitle: Text(
+                                            '学号: ${student.studentNumber}',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          trailing: Container(
+                                            padding: EdgeInsets.symmetric(
+                                              horizontal: 12,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: _attendanceCallerGroup!
+                                                  .attendanceCallRecords[student
+                                                      .id!]!
+                                                  .present
+                                                  .statusColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            child: Text(
+                                              _attendanceCallerGroup!
+                                                  .attendanceCallRecords[student
+                                                      .id!]!
+                                                  .present
+                                                  .statusText,
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        if (index <
+                                            _filteredStudents.length - 1)
+                                          Divider(
+                                            height: 1,
+                                            color: Colors.grey.withAlpha(20),
+                                          ),
+                                      ],
+                                    );
+                                  },
+                                )
+                              : Center(
+                                  child: Text(
+                                    '暂无学生',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                        ),
                       ],
                     ),
                   ),
@@ -318,7 +397,7 @@ class _AttendencePageState extends State<AttendencePage> {
                               ),
                             ),
                             Text(
-                              '12%',
+                              '${attendanceRate.round()}%',
                               style: TextStyle(
                                 fontSize: 14,
                                 color: const Color(0xFF6200EE),
@@ -337,7 +416,7 @@ class _AttendencePageState extends State<AttendencePage> {
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: FractionallySizedBox(
-                            widthFactor: 20 / 100,
+                            widthFactor: attendanceRate / 100,
                             child: Container(
                               decoration: BoxDecoration(
                                 color: const Color(0xFF6200EE),
@@ -364,7 +443,7 @@ class _AttendencePageState extends State<AttendencePage> {
                                 ),
                                 SizedBox(width: 4),
                                 Text(
-                                  '${entry.key.statusText}',
+                                  entry.key.statusText,
                                   style: TextStyle(fontSize: 12),
                                 ),
                                 SizedBox(width: 4),

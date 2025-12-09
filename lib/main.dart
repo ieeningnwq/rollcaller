@@ -29,7 +29,6 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (_, child) {
         return MaterialApp(
-          // title: KString.appTitle, // 点名
           debugShowCheckedModeBanner: false,
           // 定制主题
           theme: ThemeData(colorScheme: .fromSeed(seedColor: KColor.seedColor)),

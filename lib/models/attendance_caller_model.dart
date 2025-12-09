@@ -22,13 +22,16 @@ class AttendanceCallerModel {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'id': id,
+    var result = {
       'attendance_caller_name': attendanceCallerName,
       'class_id': classId,
       'is_archive': isArchive,
       'notes': notes,
       'created': created.toIso8601String(),
     };
+    if (id != -1) {
+      result['id'] = id;
+    }
+    return result;
   }
 }

@@ -43,4 +43,21 @@ class AttendanceCallRecordDao {
       (i) => AttendanceCallRecordModel.fromMap(maps[i]),
     );
   }
+
+  Future<int> insertAttendanceCallRecord(
+    AttendanceCallRecordModel attendanceCallRecordModel,
+  ) async {
+    final db = await _databaseHelper.database;
+    return await db.insert(tableName, attendanceCallRecordModel.toMap());
+  }
+
+  Future<int> updateAttendanceCallRecord(AttendanceCallRecordModel attendanceCallRecordModel) async {
+    final db = await _databaseHelper.database;
+    return await db.update(
+      tableName,
+      attendanceCallRecordModel.toMap(),
+      where: 'id = ?',
+      whereArgs: [attendanceCallRecordModel.id],
+    );
+  }
 }
