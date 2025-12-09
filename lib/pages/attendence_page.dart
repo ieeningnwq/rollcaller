@@ -10,6 +10,7 @@ import '../utils/attendance_call_record_dao.dart';
 import '../utils/attendance_caller_dao.dart';
 import '../utils/student_class_dao.dart';
 import '../utils/student_dao.dart';
+import '../widgets/attendance_caller_add_edit_dialog.dart';
 
 class AttendencePage extends StatefulWidget {
   const AttendencePage({super.key});
@@ -20,7 +21,7 @@ class AttendencePage extends StatefulWidget {
 
 class _AttendencePageState extends State<AttendencePage> {
   // 点名器信息是否折叠
-  bool _isAttendanceCallerInfoWidgetExpanded = false;
+  bool _isAttendanceCallerInfoWidgetExpanded = true;
   // 当前选择随机点名器
   int? _selectedCallerId;
   // 所有签到点名器
@@ -89,7 +90,6 @@ class _AttendencePageState extends State<AttendencePage> {
         return null;
       }
     } catch (e) {
-      print('Error in _getAttendanceCallerPageInfo: $e');
       return null;
     }
   }
@@ -185,8 +185,8 @@ class _AttendencePageState extends State<AttendencePage> {
                         _buildDeleteIconButton(),
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    _buildDropdownButton(),
+                    const SizedBox(height: 8),_buildDropdownButton(),
+                    
                   ],
                 ),
               ),
@@ -268,25 +268,18 @@ class _AttendencePageState extends State<AttendencePage> {
     return IconButton(
       onPressed: () => {
         // 新增点名器功能
-        // showDialog(
-        //   context: context,
-        //   builder: (context) => RandomCallerAddEditDialog(
-        //     title: '新增点名器',
-        //     randomCaller: RandomCallerModel(
-        //       classId: -1,
-        //       randomCallerName: '',
-        //       isDuplicate: 0,
-        //       isArchive: 0,
-        //       notes: '',
-        //       created: DateTime.now(),
-        //     ),
-        //   ),
-        // ).then((value) {
-        //   if (value != null && value == true) {
-        //     // 刷新随机点名器列表
-        //     _refreshPageData();
-        //   }
-        // }),
+        showDialog(
+          context: context,
+          builder: (context) => AttendanceCallerAddEditDialog(
+            title: '新增点名器',
+            attendanceCaller: AttendanceCallerModel(),
+          ),
+        ).then((value) {
+          if (value != null && value == true) {
+            // 刷新随机点名器列表
+            _refreshPageData();
+          }
+        }),
       },
       icon: Icon(Icons.add, color: Colors.green),
     );

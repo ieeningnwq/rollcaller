@@ -17,4 +17,37 @@ class AttendanceCallerDao {
       return AttendanceCallerModel.fromMap(maps[i]);
     });
   }
+
+  Future<bool> isAttendanceCallerNameExist(String callerName) async {
+    final db = await _databaseHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+      where: 'attendanceCallerName = ?',
+      whereArgs: [callerName],
+    );
+    return maps.isNotEmpty;
+  }
+
+  Future<int> insertAttendanceCaller(
+    AttendanceCallerModel attendanceCaller,
+  ) async {
+    final db = await _databaseHelper.database;
+    final Map<String, dynamic> map = attendanceCaller.toMap();
+    map.remove('id');
+    return await db.insert(tableName, map);
+  }
+
+  Future<int> updateAttendanceCaller(
+    AttendanceCallerModel attendanceCaller,
+  ) async {
+    final db = await _databaseHelper.database;
+    final Map<String, dynamic> map = attendanceCaller.toMap();
+    map.remove('id');
+    return await db.update(
+      tableName,
+      map,
+      where: 'id = ?',
+      whereArgs: [attendanceCaller.id],
+    );
+  }
 }

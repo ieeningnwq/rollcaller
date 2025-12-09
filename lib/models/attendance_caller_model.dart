@@ -10,9 +10,9 @@ class AttendanceCallerModel {
 
   factory AttendanceCallerModel.fromMap(Map<String, dynamic> map) {
     AttendanceCallerModel callerModel = AttendanceCallerModel()
-      ..attendanceCallerName = map['attendanceCallerName'] as String
-      ..classId = map['classId'] as int
-      ..isArchive = map['isArchive'] as int
+      ..attendanceCallerName = map['attendance_caller_name'] as String
+      ..classId = map['class_id'] as int
+      ..isArchive = map['is_archive'] as int
       ..notes = map['notes'] as String
       ..created = DateTime.parse(map['created'] as String);
     if (map['id'] != null) {
@@ -24,9 +24,9 @@ class AttendanceCallerModel {
   Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'attendanceCallerName': attendanceCallerName,
-      'classId': classId,
-      'isArchive': isArchive,
+      'attendance_caller_name': attendanceCallerName,
+      'class_id': classId,
+      'is_archive': isArchive,
       'notes': notes,
       'created': created.toIso8601String(),
     };

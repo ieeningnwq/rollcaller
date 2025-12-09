@@ -49,7 +49,7 @@ class _RandomCallPageState extends State<RandomCallPage>
   bool _isPickedGroupExpanded = true; // 已抽取学生组默认展开
   bool _isUnpickedGroupExpanded = true; // 未抽取学生组默认展开
   // 选择点名器折叠
-  bool _isRandomCallerInfoWidgetExpanded = false;
+  bool _isRandomCallerInfoWidgetExpanded = true;
 
   @override
   initState() {
