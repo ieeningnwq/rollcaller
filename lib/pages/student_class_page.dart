@@ -70,8 +70,21 @@ class _StudentClassState extends State<StudentClassPage> {
                         onLoading: _onLoading,
                         child: ListView.builder(
                           scrollDirection: Axis.vertical,
-                          itemCount: snapshot.data?.length ?? 0,
+                          itemCount: _studentClassMap.isEmpty
+                              ? 1
+                              : _studentClassMap.length,
                           itemBuilder: (context, index) {
+                            if (_studentClassMap.isEmpty) {
+                              return Center(
+                                child: Text(
+                                  '暂无班级',
+                                  style: TextStyle(
+                                    color: Colors.black54,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              );
+                            }
                             StudentClassModel studentClass = _studentClassMap
                                 .values
                                 .elementAt(index);

@@ -649,7 +649,7 @@ class _RandomCallPageState extends State<RandomCallPage>
 
   // 构建学生组列表
   Widget _buildStudentGroup({required bool isPickedGroup}) {
-    if (_randomCallerGroup!.students.isEmpty) {
+    if (_randomCallerGroup == null || _randomCallerGroup!.students.isEmpty) {
       return const Text(
         '暂无学生',
         style: TextStyle(color: Colors.black54, fontStyle: FontStyle.italic),
