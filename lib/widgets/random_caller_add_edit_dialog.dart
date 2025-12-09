@@ -4,7 +4,7 @@ import 'package:rollcall/utils/student_class_dao.dart';
 
 import '../models/random_caller_model.dart';
 import '../models/student_class_model.dart';
-import '../utils/random_caller_dao.dart';
+import '../utils/roll_caller_dao.dart';
 
 class RandomCallerAddEditDialog extends StatefulWidget {
   final RandomCallerModel randomCaller;

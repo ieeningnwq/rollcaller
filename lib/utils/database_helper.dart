@@ -47,9 +47,10 @@ class DatabaseHelper {
       )
     ''');
     await db.execute('''
-      CREATE TABLE ${KString.randomCallerTableName} (
+      CREATE TABLE ${KString.rollCallerTableName} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        random_caller_name TEXT NOT NULL UNIQUE,
+        roll_caller_name TEXT NOT NULL UNIQUE,
+        caller_type INTEGER NOT NULL DEFAULT 0,
         is_duplicate INTEGER NOT NULL DEFAULT 0,
         class_id INTEGER NOT NULL,
         is_archive INTEGER NOT NULL DEFAULT 0,
@@ -58,9 +59,9 @@ class DatabaseHelper {
       )
     ''');
     await db.execute('''
-      CREATE TABLE ${KString.randomCallerRecordTableName} (
+      CREATE TABLE ${KString.rollCallerRecordTableName} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        random_caller_id INTEGER NOT NULL,
+        roll_caller_id INTEGER NOT NULL,
         student_id INTEGER NOT NULL,
         score INTEGER NOT NULL,
         notes TEXT,

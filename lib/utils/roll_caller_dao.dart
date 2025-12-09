@@ -7,7 +7,7 @@ class RandomCallerDao {
   static final RandomCallerDao _instance = RandomCallerDao._internal();
   RandomCallerDao._internal();
   final DatabaseHelper dbHelper = DatabaseHelper(); // 使用单例数据库帮助类实例
-  static const String tableName = KString.randomCallerTableName;
+  static const String tableName = KString.rollCallerTableName;
   factory RandomCallerDao() => _instance;
 
   Future<int> insertRandomCaller(RandomCallerModel randomCallerModel) async {
