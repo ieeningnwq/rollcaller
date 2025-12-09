@@ -7,7 +7,7 @@ class RandomCallRecordDao {
   RandomCallRecordDao._internal();
   final DatabaseHelper _databaseHelper = DatabaseHelper();
 
-  static const String tableName = KString.rollCallerRecordTableName;
+  static const String tableName = KString.randomCallerRecordTableName;
   factory RandomCallRecordDao() => _instance;
 
   Future<List<RandomCallRecordModel>> getRecordsByCallerIdStudentId(

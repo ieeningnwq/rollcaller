@@ -47,7 +47,9 @@ class _RandomCallPageState extends State<RandomCallPage>
   int _score = 5;
   // 学生组折叠状态
   bool _isPickedGroupExpanded = true; // 已抽取学生组默认展开
-  bool _isUnpickedGroupExpanded = true; // 未抽取学生组默认展开
+  bool _isUnpickedGroupExpanded = true;
+
+  bool _isRandomCallerInfoWidgetExpanded = false; // 未抽取学生组默认展开
 
   @override
   initState() {
@@ -297,47 +299,87 @@ class _RandomCallPageState extends State<RandomCallPage>
     });
   }
 
-  Container _buildRandomCallerInfoWidget() {
-    return Container(
-      margin: const EdgeInsets.all(10.0),
-      padding: const EdgeInsets.all(14.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12.0),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(10),
-            blurRadius: 10.0,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // 顶部标题和管理链接
-          const Text(
-            '选择点名器',
-            style: TextStyle(
-              fontSize: 18.0,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+  GestureDetector _buildRandomCallerInfoWidget() {
+    return GestureDetector(
+      onTap: () {
+        // 点击显示/折叠点名器信息区域
+        setState(() {
+          _isRandomCallerInfoWidgetExpanded =
+              !_isRandomCallerInfoWidgetExpanded;
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.all(14.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12.0),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(10),
+              blurRadius: 10.0,
+              offset: const Offset(0, 2),
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildArchiveIconButton(),
-              _buildViewIconButton(),
-              _buildAddIconButton(),
-              _buildEditIconButton(),
-              _buildDeleteIconButton(),
-            ],
-          ),
-          const SizedBox(height: 8),
-          _buildDropdownButton(),
-        ],
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // 顶部标题和管理链接
+                  const Text(
+                    '选择点名器',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  Icon(
+                    _isRandomCallerInfoWidgetExpanded
+                        ? Icons.expand_less
+                        : Icons.expand_more,
+                    size: 20,
+                  ),
+                ],
+              ),
+            ),
+
+            // 点名器信息区域
+            AnimatedCrossFade(
+              firstChild: const SizedBox(height: 0, width: 0),
+              secondChild: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildArchiveIconButton(),
+                        _buildViewIconButton(),
+                        _buildAddIconButton(),
+                        _buildEditIconButton(),
+                        _buildDeleteIconButton(),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    _buildDropdownButton(),
+                  ],
+                ),
+              ),
+              crossFadeState: _isRandomCallerInfoWidgetExpanded
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              duration: const Duration(milliseconds: 300),
+            ),
+          ],
+        ),
       ),
     );
   }
