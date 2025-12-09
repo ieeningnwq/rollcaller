@@ -52,15 +52,18 @@ class _StudentClassAddEditDialogState extends State<StudentClassAddEditDialog> {
       title: Text(widget.title),
       content: Form(
         key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildClassNameInfoRow('班级名称（必填）'),
-            _buildClassQuantityInfoRowInt('学生数量（必填）'),
-            _buildInfoRow('教师姓名（可选）', teacherNameController),
-            _buildInfoRow('备注（可选）', notesController),
-          ],
+        child: SizedBox(
+          width: double.maxFinite,
+          child: ListView(
+            shrinkWrap: true,
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            children: [
+              _buildClassNameInfoRow('班级名称（必填）'),
+              _buildClassQuantityInfoRowInt('学生数量（必填）'),
+              _buildInfoRow('教师姓名（可选）', teacherNameController),
+              _buildInfoRow('备注（可选）', notesController),
+            ],
+          ),
         ),
       ),
       actions: [

@@ -86,14 +86,25 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
                     shrinkWrap: true,
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     children: [
-                      // 学生学号
-                      _buildStudentNumberField(),
-                      // 学生姓名
-                      _buildStudengNameField(),
-                      const SizedBox(height: 4),
-                      // 班级选择
-                      const Text('所在班级', style: TextStyle(fontSize: 16)),
-                      _buildClassSelectField(),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              // 学生学号
+                              _buildStudentNumberField(),
+                              // 学生姓名
+                              _buildStudengNameField(),
+                              const SizedBox(height: 4),
+                              // 班级选择
+                              const Text(
+                                '所在班级',
+                                style: TextStyle(fontSize: 16),
+                              ),
+                              _buildClassSelectField(),
+                            ],
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
