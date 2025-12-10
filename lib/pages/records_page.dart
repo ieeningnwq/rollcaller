@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../models/random_caller_model.dart';
 import 'attendance_call_records_page.dart';
 import 'random_call_records_page.dart';
 

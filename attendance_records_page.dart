@@ -1141,7 +1141,7 @@ class _AttendanceRecordsViewState extends State<AttendanceRecordsView> {
                           // 点名器筛选
                           Row(
                             children: [
-                              const Text('点名器: '),
+                              const SizedBox(width: 80, child: Text('点名器: ', textAlign: TextAlign.right)),
                               Expanded(
                                 child: DropdownButtonFormField<String>(
                                   initialValue: _selectedCallerId,
@@ -1166,8 +1166,10 @@ class _AttendanceRecordsViewState extends State<AttendanceRecordsView> {
                                     border: OutlineInputBorder(),
                                     contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
                                   ),
+                                  style: const TextStyle(fontSize: 14),
                                 ),
                               ),
+                              const SizedBox(width: 48), // 添加占位符以保持右侧对齐
                             ],
                           ),
                           const SizedBox(height: 12),
@@ -1175,7 +1177,7 @@ class _AttendanceRecordsViewState extends State<AttendanceRecordsView> {
                           // 班级筛选
                           Row(
                             children: [
-                              const Text('班级: '),
+                              const SizedBox(width: 80, child: Text('班级: ', textAlign: TextAlign.right)),
                               Expanded(
                                 child: DropdownButtonFormField<String>(
                                   initialValue: _selectedClassId,
@@ -1200,8 +1202,10 @@ class _AttendanceRecordsViewState extends State<AttendanceRecordsView> {
                                     border: OutlineInputBorder(),
                                     contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
                                   ),
+                                  style: const TextStyle(fontSize: 14),
                                 ),
                               ),
+                              const SizedBox(width: 48), // 添加占位符以保持右侧对齐
                             ],
                           ),
                           const SizedBox(height: 12),
@@ -1209,47 +1213,60 @@ class _AttendanceRecordsViewState extends State<AttendanceRecordsView> {
                           // 时间范围筛选
                           Row(
                             children: [
-                              const Text('时间范围: '),
+                              const SizedBox(width: 80, child: Text('时间范围: ', textAlign: TextAlign.right)),
                               Expanded(
-                                child: TextButton(
-                                  onPressed: () {
-                                    _showDateRangePicker();
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.grey),
-                                      borderRadius: BorderRadius.circular(4),
+                                child: SizedBox(
+                                  height: 50, // 与DropdownButtonFormField高度一致
+                                  child: TextButton(
+                                    onPressed: () {
+                                      _showDateRangePicker();
+                                    },
+                                    style: TextButton.styleFrom(
+                                      padding: EdgeInsets.zero,
                                     ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          _startDate != null 
-                                            ? '${_startDate!.year}-${_startDate!.month.toString().padLeft(2, '0')}-${_startDate!.day.toString().padLeft(2, '0')}' 
-                                            : '开始',
-                                        ),
-                                        const Text('至'),
-                                        Text(
-                                          _endDate != null 
-                                            ? '${_endDate!.subtract(const Duration(days: 1)).year}-${_endDate!.subtract(const Duration(days: 1)).month.toString().padLeft(2, '0')}-${_endDate!.subtract(const Duration(days: 1)).day.toString().padLeft(2, '0')}' 
-                                            : '结束',
-                                        ),
-                                      ],
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.grey),
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      alignment: Alignment.centerLeft,
+                                      height: double.infinity,
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            _startDate != null 
+                                              ? '${_startDate!.year}-${_startDate!.month.toString().padLeft(2, '0')}-${_startDate!.day.toString().padLeft(2, '0')}' 
+                                              : '开始',
+                                            style: const TextStyle(fontSize: 14, color: Colors.black),
+                                          ),
+                                          const Text('至', style: TextStyle(fontSize: 14)),
+                                          Text(
+                                            _endDate != null 
+                                              ? '${_endDate!.subtract(const Duration(days: 1)).year}-${_endDate!.subtract(const Duration(days: 1)).month.toString().padLeft(2, '0')}-${_endDate!.subtract(const Duration(days: 1)).day.toString().padLeft(2, '0')}' 
+                                              : '结束',
+                                            style: const TextStyle(fontSize: 14, color: Colors.black),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                              IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _startDate = null;
-                                    _endDate = null;
-                                    _applyFilters();
-                                  });
-                                },
-                                icon: const Icon(Icons.clear),
-                                tooltip: '清除时间范围',
+                              SizedBox(
+                                width: 48, // 固定宽度，与IconButton一致
+                                child: IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _startDate = null;
+                                      _endDate = null;
+                                      _applyFilters();
+                                    });
+                                  },
+                                  icon: const Icon(Icons.clear),
+                                  tooltip: '清除时间范围',
+                                ),
                               ),
                             ],
                           ),
@@ -1258,7 +1275,7 @@ class _AttendanceRecordsViewState extends State<AttendanceRecordsView> {
                           // 归档状态筛选
                           Row(
                             children: [
-                              const Text('是否归档: '),
+                              const SizedBox(width: 80, child: Text('是否归档: ', textAlign: TextAlign.right)),
                               Expanded(
                                 child: DropdownButtonFormField<bool?>(
                                   initialValue: _isArchiveFilter,
@@ -1287,8 +1304,10 @@ class _AttendanceRecordsViewState extends State<AttendanceRecordsView> {
                                     border: OutlineInputBorder(),
                                     contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
                                   ),
+                                  style: const TextStyle(fontSize: 14),
                                 ),
                               ),
+                              const SizedBox(width: 48), // 添加占位符以保持右侧对齐
                             ],
                           ),
                           const SizedBox(height: 12),
