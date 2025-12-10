@@ -120,7 +120,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                         : null,
                                   ),
                                   subtitle: Text(
-                                    '班级: ${cls.className} | 记录数: ${group.randomCallRecords.length}',
+                                    '班级: ${cls.className} | 记录数: ${group.allRecords.length}',
                                     style:
                                         group.randomCallerModel.isArchive == 1
                                         ? TextStyle(color: Colors.grey)
