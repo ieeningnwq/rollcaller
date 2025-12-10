@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:rollcall/models/random_caller_group.dart';
 import 'package:rollcall/models/student_class_model.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
@@ -21,8 +22,7 @@ class RandomCallRecordsPage extends StatefulWidget {
 class _RandomRecordsState extends State<RandomCallRecordsPage> {
   // 筛选条件是否展开
   bool _isFilterExpanded = true;
-  // 选中的点名器名称（有全部选项）
-  String? _selectedCallerName;
+
   // 全部点名器
   Map<int, RandomCallerModel> _allCallers = {};
   // 全部班级
@@ -137,8 +137,10 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                             Icons.archive_outlined,
                                             color: Colors.orange,
                                           ),
-                                          // onPressed: () => _showArchiveConfirmationDialog(index),
-                                          onPressed: () => {},
+                                          onPressed: () =>
+                                              _showArchiveConfirmationDialog(
+                                                group.randomCallerModel,
+                                              ),
                                           tooltip: '归档',
                                         ),
                                       if (group.randomCallerModel.isArchive ==
@@ -319,7 +321,9 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                                     children: [
                                                       TextButton.icon(
                                                         onPressed: () {
-                                                          // _showEditScoreDialog(index, recordIndex);
+                                                          _showEditScoreDialog(
+                                                            record,
+                                                          );
                                                         },
                                                         icon: const Icon(
                                                           Icons.edit,
@@ -330,7 +334,9 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                                       const SizedBox(width: 8),
                                                       TextButton.icon(
                                                         onPressed: () {
-                                                          // _showDeleteConfirmationDialog(index, recordIndex);
+                                                          _showDeleteConfirmationDialog(
+                                                            record,
+                                                          );
                                                         },
                                                         icon: const Icon(
                                                           Icons.delete,
@@ -387,7 +393,17 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                     '筛选条件',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
-                  TextButton(onPressed: _resetFilters, child: const Text('重置')),
+
+                  TextButton.icon(
+                    onPressed: _resetFilters,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('重置'),
+                  ),
+                  TextButton.icon(
+                    onPressed: _resetFilters,
+                    icon: const Icon(Icons.file_upload),
+                    label: const Text('导出'),
+                  ),
                   Icon(
                     _isFilterExpanded ? Icons.expand_less : Icons.expand_more,
                     size: 20,
@@ -440,7 +456,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                               setState(() {
                                 _selectedCallerId = value;
                                 // 执行筛选
-                                // _applyFilters();
+                                _applyFilters();
                               });
                             },
                             decoration: const InputDecoration(
@@ -489,7 +505,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                               setState(() {
                                 _selectedClassId = value;
                                 // 执行筛选
-                                // _applyFilters();
+                                _applyFilters();
                               });
                             },
                             decoration: const InputDecoration(
@@ -604,7 +620,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                               setState(() {
                                 _isArchiveFilter = value;
                                 // 执行筛选
-                                // _applyFilters();
+                                _applyFilters();
                               });
                             },
                             decoration: const InputDecoration(
@@ -671,7 +687,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                     _endDate = range.endDate?.add(
                       const Duration(days: 1),
                     ); // 包含所选结束日期的整天
-                    // _applyFilters();
+                    _applyFilters();
                   });
                   Navigator.pop(context);
                 }
@@ -690,7 +706,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
       setState(() {
         _startDate = range.startDate;
         _endDate = range.endDate?.add(const Duration(days: 1)); // 包含所选结束日期的整天
-        // _applyFilters();
+        _applyFilters();
       });
     }
   }
@@ -703,7 +719,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
       _startDate = null;
       _endDate = null;
       _isArchiveFilter = null; // 重置归档筛选
-      // _applyFilters();
+      _applyFilters();
     });
   }
 
@@ -766,5 +782,216 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
     setState(() {
       _allRandomCallerGroupFuture = _getAllRandomCallerGroups();
     });
+  }
+
+  void _applyFilters() {
+    var filterRecords = _groupedRecords.entries.where((group) {
+      // 点名器筛选
+      if (_selectedCallerId != null &&
+          group.value.randomCallerModel.id != _selectedCallerId) {
+        return false;
+      }
+      // 班级筛选
+      if (_selectedClassId != null &&
+          group.value.studentClassModel.id != _selectedClassId) {
+        return false;
+      }
+      // 归档状态筛选
+      if (_isArchiveFilter != null &&
+          (group.value.randomCallerModel.isArchive == 1) != _isArchiveFilter) {
+        return false;
+      }
+      // 时间筛选
+      if (_startDate != null || _endDate != null) {
+        bool hasMatchingRecord = false;
+        for (final record in group.value.randomCallRecords.values.expand(
+          (records) => records,
+        )) {
+          bool matchesStart =
+              _startDate == null || record.created.isAfter(_startDate!);
+          bool matchesEnd =
+              _endDate == null || record.created.isBefore(_endDate!);
+          if (matchesStart && matchesEnd) {
+            hasMatchingRecord = true;
+            break;
+          }
+        }
+        if (!hasMatchingRecord) {
+          return false;
+        }
+      }
+      return true;
+    });
+    setState(() {
+      _filteredRecords = Map.fromEntries(filterRecords);
+    });
+  }
+
+  void _showEditScoreDialog(RandomCallRecordModel record) {
+    final TextEditingController scoreController = TextEditingController(
+      text: record.score.toString(),
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('编辑分数'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: scoreController,
+                  keyboardType: TextInputType.number,
+                  autovalidateMode: AutovalidateMode.onUnfocus,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: const InputDecoration(
+                    labelText: '分数',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return '请输入分数';
+                    }
+                    int num = int.tryParse(value)!;
+                    if (num <= 0 || num > 10) {
+                      return '请输入有效的整数（1-10）';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('取消'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final newScore = int.tryParse(scoreController.text);
+                if (newScore != null) {
+                  // 更新分数
+                  record.score = newScore;
+                  // 保存到数据库
+                  RandomCallRecordDao().update(record).then((value) {
+                    if (value > 0) {
+                      // 刷新数据
+                      setState(() {
+                        _filteredRecords[record.randomCallerId]!
+                                .randomCallRecords[record.studentId]!
+                                .where((element) => element.id == record.id)
+                                .toList()
+                                .first =
+                            record;
+                        _groupedRecords[record.randomCallerId]!
+                                .randomCallRecords[record.studentId]!
+                                .where((element) => element.id == record.id)
+                                .toList()
+                                .first =
+                            record;
+                      });
+                    }
+                  });
+                  Navigator.of(context).pop();
+                }
+              },
+              child: const Text('保存'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDeleteConfirmationDialog(RandomCallRecordModel record) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('确认删除'),
+          content: const Text('确定要删除这条点名记录吗？此操作不可恢复。'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('取消'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // 删除记录数据
+                RandomCallRecordDao().delete(record.id!).then((value) {
+                  if (value > 0) {
+                    // 刷新数据
+                    setState(() {
+                      _filteredRecords[record.randomCallerId]!
+                          .randomCallRecords[record.studentId]!
+                          .removeWhere((element) => element.id == record.id);
+                      _groupedRecords[record.randomCallerId]!
+                          .randomCallRecords[record.studentId]!
+                          .removeWhere((element) => element.id == record.id);
+                    });
+                  }
+                });
+                Navigator.pop(context);
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: const Text('删除'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  // 显示归档确认对话框
+
+  void _showArchiveConfirmationDialog(RandomCallerModel randomCallerModel) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('确认归档'),
+          content: const Text('归档后该点名器及记录将不可修改且无法撤销，是否继续？'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('取消'),
+            ),
+            TextButton(
+              onPressed: () {
+                // 归档点名器
+                randomCallerModel.isArchive = 1;
+                RandomCallerDao().updateRandomCaller(randomCallerModel).then((
+                  value,
+                ) {
+                  if (value > 0) {
+                    // 刷新数据
+                    setState(() {
+                      _filteredRecords[randomCallerModel.id]!
+                              .randomCallerModel
+                              .isArchive =
+                          1;
+                      _groupedRecords[randomCallerModel.id]!
+                              .randomCallerModel
+                              .isArchive =
+                          1;
+                    });
+                  }
+                });
+                Navigator.pop(context);
+              },
+              style: TextButton.styleFrom(foregroundColor: Colors.red),
+              child: const Text('确认归档'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

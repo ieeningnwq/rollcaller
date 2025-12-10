@@ -26,7 +26,9 @@ class RandomCallRecordDao {
     );
   }
 
-  Future<List<RandomCallRecordModel>> getRecordsByCallerId({required int callerId}) async {
+  Future<List<RandomCallRecordModel>> getRecordsByCallerId({
+    required int callerId,
+  }) async {
     final db = await _databaseHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       tableName,
@@ -65,5 +67,24 @@ class RandomCallRecordDao {
   ) async {
     final db = await _databaseHelper.database;
     return await db.insert(tableName, randomCallRecordModel.toMap());
+  }
+
+  Future<int> update(RandomCallRecordModel record) async {
+    final db = await _databaseHelper.database;
+    return await db.update(
+      tableName,
+      record.toMap(),
+      where: 'id = ?',
+      whereArgs: [record.id],
+    );
+  }
+
+  Future<int> delete(int id) async {
+    final db = await _databaseHelper.database;
+    return await db.delete(
+      tableName,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 }
