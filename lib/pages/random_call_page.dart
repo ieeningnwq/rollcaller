@@ -118,7 +118,7 @@ class _RandomCallPageState extends State<RandomCallPage>
               randomCallRecords[student.id!] = [];
             }
             return RandomCallRecordDao()
-                .getRecordsByCallerId(selectedCaller.id!)
+                .getRecordsByCallerId(callerId: selectedCaller.id!)
                 .then((value) async {
                   for (var record in value) {
                     randomCallRecords[record.studentId]!.add(record);

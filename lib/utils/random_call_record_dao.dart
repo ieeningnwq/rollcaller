@@ -26,7 +26,7 @@ class RandomCallRecordDao {
     );
   }
 
-  Future<List<RandomCallRecordModel>> getRecordsByCallerId(int callerId) async {
+  Future<List<RandomCallRecordModel>> getRecordsByCallerId({required int callerId}) async {
     final db = await _databaseHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       tableName,

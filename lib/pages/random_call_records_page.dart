@@ -3,7 +3,13 @@ import 'package:rollcall/models/random_caller_group.dart';
 import 'package:rollcall/models/student_class_model.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
+import '../models/random_call_record.dart';
 import '../models/random_caller_model.dart';
+import '../models/student_model.dart';
+import '../utils/random_call_record_dao.dart';
+import '../utils/random_caller_dao.dart';
+import '../utils/student_class_dao.dart';
+import '../utils/student_dao.dart';
 
 class RandomCallRecordsPage extends StatefulWidget {
   const RandomCallRecordsPage({super.key});
@@ -18,9 +24,9 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
   // 选中的点名器名称（有全部选项）
   String? _selectedCallerName;
   // 全部点名器
-  final Map<int, RandomCallerModel> _allCallers = {};
+  Map<int, RandomCallerModel> _allCallers = {};
   // 全部班级
-  final Map<int, StudentClassModel> _allClasses = {};
+  Map<int, StudentClassModel> _allClasses = {};
   // 按点名器分组记录
   Map<int, RandomCallerGroupModel> _groupedRecords = {};
   Map<int, RandomCallerGroupModel> _filteredRecords = {};
@@ -34,14 +40,327 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
   DateTime? _endDate;
   // 筛选条件：是否归档
   bool? _isArchiveFilter;
+  // 获取所有点名器所有信息Future
+  late Future<Map<int, RandomCallerGroupModel>> _allRandomCallerGroupFuture;
+
+  @override
+  initState() {
+    super.initState();
+    _allRandomCallerGroupFuture = _getAllRandomCallerGroups();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // 筛选区域
-        _buildSelectersWidget(),
-      ],
+    return FutureBuilder(
+      future: _allRandomCallerGroupFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const Center(child: Text('No data available'));
+        } else {
+          _groupedRecords = snapshot.data!;
+          return Expanded(
+            child: Column(
+              children: [
+                // 筛选区域
+                _buildSelectersWidget(),
+                // 学生列表区域
+                Expanded(
+                  child: _filteredRecords.isEmpty
+                      ? SingleChildScrollView(
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.inbox_outlined,
+                                  size: 64,
+                                  color: Colors.grey[400],
+                                ),
+                                const SizedBox(height: 16),
+                                const Text(
+                                  '没有找到点名记录',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  '请尝试调整筛选条件',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: _filteredRecords.length,
+                          itemBuilder: (context, index) {
+                            final group = _filteredRecords.values
+                                .toList()[index];
+                            final cls = group.studentClassModel;
+
+                            return Column(
+                              children: [
+                                // 分组标题
+                                ListTile(
+                                  title: Text(
+                                    group.randomCallerModel.randomCallerName,
+                                    style:
+                                        group.randomCallerModel.isArchive == 1
+                                        ? TextStyle(color: Colors.grey)
+                                        : null,
+                                  ),
+                                  subtitle: Text(
+                                    '班级: ${cls.className} | 记录数: ${group.randomCallRecords.length}',
+                                    style:
+                                        group.randomCallerModel.isArchive == 1
+                                        ? TextStyle(color: Colors.grey)
+                                        : null,
+                                  ),
+                                  trailing: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // 归档按钮
+                                      if (group.randomCallerModel.isArchive ==
+                                          0)
+                                        IconButton(
+                                          icon: const Icon(
+                                            Icons.archive_outlined,
+                                            color: Colors.orange,
+                                          ),
+                                          // onPressed: () => _showArchiveConfirmationDialog(index),
+                                          onPressed: () => {},
+                                          tooltip: '归档',
+                                        ),
+                                      if (group.randomCallerModel.isArchive ==
+                                          1)
+                                        const Text(
+                                          '已归档',
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      Icon(
+                                        group.isExpanded
+                                            ? Icons.expand_less
+                                            : Icons.expand_more,
+                                        color:
+                                            group.randomCallerModel.isArchive ==
+                                                1
+                                            ? Colors.grey
+                                            : null,
+                                      ),
+                                    ],
+                                  ),
+                                  onTap: () => _toggleGroupExpanded(index),
+                                  tileColor: Colors.grey[100],
+                                ),
+
+                                // 展开时显示记录列表
+                                if (group.isExpanded)
+                                  if (group.randomCallRecords.isEmpty)
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 32,
+                                        horizontal: 16,
+                                      ),
+                                      child: Text(
+                                        '该点名器下没有点名记录',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                    )
+                                  else
+                                    ListView.builder(
+                                      shrinkWrap: true,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemCount: group.allRecords.length,
+                                      itemBuilder: (context, recordIndex) {
+                                        final RandomCallRecordModel record =
+                                            group.allRecords[recordIndex];
+                                        final student =
+                                            group.students[record.studentId];
+
+                                        return Card(
+                                          margin: const EdgeInsets.symmetric(
+                                            horizontal: 16,
+                                            vertical: 4,
+                                          ),
+                                          color:
+                                              group
+                                                      .randomCallerModel
+                                                      .isArchive ==
+                                                  1
+                                              ? Colors.grey[50]
+                                              : null,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(12),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Row(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .baseline,
+                                                      textBaseline: TextBaseline
+                                                          .alphabetic,
+                                                      children: [
+                                                        Text(
+                                                          student?.studentName ??
+                                                              '未知学生',
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 16,
+                                                            color:
+                                                                group
+                                                                        .randomCallerModel
+                                                                        .isArchive ==
+                                                                    1
+                                                                ? Colors.grey
+                                                                : null,
+                                                          ),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 12,
+                                                        ),
+                                                        Text(
+                                                          student?.studentNumber ??
+                                                              '未知',
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            color:
+                                                                group
+                                                                        .randomCallerModel
+                                                                        .isArchive ==
+                                                                    1
+                                                                ? Colors
+                                                                      .grey[500]
+                                                                : Colors
+                                                                      .grey[600],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Text(
+                                                      '分数: ${record.score}',
+                                                      style: TextStyle(
+                                                        color:
+                                                            group
+                                                                    .randomCallerModel
+                                                                    .isArchive ==
+                                                                1
+                                                            ? Colors.grey[500]
+                                                            : (record.score >=
+                                                                      90
+                                                                  ? Colors.green
+                                                                  : Colors
+                                                                        .orange),
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Text(
+                                                  '班级: ${student?.className ?? ''}',
+                                                  style: TextStyle(
+                                                    color:
+                                                        group
+                                                                .randomCallerModel
+                                                                .isArchive ==
+                                                            1
+                                                        ? Colors.grey
+                                                        : null,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '时间: ${record.created.toString().substring(0, 19)}',
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color:
+                                                        group
+                                                                .randomCallerModel
+                                                                .isArchive ==
+                                                            1
+                                                        ? Colors.grey[500]
+                                                        : Colors.grey[600],
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 12),
+                                                // 操作按钮（只有未归档的记录才显示）
+                                                if (group
+                                                        .randomCallerModel
+                                                        .isArchive ==
+                                                    0)
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
+                                                    children: [
+                                                      TextButton.icon(
+                                                        onPressed: () {
+                                                          // _showEditScoreDialog(index, recordIndex);
+                                                        },
+                                                        icon: const Icon(
+                                                          Icons.edit,
+                                                          size: 16,
+                                                        ),
+                                                        label: const Text('编辑'),
+                                                      ),
+                                                      const SizedBox(width: 8),
+                                                      TextButton.icon(
+                                                        onPressed: () {
+                                                          // _showDeleteConfirmationDialog(index, recordIndex);
+                                                        },
+                                                        icon: const Icon(
+                                                          Icons.delete,
+                                                          size: 16,
+                                                        ),
+                                                        label: const Text('删除'),
+                                                        style:
+                                                            TextButton.styleFrom(
+                                                              foregroundColor:
+                                                                  Colors.red,
+                                                            ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                              ],
+                            );
+                          },
+                        ),
+                ),
+              ],
+            ),
+          );
+        }
+      },
     );
   }
 
@@ -385,6 +704,67 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
       _endDate = null;
       _isArchiveFilter = null; // 重置归档筛选
       // _applyFilters();
+    });
+  }
+
+  // 切换分组展开/折叠状态
+  void _toggleGroupExpanded(int index) {
+    setState(() {
+      _filteredRecords.values.toList()[index].isExpanded = !_filteredRecords
+          .values
+          .toList()[index]
+          .isExpanded;
+    });
+  }
+
+  Future<Map<int, RandomCallerGroupModel>> _getAllRandomCallerGroups() async {
+    Map<int, RandomCallerGroupModel> randomCallerGroupsMap = {};
+    // 获取所有班级信息，筛选按钮需要
+    _allClasses = {
+      for (var studentClass in await StudentClassDao().getAllStudentClasses())
+        studentClass.id!: studentClass,
+    };
+    // 获取全部签到点名器
+    List<RandomCallerModel> allRandomCallers = await RandomCallerDao()
+        .getAllRandomCallers();
+    // 保存全部签到点名器
+    _allCallers = {
+      for (var randomCaller in allRandomCallers) randomCaller.id!: randomCaller,
+    };
+    for (var selectedCaller in _allCallers.values) {
+      // 获取班级信息
+      StudentClassModel studentClass = _allClasses[selectedCaller.classId]!;
+      // 获取班级学生
+      List<StudentModel> students = await StudentDao()
+          .getAllStudentsByClassName(studentClass.className);
+      // 获取签到记录
+      List<RandomCallRecordModel> records = await RandomCallRecordDao()
+          .getRecordsByCallerId(callerId: selectedCaller.id!);
+      // 构建签到记录映射
+      Map<int, List<RandomCallRecordModel>> randomCallRecords = {};
+      for (var student in students) {
+        randomCallRecords[student.id!] = [];
+      }
+
+      for (RandomCallRecordModel record in records) {
+        randomCallRecords[record.studentId]!.add(record);
+      }
+      randomCallerGroupsMap[selectedCaller.id!] = RandomCallerGroupModel(
+        randomCallerModel: selectedCaller,
+        students: {for (var student in students) student.id!: student},
+        studentClassModel: studentClass,
+        randomCallRecords: randomCallRecords,
+      );
+    }
+    // 初始筛选记录
+    _filteredRecords = randomCallerGroupsMap;
+    // 构建并返回分组模型
+    return randomCallerGroupsMap;
+  }
+
+  Future<void> _refreshData() async {
+    setState(() {
+      _allRandomCallerGroupFuture = _getAllRandomCallerGroups();
     });
   }
 }
