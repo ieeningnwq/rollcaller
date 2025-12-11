@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../models/student_class_model.dart';
 import '../utils/student_class_dao.dart';
+import '../utils/student_dao.dart';
 
 class StudentClassAddEditDialog extends StatefulWidget {
   final StudentClassModel studentClass;
@@ -164,6 +165,7 @@ class _StudentClassAddEditDialogState extends State<StudentClassAddEditDialog> {
 
   Future<void> _saveOnPressed() async {
     // 表单验证通过，执行添加/编辑操作
+    String oldClassName = widget.studentClass.className;
     widget.studentClass.className = classNameController.text;
     widget.studentClass.studentQuantity = int.parse(
       studentQuantityController.text,
@@ -195,9 +197,24 @@ class _StudentClassAddEditDialogState extends State<StudentClassAddEditDialog> {
         }
       });
     } else {
-      // 更新操作
+      // 更新班级操作
+      // 找到班级相关学生
+      var studentDao = StudentDao(); // 创建StudentDao实例。
+      var students = await studentDao.getAllStudentsByClassName(oldClassName);
       classDao.updateStudentClassById(widget.studentClass).then((onValue) {
         if (onValue != 0) {
+          // 更新学生班级名称
+          for (var student in students) {
+            var classNames = student.className.split(',');
+            for (int i = 0; i < classNames.length; i++) {
+              if (classNames[i] == oldClassName) {
+                classNames[i] = widget.studentClass.className;
+                break;
+              }
+            }
+            student.className = classNames.join(',');
+            studentDao.updateStudentById(student);
+          }
           if (context.mounted) {
             ScaffoldMessenger.of(
               context,

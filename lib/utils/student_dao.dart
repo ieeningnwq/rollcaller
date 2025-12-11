@@ -66,7 +66,7 @@ class StudentDao {
     await db.delete(tableName, where: 'id=?', whereArgs: [id]);
   }
 
-  Future<int> updateStudentClassById(StudentModel student) async {
+  Future<int> updateStudentById(StudentModel student) async {
     final db = await dbHelper.database;
     return await db.update(
       tableName,

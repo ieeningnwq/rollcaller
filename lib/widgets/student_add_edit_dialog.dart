@@ -245,7 +245,7 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
       } else {
         // 修改学生
         studentDao
-            .updateStudentClassById(widget.student)
+            .updateStudentById(widget.student)
             .then(
               (value) => {
                 if (value != 0)

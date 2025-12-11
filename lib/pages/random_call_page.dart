@@ -89,71 +89,65 @@ class _RandomCallPageState extends State<RandomCallPage>
   Future<RandomCallerGroupModel?> _getRandomCallerPageInfo() async {
     Map<int, List<RandomCallRecordModel>> randomCallRecords = {};
 
-    return RandomCallerDao().getAllIsNotArchiveRandomCallers().then((
-      allRandomCallers,
-    ) async {
-      // 保存全部随机点名器
-      _allRandomCallersMap = {
-        for (var randomCaller in allRandomCallers)
-          randomCaller.id!: randomCaller,
-      };
-      // 初始选择第一个随机点名器
-      _selectedCallerId ??= allRandomCallers.isNotEmpty
-          ? allRandomCallers.first.id
-          : null;
-      if (_selectedCallerId != null) {
-        var selectedCaller = _allRandomCallersMap[_selectedCallerId!]!;
-        return StudentClassDao().getStudentClass(selectedCaller.classId).then((
-          studentClass,
-        ) async {
-          return (StudentDao().getAllStudentsByClassName(
-            studentClass.className,
-          )).then((students) async {
-            List<StudentModel> studentModels = students;
+    var allRandomCallers = await RandomCallerDao()
+        .getAllIsNotArchiveRandomCallers();
+    // 保存全部随机点名器
+    _allRandomCallersMap = {
+      for (var randomCaller in allRandomCallers) randomCaller.id!: randomCaller,
+    };
+    // 初始选择第一个随机点名器
+    _selectedCallerId ??= allRandomCallers.isNotEmpty
+        ? allRandomCallers.first.id
+        : null;
+    if (_selectedCallerId != null) {
+      var selectedCaller = _allRandomCallersMap[_selectedCallerId!]!;
+      var studentClass = await StudentClassDao().getStudentClass(
+        selectedCaller.classId,
+      );
+      var students = await StudentDao().getAllStudentsByClassName(
+        studentClass.className,
+      );
+      List<StudentModel> studentModels = students;
 
-            for (var student in studentModels) {
-              randomCallRecords[student.id!] = [];
-            }
-            return RandomCallRecordDao()
-                .getRecordsByCallerId(callerId: selectedCaller.id!)
-                .then((value) async {
-                  for (var record in value) {
-                    randomCallRecords[record.studentId]!.add(record);
-                  }
-                  // 初始化可选择学生
-                  if (selectedCaller.isDuplicate == 0) {
-                    // 不可重复
-                    _ableToSelectStudents = {
-                      for (var student in studentModels)
-                        if (randomCallRecords[student.id!]!.isEmpty)
-                          student.id!: student,
-                    };
-                  } else {
-                    // 可重复
-                    _ableToSelectStudents = {
-                      for (var student in studentModels) student.id!: student,
-                    };
-                  }
-                  // 初始选择第一个学生
-                  _currentStudent = _ableToSelectStudents.isNotEmpty
-                      ? _ableToSelectStudents.values.first
-                      : null;
-                  return RandomCallerGroupModel(
-                    randomCallerModel: selectedCaller,
-                    students: {
-                      for (var student in studentModels) student.id!: student,
-                    },
-                    studentClassModel: studentClass,
-                    randomCallRecords: randomCallRecords,
-                  );
-                });
-          });
-        });
-      } else {
-        _currentStudent = null;
-        return null;
+      for (var student in studentModels) {
+        randomCallRecords[student.id!] = [];
       }
-    });
+      for (var student in studentModels) {
+        randomCallRecords[student.id!] = [];
+      }
+      var records = await RandomCallRecordDao().getRecordsByCallerId(
+        callerId: selectedCaller.id!,
+      );
+      for (var record in records) {
+        randomCallRecords[record.studentId]!.add(record);
+      }
+      // 初始化可选择学生
+      if (selectedCaller.isDuplicate == 0) {
+        // 不可重复
+        _ableToSelectStudents = {
+          for (var student in studentModels)
+            if (randomCallRecords[student.id!]!.isEmpty) student.id!: student,
+        };
+      } else {
+        // 可重复
+        _ableToSelectStudents = {
+          for (var student in studentModels) student.id!: student,
+        };
+      }
+      // 初始选择第一个学生
+      _currentStudent = _ableToSelectStudents.isNotEmpty
+          ? _ableToSelectStudents.values.first
+          : null;
+      return RandomCallerGroupModel(
+        randomCallerModel: selectedCaller,
+        students: {for (var student in studentModels) student.id!: student},
+        studentClassModel: studentClass,
+        randomCallRecords: randomCallRecords,
+      );
+    }else{
+      _selectedCallerId = null;
+      return null;
+    }
   }
 
   Future<void> _refreshPageData() async {

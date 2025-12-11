@@ -491,7 +491,7 @@ class _StudentPageState extends State<StudentPage> {
             // 更新班级信息
             student.className = '${student.className},$className';
             // 学生存在，更新班级名称
-            await StudentDao().updateStudentClassById(student);
+            await StudentDao().updateStudentById(student);
           } else {
             // 创建新学生
             var student = StudentModel(
