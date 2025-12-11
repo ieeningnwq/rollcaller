@@ -50,6 +50,8 @@ class _RandomCallPageState extends State<RandomCallPage>
   bool _isUnpickedGroupExpanded = true; // 未抽取学生组默认展开
   // 选择点名器折叠
   bool _isRandomCallerInfoWidgetExpanded = true;
+  // !  可选择学生，为满足不可重复点名需求
+  late Map<int, StudentModel> _ableToSelectStudents;
 
   @override
   initState() {
@@ -72,11 +74,9 @@ class _RandomCallPageState extends State<RandomCallPage>
 
             // 随机选择一个新的学生
             setState(() {
-              int studentId =
-                  _randomCallerGroup!.students.keys.toList()[_random.nextInt(
-                    _randomCallerGroup!.students.length,
-                  )];
-              _currentStudent = _randomCallerGroup!.students[studentId];
+              int studentId = _ableToSelectStudents.keys
+                  .toList()[_random.nextInt(_ableToSelectStudents.length)];
+              _currentStudent = _ableToSelectStudents[studentId];
             });
           }
         }
@@ -110,10 +110,7 @@ class _RandomCallPageState extends State<RandomCallPage>
             studentClass.className,
           )).then((students) async {
             List<StudentModel> studentModels = students;
-            // 初始选择第一个学生
-            _currentStudent = studentModels.isNotEmpty
-                ? studentModels.first
-                : null;
+
             for (var student in studentModels) {
               randomCallRecords[student.id!] = [];
             }
@@ -123,6 +120,24 @@ class _RandomCallPageState extends State<RandomCallPage>
                   for (var record in value) {
                     randomCallRecords[record.studentId]!.add(record);
                   }
+                  // 初始化可选择学生
+                  if (selectedCaller.isDuplicate == 0) {
+                    // 不可重复
+                    _ableToSelectStudents = {
+                      for (var student in studentModels)
+                        if (randomCallRecords[student.id!]!.isEmpty)
+                          student.id!: student,
+                    };
+                  } else {
+                    // 可重复
+                    _ableToSelectStudents = {
+                      for (var student in studentModels) student.id!: student,
+                    };
+                  }
+                  // 初始选择第一个学生
+                  _currentStudent = _ableToSelectStudents.isNotEmpty
+                      ? _ableToSelectStudents.values.first
+                      : null;
                   return RandomCallerGroupModel(
                     randomCallerModel: selectedCaller,
                     students: {
@@ -315,13 +330,25 @@ class _RandomCallPageState extends State<RandomCallPage>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // 顶部标题和管理链接
-                  const Text(
-                    '选择点名器',
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
+                  Row(
+                    children: [
+                      const Text(
+                        '选择点名器',
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        '    ${_randomCallerGroup == null ? '无选中点名器' : (_randomCallerGroup!.randomCallerModel.isDuplicate == 0 ? '${_randomCallerGroup!.randomCallerModel.randomCallerName}：不可重复' : '${_randomCallerGroup!.randomCallerModel.randomCallerName}：可重复')}',
+                        style: const TextStyle(
+                          fontSize: 14.0,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
                   ),
                   Icon(
                     _isRandomCallerInfoWidgetExpanded
@@ -365,7 +392,6 @@ class _RandomCallPageState extends State<RandomCallPage>
       ),
     );
   }
-
 
   IconButton _buildViewIconButton() {
     return IconButton(
@@ -643,6 +669,15 @@ class _RandomCallPageState extends State<RandomCallPage>
           _randomCallerGroup!.randomCallRecords[_currentStudent!.id!]!.add(
             randomCallRecordModel,
           );
+          // 如果不可重复
+          if (_randomCallerGroup!.randomCallerModel.isDuplicate == 0) {
+            // 如果不可重复选择，从可选择学生中移除当前选中的学生
+            _ableToSelectStudents.remove(_currentStudent!.id!);
+            // 初始选择第一个学生
+            _currentStudent = _ableToSelectStudents.isNotEmpty
+                ? _ableToSelectStudents.values.first
+                : null;
+          }
           // 保存评分后，重置分数为默认值5分
           _score = 5;
         });
@@ -704,7 +739,15 @@ class _RandomCallPageState extends State<RandomCallPage>
             // 实现手动抽取功能
             setState(() {
               // 设置当前学生为被点击的学生
-              _currentStudent = studentRecord.keys.first;
+              if (_randomCallerGroup!.randomCallerModel.isDuplicate == 0 &&
+                  isPickedGroup) {
+                Fluttertoast.showToast(
+                  msg:
+                      '${_randomCallerGroup!.randomCallerModel.randomCallerName}不可重复选择，已抽取学生无法重复选择',
+                );
+              } else {
+                _currentStudent = studentRecord.keys.first;
+              }
               // 重置分数为默认值5分
               _score = 5;
             });
