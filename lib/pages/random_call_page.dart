@@ -344,7 +344,6 @@ class _RandomCallPageState extends State<RandomCallPage>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildArchiveIconButton(),
                         _buildViewIconButton(),
                         _buildAddIconButton(),
                         _buildEditIconButton(),
@@ -367,24 +366,6 @@ class _RandomCallPageState extends State<RandomCallPage>
     );
   }
 
-  IconButton _buildArchiveIconButton() {
-    return IconButton(
-      onPressed: () {
-        // 点名器归档功能
-        if (_selectedCallerId != null) {
-          // showDialog(
-          //   context: context,
-          //   builder: (context) => RandomCallerViewDialog(
-          //     randomCaller: _allRandomCallersMap[_selectedCallerId!]!,
-          //   ),
-          // );
-        } else {
-          Fluttertoast.showToast(msg: '请先选择点名器');
-        }
-      },
-      icon: const Icon(Icons.archive, color: Colors.grey),
-    );
-  }
 
   IconButton _buildViewIconButton() {
     return IconButton(

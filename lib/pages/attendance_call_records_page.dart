@@ -324,7 +324,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                                     ],
                                                   ),
                                                   Text(
-                                                    '班级: ${student?.className ?? '未知'}',
+                                                    '班级: ${student.className}',
                                                     style: TextStyle(
                                                       color:
                                                           group
@@ -883,7 +883,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                         onChanged: (bool? value) {
                           setState(() {
                             if (value == true) {
-                              selectedCallerIds.add(caller.id!);
+                              selectedCallerIds.add(caller.id);
                             } else {
                               selectedCallerIds.remove(caller.id);
                             }
