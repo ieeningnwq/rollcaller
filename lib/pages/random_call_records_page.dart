@@ -1,5 +1,10 @@
+import 'dart:io';
+
+import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:rollcall/models/random_caller_group.dart';
 import 'package:rollcall/models/student_class_model.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
@@ -400,7 +405,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                     label: const Text('重置'),
                   ),
                   TextButton.icon(
-                    onPressed: _resetFilters,
+                    onPressed: _showExportDialog,
                     icon: const Icon(Icons.file_upload),
                     label: const Text('导出'),
                   ),
@@ -652,7 +657,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
   // 显示时间范围选择器弹窗
   void _showDateRangePicker() {
     showDialog(
-      context: context,
+      context: this.context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('选择时间范围'),
@@ -778,12 +783,6 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
     return randomCallerGroupsMap;
   }
 
-  Future<void> _refreshData() async {
-    setState(() {
-      _allRandomCallerGroupFuture = _getAllRandomCallerGroups();
-    });
-  }
-
   void _applyFilters() {
     var filterRecords = _groupedRecords.entries.where((group) {
       // 点名器筛选
@@ -833,7 +832,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
     );
 
     showDialog(
-      context: context,
+      context: this.context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('编辑分数'),
@@ -909,7 +908,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
 
   void _showDeleteConfirmationDialog(RandomCallRecordModel record) {
     showDialog(
-      context: context,
+      context: this.context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('确认删除'),
@@ -951,7 +950,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
 
   void _showArchiveConfirmationDialog(RandomCallerModel randomCallerModel) {
     showDialog(
-      context: context,
+      context: this.context,
       builder: (context) {
         return AlertDialog(
           title: const Text('确认归档'),
@@ -993,5 +992,203 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
         );
       },
     );
+  }
+
+  // 选择点名器导出的对话框
+  Future<void> _showExportDialog() async {
+    // 状态变量用于跟踪选中的点名器
+    Set<int> selectedCallerIds = {};
+
+    // 显示选择对话框
+    await showDialog(
+      context: this.context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('选择需要导出的点名器'),
+          content: StatefulBuilder(
+            builder: (BuildContext context, StateSetter setState) {
+              return SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('请选择要导出的点名器：'),
+                    const SizedBox(height: 12),
+                    ..._allCallers.values.toList().map((caller) {
+                      return CheckboxListTile(
+                        title: Text(caller.randomCallerName),
+                        subtitle: Text(
+                          '班级: ${_allClasses[caller.classId]?.className}',
+                        ),
+                        value: selectedCallerIds.contains(caller.id),
+                        onChanged: (bool? value) {
+                          setState(() {
+                            if (value == true) {
+                              selectedCallerIds.add(caller.id!);
+                            } else {
+                              selectedCallerIds.remove(caller.id);
+                            }
+                          });
+                        },
+                      );
+                    }),
+                  ],
+                ),
+              );
+            },
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('取消'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                if (selectedCallerIds.isNotEmpty) {
+                  _exportToExcel(selectedCallerIds);
+                } else {
+                  ScaffoldMessenger.of(this.context).showSnackBar(
+                    const SnackBar(
+                      content: Text('请至少选择一个点名器'),
+                      backgroundColor: Colors.orange,
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              },
+              child: const Text('导出'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 导出数据到Excel文件
+  Future<void> _exportToExcel(Set<int> selectedCallerIds) async {
+    try {
+      // 创建一个新的Excel文件
+      Excel excelFile = Excel.createExcel();
+      // 统计导出的记录数量
+      int totalExportedRecords = 0;
+      // 为每个选中的点名器创建一个工作表
+      for (int callerId in selectedCallerIds) {
+        // 找到对应的点名器
+        RandomCallerModel? caller;
+        try {
+          caller = _allCallers[callerId];
+        } catch (e) {
+          // 点名器不存在，跳过
+          continue;
+        }
+        // 获取该点名器的所有记录
+        List<RandomCallRecordModel> records =
+            _groupedRecords[callerId]!.allRecords;
+        // 没有记录跳过，不保存该点名器的工作表
+        if (records.isEmpty) continue;
+
+        // 创建工作表，表名使用点名器名称
+        String sheetName = caller!.randomCallerName;
+        // 确保表名不超过Excel限制的31个字符
+        if (sheetName.length > 31) {
+          sheetName = sheetName.substring(0, 31);
+        }
+        // 创建或获取工作表
+        Sheet sheet = excelFile[sheetName];
+        // 设置表头
+        sheet.appendRow([
+          TextCellValue('序号'),
+          TextCellValue('点名器名称'),
+          TextCellValue('班级名称'),
+          TextCellValue('学生学号'),
+          TextCellValue('学生姓名'),
+          TextCellValue('分数'),
+          TextCellValue('点名时间'),
+          TextCellValue('备注'),
+        ]);
+
+        // 导出每条记录
+        for (int i = 0; i < records.length; i++) {
+          RandomCallRecordModel record = records[i];
+          // 获取学生信息
+          StudentModel student =
+              _groupedRecords[callerId]!.students[record.studentId]!;
+          // 获取班级信息
+          StudentClassModel cls = _groupedRecords[callerId]!.studentClassModel;
+
+          sheet.appendRow([
+            TextCellValue((i + 1).toString()),
+            TextCellValue(caller.randomCallerName),
+            TextCellValue(cls.className),
+            TextCellValue(student.studentNumber),
+            TextCellValue(student.studentName),
+            TextCellValue(record.score.toString()),
+            TextCellValue(record.created.toIso8601String()),
+            TextCellValue(record.notes),
+          ]);
+          totalExportedRecords++;
+        }
+      }
+      // 如果没有导出任何记录，显示提示
+      if (totalExportedRecords == 0) {
+        ScaffoldMessenger.of(this.context).showSnackBar(
+          const SnackBar(
+            content: Text('没有找到可导出的记录'),
+            backgroundColor: Colors.orange,
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+      }
+      // 保存Excel文件
+
+      String fileName =
+          '点名记录_${DateTime.now().year}${DateTime.now().month.toString().padLeft(2, '0')}${DateTime.now().day.toString().padLeft(2, '0')}_${DateTime.now().hour}${DateTime.now().minute}${DateTime.now().second}.xlsx';
+      String downloadsPath = '';
+      // 根据不同平台获取下载路径
+      if (Platform.isAndroid || Platform.isIOS) {
+        var directory = await getExternalStorageDirectory();
+        downloadsPath = join(directory!.path, fileName);
+      } else if (Platform.isWindows) {
+        downloadsPath = '${Platform.environment['USERPROFILE']}/Downloads/';
+      } else if (Platform.isMacOS) {
+        downloadsPath = '${Platform.environment['HOME']}/Downloads/';
+      }
+      excelFile.delete('Sheet1');
+      var fileBytes = excelFile.save();
+      // 确保目录存在，保存Excel文件
+      File(downloadsPath)
+        ..createSync(recursive: true)
+        ..writeAsBytesSync(fileBytes!);
+      // 显示导出成功信息
+      if (mounted) {
+        ScaffoldMessenger.of(this.context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '导出成功！共导出 $totalExportedRecords 条记录到文件：$fileName',
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        // 显示导出失败信息
+        ScaffoldMessenger.of(this.context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '导出失败：${e.toString()}',
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
   }
 }
