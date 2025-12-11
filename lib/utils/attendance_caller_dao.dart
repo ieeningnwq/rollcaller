@@ -22,7 +22,7 @@ class AttendanceCallerDao {
     final db = await _databaseHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       tableName,
-      where: 'attendanceCallerName = ?',
+      where: 'attendance_caller_name = ?',
       whereArgs: [callerName],
     );
     return maps.isNotEmpty;

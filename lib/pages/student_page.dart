@@ -1,6 +1,10 @@
 import 'dart:developer';
+import 'dart:io';
 
+import 'package:excel/excel.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:rollcall/models/student_class_model.dart';
 
@@ -81,8 +85,19 @@ class _StudentPageState extends State<StudentPage> {
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
             ),
-            // 搜索栏
-            _searchWidget(),
+            Row(
+              children: [
+                // 搜索栏
+                _searchWidget(),
+                // 导入学生
+                IconButton(
+                  onPressed: () {
+                    _importStudentsFromExcel();
+                  },
+                  icon: Icon(Icons.download),
+                ),
+              ],
+            ),
             // 班级列表
             Expanded(
               child: FutureBuilder<Map<int, StudentClassGroup>>(
@@ -238,20 +253,25 @@ class _StudentPageState extends State<StudentPage> {
     _refreshController.loadComplete();
   }
 
-  Padding _searchWidget() => Padding(
-    padding: const EdgeInsets.all(8),
-    child: TextField(
-      controller: _searchController,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.search),
-        hintText: '搜索学号或姓名...',
-        hintStyle: TextStyle(fontSize: 14),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
+  Expanded _searchWidget() => Expanded(
+    child: Padding(
+      padding: const EdgeInsets.all(8),
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          prefixIcon: const Icon(Icons.search),
+          hintText: '搜索学号或姓名...',
+          hintStyle: TextStyle(fontSize: 14),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 6,
+            vertical: 4,
+          ),
+          filled: true,
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-        filled: true,
       ),
     ),
   );
@@ -405,5 +425,90 @@ class _StudentPageState extends State<StudentPage> {
         ],
       ),
     );
+  }
+
+  Future<void> _importStudentsFromExcel() async {
+    try {
+      // 选择Excel文件
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['xlsx'],
+      );
+      if (result == null) return; // 用户取消选择
+      // 读取文件
+      var bytes = File(result.files.single.path!).readAsBytesSync();
+      var excel = Excel.decodeBytes(bytes);
+      int totalCount = 0;
+      // 解析学生工作表
+      for (var table in excel.tables.keys) {
+        // 读取第一列，确认 学号	姓名	班级 行号
+        var firstColumn = excel.tables[table]!.rows[0];
+        // 确认 学号	姓名	班级 行号
+        int studentNumberIndex = -1;
+        int nameIndex = -1;
+        int classNameIndex = -1;
+        for (var i = 0; i < firstColumn.length; i++) {
+          if (firstColumn[i]?.value?.toString() == '学号') {
+            studentNumberIndex = i;
+          } else if (firstColumn[i]?.value?.toString() == '姓名') {
+            nameIndex = i;
+          } else if (firstColumn[i]?.value?.toString() == '班级') {
+            classNameIndex = i;
+          }
+        }
+        // 从第2行开始读取学生数据
+        for (var row in excel.tables[table]!.rows.skip(1)) {
+          String studentNumber =
+              row[studentNumberIndex]?.value?.toString() ?? '';
+          String name = row[nameIndex]?.value?.toString() ?? '';
+          String className = row[classNameIndex]?.value?.toString() ?? '';
+          if (studentNumber.isEmpty || name.isEmpty || className.isEmpty) {
+            // 如果有为空的信息
+            continue;
+          }
+          // 确保班级存在
+          if (!(await StudentClassDao().isStudentClassesNameExist(className))) {
+            // 班级不存在，创建新班级
+            var studentClass = StudentClassModel(
+              className: className,
+              created: DateTime.now(),
+              studentQuantity: 0,
+              teacherName: '',
+              notes: '',
+            );
+            await StudentClassDao().insertStudentClass(studentClass);
+          }
+          // 判断学生是否存在
+          if (await StudentDao().isStudentNumberExist(studentNumber)) {
+            // 获取学生信息
+            var student = await StudentDao().getStudentByStudentNumber(
+              studentNumber,
+            );
+            // 确认学生班级不包含该班级
+            if ((',${student!.className},'.contains(',$className,'))) {
+              continue;
+            }
+            // 更新班级信息
+            student.className = '${student.className},$className';
+            // 学生存在，更新班级名称
+            await StudentDao().updateStudentClassById(student);
+          } else {
+            // 创建新学生
+            var student = StudentModel(
+              studentNumber: studentNumber,
+              className: className,
+              studentName: name,
+              created: DateTime.now(),
+            );
+            await StudentDao().insertStudent(student);
+          }
+          totalCount++;
+          log(studentNumber);
+        }
+      }
+      Fluttertoast.showToast(msg: '成功导入 $totalCount 个学生');
+    } catch (e) {
+      Fluttertoast.showToast(msg: '导入学生错误：${e.toString()}');
+    }
   }
 }

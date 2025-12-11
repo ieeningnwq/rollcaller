@@ -75,4 +75,10 @@ class StudentDao {
       whereArgs: [student.id],
     );
   }
+
+  Future<StudentModel?> getStudentByStudentNumber(String studentNumber) async {
+    final db = await dbHelper.database;
+    var mapData = await db.query(tableName, where: 'student_number=?', whereArgs: [studentNumber]);
+    return mapData.isNotEmpty ? StudentModel.fromMap(mapData.first) : null; 
+  }
 }

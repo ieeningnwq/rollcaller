@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 
 import '../configs/strings.dart';
 import '../models/student_class_model.dart';
+import '../models/student_model.dart';
 import './database_helper.dart';
 
 class StudentClassDao {
@@ -19,7 +20,7 @@ class StudentClassDao {
     return await db.insert(
       tableName,
       mapData,
-      conflictAlgorithm: ConflictAlgorithm.replace,
+      conflictAlgorithm: ConflictAlgorithm.ignore,
     );
   }
 
@@ -95,4 +96,5 @@ class StudentClassDao {
     var mapData = await db.query(tableName, where: 'class_name=?', whereArgs: [className]);
     return StudentClassModel.fromMap(mapData.first);
   }
+
 }
