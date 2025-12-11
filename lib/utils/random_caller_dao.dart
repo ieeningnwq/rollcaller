@@ -48,4 +48,16 @@ class RandomCallerDao {
     final db = await dbHelper.database;
     return await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
   }
+
+  Future<List<RandomCallerModel>> getAllIsNotArchiveRandomCallers() async {
+    final db = await dbHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+      where: 'is_archive = ?',
+      whereArgs: [0],
+    );
+    return maps.isNotEmpty
+        ? maps.map((map) => RandomCallerModel.fromMap(map)).toList()
+        : [];
+  }
 }

@@ -67,7 +67,7 @@ class _AttendencePageState extends State<AttendencePage> {
       Map<int, AttendanceCallRecordModel> attendanceCallRecords = {};
       // 获取全部签到点名器
       List<AttendanceCallerModel> allAttendanceCallers =
-          await AttendanceCallerDao().getAllAttendanceCallers();
+          await AttendanceCallerDao().getAllIsNotArchiveAttendanceCallers();
       // 保存全部签到点名器
       _allAttendaceCallersMap = {
         for (var attendanceCaller in allAttendanceCallers)

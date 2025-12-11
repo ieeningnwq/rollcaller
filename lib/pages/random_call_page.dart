@@ -89,7 +89,7 @@ class _RandomCallPageState extends State<RandomCallPage>
   Future<RandomCallerGroupModel?> _getRandomCallerPageInfo() async {
     Map<int, List<RandomCallRecordModel>> randomCallRecords = {};
 
-    return RandomCallerDao().getAllRandomCallers().then((
+    return RandomCallerDao().getAllIsNotArchiveRandomCallers().then((
       allRandomCallers,
     ) async {
       // 保存全部随机点名器

@@ -59,4 +59,16 @@ class AttendanceCallerDao {
       whereArgs: [id],
     );
   }
+
+  Future<List<AttendanceCallerModel>> getAllIsNotArchiveAttendanceCallers() async {
+    final db = await _databaseHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+      where: 'is_archive = ?',
+      whereArgs: [0],
+    );
+    return maps.isNotEmpty
+        ? maps.map((map) => AttendanceCallerModel.fromMap(map)).toList()
+        : [];
+  }
 }
