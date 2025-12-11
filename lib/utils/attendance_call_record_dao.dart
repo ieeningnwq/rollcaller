@@ -51,13 +51,29 @@ class AttendanceCallRecordDao {
     return await db.insert(tableName, attendanceCallRecordModel.toMap());
   }
 
-  Future<int> updateAttendanceCallRecord(AttendanceCallRecordModel attendanceCallRecordModel) async {
+  Future<int> updateAttendanceCallRecord(
+    AttendanceCallRecordModel attendanceCallRecordModel,
+  ) async {
     final db = await _databaseHelper.database;
     return await db.update(
       tableName,
       attendanceCallRecordModel.toMap(),
       where: 'id = ?',
       whereArgs: [attendanceCallRecordModel.id],
+    );
+  }
+
+  Future<int> deleteAttendanceCallRecord(int id) async {
+    final db = await _databaseHelper.database;
+    return await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<int> deleteAttendanceCallRecordById(int recordId) async {
+    final db = await _databaseHelper.database;
+    return await db.delete(
+      tableName,
+      where: 'id = ?',
+      whereArgs: [recordId],
     );
   }
 }

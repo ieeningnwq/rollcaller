@@ -8,6 +8,7 @@ class AttendanceCallerGroupModel {
   final StudentClassModel studentClassModel;
   Map<int, StudentModel> students = {};
   Map<int, AttendanceCallRecordModel> attendanceCallRecords = {};
+  bool isExpanded = false;
 
   AttendanceCallerGroupModel({
     required this.attendanceCallerModel,
@@ -15,4 +16,7 @@ class AttendanceCallerGroupModel {
     required this.attendanceCallRecords,
     required this.students,
   });
+
+  List<AttendanceCallRecordModel> get allRecords =>
+      attendanceCallRecords.values.toList();
 }
