@@ -76,4 +76,32 @@ class AttendanceCallRecordDao {
       whereArgs: [recordId],
     );
   }
+
+  Future<List<AttendanceCallRecordModel>> getAttendanceCallRecordsByCallerId(int callerId) async {
+    final db = await _databaseHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+      where: 'attendance_caller_id = ?',
+      whereArgs: [callerId],
+    );
+
+    return List.generate(
+      maps.length,
+      (i) => AttendanceCallRecordModel.fromMap(maps[i]),
+    );
+  }
+
+  Future<List<AttendanceCallRecordModel>> getAttendanceCallRecordsByStudentId(int studentId) async {
+    final db = await _databaseHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+      where: 'attendance_student_id = ?',
+      whereArgs: [studentId],
+    );
+
+    return List.generate(
+      maps.length,
+      (i) => AttendanceCallRecordModel.fromMap(maps[i]),
+    );
+  }
 }

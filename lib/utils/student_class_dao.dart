@@ -2,7 +2,6 @@ import 'package:sqflite/sqflite.dart';
 
 import '../configs/strings.dart';
 import '../models/student_class_model.dart';
-import '../models/student_model.dart';
 import './database_helper.dart';
 
 class StudentClassDao {

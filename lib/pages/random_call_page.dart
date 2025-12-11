@@ -462,14 +462,23 @@ class _RandomCallPageState extends State<RandomCallPage>
   IconButton _buildDeleteIconButton() {
     return IconButton(
       onPressed: () async {
+        // 校验是否有关联的随机点名记录
+        final randomCallRecords = await RandomCallRecordDao()
+            .getRandomCallRecordsByCallerId(_selectedCallerId!);
+        if (randomCallRecords.isNotEmpty) {
+          // 有随机点名记录，提示用户先删除随机点名记录
+          Fluttertoast.showToast(msg: '该点名器下有随机点名记录，无法删除。请先删除该点名器下的所有随机点名记录。');
+          return;
+        }
         // 删除点名器功能
         if (_selectedCallerId != null) {
-          showDialog(
+          if(mounted) {
+            showDialog(
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
                 title: const Text('确认删除'),
-                content: const Text('确定要删除选中的点名器吗？此操作不可撤销'),
+                content: const Text('确定要删除选中的点名器吗？此操作不可撤销。'),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
@@ -505,6 +514,7 @@ class _RandomCallPageState extends State<RandomCallPage>
               );
             },
           );
+          }
         } else {
           Fluttertoast.showToast(msg: '请先选择点名器');
         }

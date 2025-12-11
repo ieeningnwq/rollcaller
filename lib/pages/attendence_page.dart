@@ -621,10 +621,19 @@ class _AttendencePageState extends State<AttendencePage> {
 
   IconButton _buildDeleteIconButton() {
     return IconButton(
-      onPressed: () {
+      onPressed: () async {
+        // 校验是否有关联的签到点名记录
+        final attendanceCallRecords = await AttendanceCallRecordDao()
+            .getAttendanceCallRecordsByCallerId(_selectedCallerId!);
+        if (attendanceCallRecords.isNotEmpty) {
+          // 有签到点名记录，提示用户先删除签到点名记录
+          Fluttertoast.showToast(msg: '该点名器下有签到点名记录，无法删除。请先删除该点名器下的所有签到点名记录。');
+          return;
+        }
         // 删除点名器功能
         if (_selectedCallerId != null) {
-          showDialog(
+          if (context.mounted) {
+            showDialog(
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
@@ -665,6 +674,7 @@ class _AttendencePageState extends State<AttendencePage> {
               );
             },
           );
+          }
         } else {
           Fluttertoast.showToast(msg: '请先选择点名器');
         }

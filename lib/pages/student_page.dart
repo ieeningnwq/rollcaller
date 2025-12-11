@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:rollcall/models/student_class_model.dart';
+import 'package:rollcall/utils/attendance_call_record_dao.dart';
+import 'package:rollcall/utils/attendance_caller_dao.dart';
+import 'package:rollcall/utils/random_call_record_dao.dart';
 
 import '../models/student_class_group.dart';
 import '../models/student_model.dart';
@@ -406,6 +409,25 @@ class _StudentPageState extends State<StudentPage> {
                         ),
                         TextButton(
                           onPressed: () async {
+                            // 校验是否有随机点名记录
+                            RandomCallRecordDao randomCallRecordDao =
+                                RandomCallRecordDao();
+                            var randomCallRecords = await randomCallRecordDao
+                                .getRandomCallRecordsByStudentId(student.id!);
+                            // 校验是否有签到点名记录
+                            AttendanceCallRecordDao attendanceCallRecordDao =
+                                AttendanceCallRecordDao();
+                            var attendanceCallRecords =
+                                await attendanceCallRecordDao
+                                    .getAttendanceCallRecordsByStudentId(
+                                      student.id!,
+                                    );
+                            if (randomCallRecords.isNotEmpty ||
+                                attendanceCallRecords.isNotEmpty) {
+                              // 有随机点名记录，提示用户先删除随机点名记录
+                              Fluttertoast.showToast(msg: '该学生下有随机点名记录或签到点名记录，无法删除。请先删除该学生下的所有随机点名记录或签到点名记录。');
+                              return;
+                            }
                             await StudentDao().deleteStudentById(student.id);
                             if (context.mounted) {
                               // 刷新学生列表
@@ -507,6 +529,7 @@ class _StudentPageState extends State<StudentPage> {
         }
       }
       Fluttertoast.showToast(msg: '成功导入 $totalCount 个学生');
+      _refreshClassGroupData();
     } catch (e) {
       Fluttertoast.showToast(msg: '导入学生错误：${e.toString()}');
     }

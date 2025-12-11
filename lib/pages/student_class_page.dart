@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:rollcall/models/student_model.dart';
+import 'package:rollcall/utils/attendance_caller_dao.dart';
+import 'package:rollcall/utils/random_caller_dao.dart';
 
 import '../configs/strings.dart';
 import '../models/student_class_model.dart';
@@ -351,7 +354,17 @@ class _StudentClassState extends State<StudentClassPage> {
                       var students = await studentDao.getAllStudentsByClassName(
                         studentClass.className,
                       );
-                      if (students.isEmpty) {
+                      // 校验该班级是否还有随机点名器
+                      var randomCallerDao = RandomCallerDao();
+                      var randomCallers = await randomCallerDao.getRandomCallersByClassId(
+                        studentClass.id!,
+                      );
+                      // 校验该班级是否还有签到点名器
+                      var attendanceCallerDao = AttendanceCallerDao();
+                      var attendanceCallers = await attendanceCallerDao.getAttendanceCallersByClassId(
+                        studentClass.id!,
+                      );
+                      if (students.isEmpty && randomCallers.isEmpty && attendanceCallers.isEmpty) {
                         classDao
                             .deleteStudentClassByClassName(
                               studentClass.className,
@@ -369,26 +382,7 @@ class _StudentClassState extends State<StudentClassPage> {
                             });
                       } else {
                         // 班级下还有学生，提示用户先删除学生
-                        if (context.mounted) {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text('提示'),
-                                content: Text('该班级下还有学生，无法删除。请先删除班级下的所有学生。'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => {
-                                      Navigator.of(context).pop(),
-                                      Navigator.of(context).pop(),
-                                    },
-                                    child: Text('确定'),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        }
+                        Fluttertoast.showToast(msg: '该班级下还有学生、随机点名器、签到点名器，无法删除。请先删除班级下的所有学生、随机点名器、签到点名器。');
                         // 关闭确认弹窗
                       }
                     },

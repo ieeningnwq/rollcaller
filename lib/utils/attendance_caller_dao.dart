@@ -71,4 +71,16 @@ class AttendanceCallerDao {
         ? maps.map((map) => AttendanceCallerModel.fromMap(map)).toList()
         : [];
   }
+
+  Future<List<AttendanceCallerModel>> getAttendanceCallersByClassId(int classId) async {
+    final db = await _databaseHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+      where: 'class_id = ?',
+      whereArgs: [classId],
+    );
+    return maps.isNotEmpty
+        ? maps.map((map) => AttendanceCallerModel.fromMap(map)).toList()
+        : [];
+  }
 }
