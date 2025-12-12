@@ -220,6 +220,7 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
         // 添加学生列表成功
         if (id != 0) {
           // 添加学生班级关系
+          widget.student.id = id;
           await StudentClassRelationDao().insertStudentClasses(
             widget.student.id!,
             classIds,
