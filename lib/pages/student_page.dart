@@ -200,9 +200,21 @@ class _StudentPageState extends State<StudentPage> {
       (value) => studentClasses.addAll(value),
     );
     for (StudentClassModel classModel in studentClasses) {
-      var students = await studentDao.getAllStudentsByClassName(
-        classModel.className,
-      );
+      List<StudentModel> students = [];
+      List<int> studentIds = await StudentClassRelationDao()
+          .getAllStudentIdsByClassId(classModel.id!);
+      for (int studentId in studentIds) {
+        var student = await studentDao.getStudentById(studentId);
+        // 添加学生班级信息
+        var classIds = await StudentClassRelationDao()
+            .getAllClassIdsByStudentId(studentId);
+        for (int classId in classIds) {
+          student!.classesMap[classId] = await classDao.getStudentClass(classId);
+        }
+        if (student != null) {
+          students.add(student);
+        }
+      }
       StudentClassGroup classGroup = StudentClassGroup(
         studentClass: classModel,
         students: students,
@@ -210,7 +222,16 @@ class _StudentPageState extends State<StudentPage> {
       classGroups[classModel.id!] = classGroup;
     }
     // 查询有的学生没有班级
-    var allStudents = await studentDao.getAllStudentsWithoutClassName();
+    // 所有学生
+    var allStudents = await studentDao.getAllStudents();
+    // 所有有班级学生
+    var allStudentClassIds = Set.from(
+      await StudentClassRelationDao().getAllStudentIds(),
+    );
+    allStudents.removeWhere(
+      (student) => allStudentClassIds.contains(student.id),
+    );
+
     var studentClass = StudentClassModel(
       className: '无班级学生',
       studentQuantity: allStudents.length,

@@ -52,7 +52,7 @@ class DatabaseHelper {
       CREATE TABLE ${KString.studentClassRelationTableName} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         student_id INTEGER NOT NULL,
-        class_id INTEGER NOT NULL,
+        class_id INTEGER NOT NULL
       )
     ''');
     // 随机点名表格

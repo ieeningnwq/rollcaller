@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 
 import '../models/student_class_model.dart';
 import '../utils/student_class_dao.dart';
-import '../utils/student_dao.dart';
 
 class StudentClassAddEditDialog extends StatefulWidget {
   final StudentClassModel studentClass;
@@ -165,7 +164,6 @@ class _StudentClassAddEditDialogState extends State<StudentClassAddEditDialog> {
 
   Future<void> _saveOnPressed() async {
     // 表单验证通过，执行添加/编辑操作
-    String oldClassName = widget.studentClass.className;
     widget.studentClass.className = classNameController.text;
     widget.studentClass.studentQuantity = int.parse(
       studentQuantityController.text,

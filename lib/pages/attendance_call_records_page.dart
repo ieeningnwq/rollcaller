@@ -16,6 +16,7 @@ import '../models/student_model.dart';
 import '../utils/attendance_call_record_dao.dart';
 import '../utils/attendance_caller_dao.dart';
 import '../utils/student_class_dao.dart';
+import '../utils/student_class_relation_dao.dart';
 import '../utils/student_dao.dart';
 import '../widgets/attendance_caller_record_edit_dialog.dart';
 
@@ -421,8 +422,15 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
         attendanceCaller.classId,
       );
       // 获取班级学生
-      List<StudentModel> students = await StudentDao()
-          .getAllStudentsByClassName(studentClass.className);
+      List<StudentModel> students = [];
+      List<int> studentIds = await StudentClassRelationDao()
+          .getAllStudentIdsByClassId(studentClass.id!);
+      for (int studentId in studentIds) {
+        var student = await StudentDao().getStudentById(studentId);
+        if (student != null) {
+          students.add(student);
+        }
+      }
       // 获取签到记录
       List<AttendanceCallRecordModel> records = await AttendanceCallRecordDao()
           .getRecordsByCallerId(callerId: attendanceCaller.id);

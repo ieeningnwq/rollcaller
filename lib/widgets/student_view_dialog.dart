@@ -44,7 +44,7 @@ class _StudentViewDialogState extends State<StudentViewDialog> {
     return AlertDialog(
       title: const Text('学生信息详情'),
       content: SingleChildScrollView(
-        child: FutureBuilder(future: _getStudentAllClasses(), builder: (context, snapshot) {
+        child: FutureBuilder(future: _getStudentAllClassesFuture, builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.start,

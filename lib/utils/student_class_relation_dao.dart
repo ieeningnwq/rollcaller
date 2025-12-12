@@ -76,4 +76,12 @@ class StudentClassRelationDao {
       conflictAlgorithm: ConflictAlgorithm.ignore,
     );
   }
+
+  Future<List<int>> getAllStudentIds() async {
+    final db = await dbHelper.database;
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+      'SELECT DISTINCT student_id FROM $tableName',
+    );
+    return maps.map((map) => map['student_id'] as int).toList();
+  }
 }

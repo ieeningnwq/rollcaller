@@ -88,25 +88,14 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
                     shrinkWrap: true,
                     padding: const EdgeInsets.symmetric(vertical: 4),
                     children: [
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: [
-                              // 学生学号
-                              _buildStudentNumberField(),
-                              // 学生姓名
-                              _buildStudengNameField(),
-                              const SizedBox(height: 4),
-                              // 班级选择
-                              const Text(
-                                '所在班级',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                              _buildClassSelectField(),
-                            ],
-                          ),
-                        ),
-                      ),
+                      // 学生学号
+                      _buildStudentNumberField(),
+                      // 学生姓名
+                      _buildStudengNameField(),
+                      const SizedBox(height: 4),
+                      // 班级选择
+                      const Text('所在班级', style: TextStyle(fontSize: 16)),
+                      _buildClassSelectField(),
                     ],
                   ),
                 ),
@@ -221,15 +210,13 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
       // 更新学生班级关系
       widget.student.classesMap = {};
       for (int classId in classIds) {
-        widget.student.classesMap[
-            classId] = _allStudentClassesMap[classId]!;
+        widget.student.classesMap[classId] = _allStudentClassesMap[classId]!;
       }
       // 判断是新增还是修改
       if (isAdd) {
         // 新增学生
         widget.student.created = DateTime.now();
-        int id=await studentDao
-            .insertStudent(widget.student);
+        int id = await studentDao.insertStudent(widget.student);
         // 添加学生列表成功
         if (id != 0) {
           // 添加学生班级关系

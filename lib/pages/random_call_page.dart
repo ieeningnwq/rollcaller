@@ -10,6 +10,7 @@ import '../models/random_caller_model.dart';
 import '../models/student_model.dart';
 import '../utils/random_call_record_dao.dart';
 import '../utils/student_class_dao.dart';
+import '../utils/student_class_relation_dao.dart';
 import '../utils/student_dao.dart';
 import '../widgets/random_caller_add_edit_dialog.dart';
 import '../widgets/random_caller_view_dialog.dart';
@@ -104,9 +105,15 @@ class _RandomCallPageState extends State<RandomCallPage>
       var studentClass = await StudentClassDao().getStudentClass(
         selectedCaller.classId,
       );
-      var students = await StudentDao().getAllStudentsByClassName(
-        studentClass.className,
-      );
+      List<StudentModel> students = [];
+      List<int> studentIds = await StudentClassRelationDao()
+          .getAllStudentIdsByClassId(studentClass.id!);
+      for (int studentId in studentIds) {
+        var student = await StudentDao().getStudentById(studentId);
+        if (student != null) {
+          students.add(student);
+        }
+      }
       List<StudentModel> studentModels = students;
 
       for (var student in studentModels) {

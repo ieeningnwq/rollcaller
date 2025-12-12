@@ -8,6 +8,7 @@ import 'package:rollcall/utils/random_caller_dao.dart';
 import '../configs/strings.dart';
 import '../models/student_class_model.dart';
 import '../utils/student_class_dao.dart';
+import '../utils/student_class_relation_dao.dart';
 import '../utils/student_dao.dart';
 import '../widgets/student_class_add_edit_dialog.dart';
 
@@ -186,10 +187,16 @@ class _StudentClassState extends State<StudentClassPage> {
         .getAllStudentClasses();
     if (studentClasses.isNotEmpty) {
       for (StudentClassModel item in studentClasses) {
-        List<StudentModel> number = await studentDao.getAllStudentsByClassName(
-          item.className,
-        );
-        item.classQuantity = number.length;
+        List<StudentModel> students = [];
+        List<int> studentIds = await StudentClassRelationDao()
+            .getAllStudentIdsByClassId(item.id!);
+        for (int studentId in studentIds) {
+          var student = await studentDao.getStudentById(studentId);
+          if (student != null) {
+            students.add(student);
+          }
+        }
+        item.classQuantity = students.length;
         data[item.id!] = item;
       }
     }
@@ -350,21 +357,19 @@ class _StudentClassState extends State<StudentClassPage> {
                   TextButton(
                     onPressed: () async {
                       // 校验该班级下是否还有学生
-                      var studentDao = StudentDao();
-                      var students = await studentDao.getAllStudentsByClassName(
-                        studentClass.className,
-                      );
+                      List<int> studentIds = await StudentClassRelationDao()
+                          .getAllStudentIdsByClassId(studentClass.id!);
                       // 校验该班级是否还有随机点名器
                       var randomCallerDao = RandomCallerDao();
-                      var randomCallers = await randomCallerDao.getRandomCallersByClassId(
-                        studentClass.id!,
-                      );
+                      var randomCallers = await randomCallerDao
+                          .getRandomCallersByClassId(studentClass.id!);
                       // 校验该班级是否还有签到点名器
                       var attendanceCallerDao = AttendanceCallerDao();
-                      var attendanceCallers = await attendanceCallerDao.getAttendanceCallersByClassId(
-                        studentClass.id!,
-                      );
-                      if (students.isEmpty && randomCallers.isEmpty && attendanceCallers.isEmpty) {
+                      var attendanceCallers = await attendanceCallerDao
+                          .getAttendanceCallersByClassId(studentClass.id!);
+                      if (studentIds.isEmpty &&
+                          randomCallers.isEmpty &&
+                          attendanceCallers.isEmpty) {
                         classDao
                             .deleteStudentClassByClassName(
                               studentClass.className,
@@ -382,7 +387,10 @@ class _StudentClassState extends State<StudentClassPage> {
                             });
                       } else {
                         // 班级下还有学生，提示用户先删除学生
-                        Fluttertoast.showToast(msg: '该班级下还有学生、随机点名器、签到点名器，无法删除。请先删除班级下的所有学生、随机点名器、签到点名器。');
+                        Fluttertoast.showToast(
+                          msg:
+                              '该班级下还有学生、随机点名器、签到点名器，无法删除。请先删除班级下的所有学生、随机点名器、签到点名器。',
+                        );
                         // 关闭确认弹窗
                       }
                     },

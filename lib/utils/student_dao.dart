@@ -22,32 +22,10 @@ class StudentDao {
     );
   }
 
-  Future<List<Map<String, dynamic>>> getAllStudents() async {
+  Future<List<StudentModel>> getAllStudents() async {
     final db = await dbHelper.database;
-    return await db.query(tableName);
-  }
-
-  Future<List<StudentModel>> getAllStudentsByClassName(String className) async {
-    final db = await dbHelper.database;
-    List<Map<String, dynamic>> result = await db.query(
-      tableName,
-      where: 'INSTR("," || class_name || ",", ?) > 0',
-      whereArgs: [',$className,'],
-    );
-    return result.isNotEmpty
-        ? result.map((map) => StudentModel.fromMap(map)).toList()
-        : [];
-  }
-
-   Future<List<StudentModel>> getAllStudentsWithoutClassName() async {
-    final db = await dbHelper.database;
-    List<Map<String, dynamic>> result = await db.query(
-      tableName,
-      where: 'class_name IS NULL OR class_name = ""',
-    );
-    return result.isNotEmpty
-        ? result.map((map) => StudentModel.fromMap(map)).toList()
-        : [];
+    var result= await db.query(tableName);
+    return result.map((e) => StudentModel.fromMap(e)).toList();
   }
 
   Future<bool> isStudentNumberExist(String studentNumber) async {
@@ -80,5 +58,19 @@ class StudentDao {
     final db = await dbHelper.database;
     var mapData = await db.query(tableName, where: 'student_number=?', whereArgs: [studentNumber]);
     return mapData.isNotEmpty ? StudentModel.fromMap(mapData.first) : null; 
+  }
+
+  Future<StudentModel?> getStudentById(int studentId) async {
+    final db = await dbHelper.database;
+    var mapData = await db.query(tableName, where: 'id=?', whereArgs: [studentId]);
+    return mapData.isNotEmpty ? StudentModel.fromMap(mapData.first) : null; 
+  }
+
+  Future<List<int>> getAllStudentIds() async {
+    final db = await dbHelper.database;
+    final List<Map<String, dynamic>> maps = await db.rawQuery(
+      'SELECT DISTINCT student_id FROM $tableName',
+    );
+    return maps.map((map) => map['student_id'] as int).toList();
   }
 }
