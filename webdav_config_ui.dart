@@ -209,41 +209,92 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                   ),
                   const SizedBox(height: 24),
 
-                  // 保存配置按钮
-                  ElevatedButton(
-                    onPressed: () {
-                      // 保存配置的逻辑
-                      print('保存配置');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 14.0,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Icon(
-                          Icons.save,
-                          color: Colors.white,
-                          size: 18,
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          '保存配置',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
+                  // 按钮行
+                  Row(
+                    children: [
+                      // 测试连接按钮
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            // 测试连接的逻辑
+                            print('测试连接');
+                            // 可以添加连接测试逻辑，例如显示加载状态、检查连接是否成功等
+                          },
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 14.0,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            side: const BorderSide(
+                              color: Colors.purple,
+                              width: 1,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(
+                                Icons.network_check,
+                                color: Colors.purple,
+                                size: 18,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                '测试连接',
+                                style: TextStyle(
+                                  color: Colors.purple,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 12),
+                      
+                      // 保存配置按钮
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            // 保存配置的逻辑
+                            print('保存配置');
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.purple,
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 14.0,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(
+                                Icons.save,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                '保存配置',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

@@ -8,8 +8,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:rollcall/models/student_class_model.dart';
 import 'package:rollcall/utils/attendance_call_record_dao.dart';
-import 'package:rollcall/utils/attendance_caller_dao.dart';
 import 'package:rollcall/utils/random_call_record_dao.dart';
+import 'package:rollcall/utils/student_class_relation_dao.dart';
 
 import '../models/student_class_group.dart';
 import '../models/student_model.dart';
@@ -173,7 +173,6 @@ class _StudentPageState extends State<StudentPage> {
               student: StudentModel(
                 studentName: '',
                 studentNumber: '',
-                className: '',
                 created: DateTime.now(),
               ),
               title: '添加学生',
@@ -425,7 +424,10 @@ class _StudentPageState extends State<StudentPage> {
                             if (randomCallRecords.isNotEmpty ||
                                 attendanceCallRecords.isNotEmpty) {
                               // 有随机点名记录，提示用户先删除随机点名记录
-                              Fluttertoast.showToast(msg: '该学生下有随机点名记录或签到点名记录，无法删除。请先删除该学生下的所有随机点名记录或签到点名记录。');
+                              Fluttertoast.showToast(
+                                msg:
+                                    '该学生下有随机点名记录或签到点名记录，无法删除。请先删除该学生下的所有随机点名记录或签到点名记录。',
+                              );
                               return;
                             }
                             await StudentDao().deleteStudentById(student.id);
@@ -489,16 +491,22 @@ class _StudentPageState extends State<StudentPage> {
             continue;
           }
           // 确保班级存在
-          if (!(await StudentClassDao().isStudentClassesNameExist(className))) {
+          int classId = -1;
+          var studentClass = await StudentClassDao().getStudentClassByClassName(
+            className,
+          );
+          if (studentClass == null) {
             // 班级不存在，创建新班级
-            var studentClass = StudentClassModel(
+            studentClass = StudentClassModel(
               className: className,
               created: DateTime.now(),
               studentQuantity: 0,
               teacherName: '',
               notes: '',
             );
-            await StudentClassDao().insertStudentClass(studentClass);
+            classId = await StudentClassDao().insertStudentClass(studentClass);
+          } else {
+            classId = studentClass.id!;
           }
           // 判断学生是否存在
           if (await StudentDao().isStudentNumberExist(studentNumber)) {
@@ -507,25 +515,33 @@ class _StudentPageState extends State<StudentPage> {
               studentNumber,
             );
             // 确认学生班级不包含该班级
-            if ((',${student!.className},'.contains(',$className,'))) {
+            if (await StudentClassRelationDao().isStudentClassRelationExist(
+              student?.id!,
+              classId,
+            )) {
+              // 如果存在，跳过
               continue;
             }
-            // 更新班级信息
-            student.className = '${student.className},$className';
-            // 学生存在，更新班级名称
-            await StudentDao().updateStudentById(student);
+            // 更新学生班级关系信息
+            await StudentClassRelationDao().insertStudentClassRelation({
+              'student_id': student?.id!,
+              'class_id': classId,
+            });
           } else {
             // 创建新学生
             var student = StudentModel(
               studentNumber: studentNumber,
-              className: className,
               studentName: name,
               created: DateTime.now(),
             );
-            await StudentDao().insertStudent(student);
+            int studentId = await StudentDao().insertStudent(student);
+            // 更新学生班级关系信息
+            await StudentClassRelationDao().insertStudentClassRelation({
+              'student_id': studentId,
+              'class_id': classId,
+            });
           }
           totalCount++;
-          log(studentNumber);
         }
       }
       Fluttertoast.showToast(msg: '成功导入 $totalCount 个学生');

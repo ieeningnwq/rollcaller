@@ -324,7 +324,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                                     ],
                                                   ),
                                                   Text(
-                                                    '班级: ${student.className}',
+                                                    '班级: ${group.studentClassModel.className}',
                                                     style: TextStyle(
                                                       color:
                                                           group

@@ -27,6 +27,7 @@ class DatabaseHelper {
   }
 
   void _createDb(Database db, int version) async {
+    // 学生班级表格
     await db.execute('''
       CREATE TABLE ${KString.studentClassTableName} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,15 +38,24 @@ class DatabaseHelper {
         created TEXT NOT NULL
       )
     ''');
+    // 学生表格
     await db.execute('''
       CREATE TABLE ${KString.studentTableName} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         student_number TEXT NOT NULL UNIQUE,
         student_name TEXT NOT NULL,
-        class_name TEXT,
         created TEXT NOT NULL
       )
     ''');
+    // 学生班级关系表格
+    await db.execute('''
+      CREATE TABLE ${KString.studentClassRelationTableName} (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        student_id INTEGER NOT NULL,
+        class_id INTEGER NOT NULL,
+      )
+    ''');
+    // 随机点名表格
     await db.execute('''
       CREATE TABLE ${KString.randomCallerTableName} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -57,6 +67,7 @@ class DatabaseHelper {
         created TEXT NOT NULL
       )
     ''');
+    // 随机点名记录表格
     await db.execute('''
       CREATE TABLE ${KString.randomCallerRecordTableName} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -67,7 +78,7 @@ class DatabaseHelper {
         created TEXT NOT NULL
       )
     ''');
-
+    // 出勤点名表格
     await db.execute('''
       CREATE TABLE ${KString.attendanceCallerTableName} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -78,6 +89,7 @@ class DatabaseHelper {
         created TEXT NOT NULL
       )
     ''');
+    // 出勤点名记录表格
     await db.execute('''
       CREATE TABLE ${KString.attendanceCallerRecordTableName} (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

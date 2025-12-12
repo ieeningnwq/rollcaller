@@ -4,24 +4,22 @@ class StudentModel {
   int? id;
   String studentNumber;
   String studentName;
-  String className;
   DateTime created;
+  Map<int,StudentClassModel> classesMap = {};
 
   StudentModel({
     required this.studentName,
     required this.studentNumber,
-    required this.className,
     required this.created,
   });
 
-  bool isInClass(StudentClassModel studentClass) =>
-      studentClass.className.contains(className);
+  List<StudentClassModel> get allClasses => classesMap.values.toList();
+
 
   factory StudentModel.fromMap(Map<String, dynamic> mapData) {
     var studentModel = StudentModel(
       studentName: mapData['student_name'],
       studentNumber: mapData['student_number'],
-      className: mapData['class_name'],
       created: mapData['created'] != null
           ? DateTime.parse(mapData['created'])
           : DateTime.now(),
@@ -39,13 +37,12 @@ class StudentModel {
     }
     data['student_number'] = studentNumber;
     data['student_name'] = studentName;
-    data['class_name'] = className;
     data['created'] = created.toIso8601String();
     return data;
   }
 
   @override
   toString() {
-    return 'StudentModel(id: $id, studentNumber: $studentNumber, studentName: $studentName, className: $className, created: $created)';
+    return 'StudentModel(id: $id, studentNumber: $studentNumber, studentName: $studentName, created: $created)';
   }
 }

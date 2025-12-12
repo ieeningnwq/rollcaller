@@ -63,7 +63,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
-        }  else {
+        } else {
           _groupedRecords = snapshot.data!;
           return Expanded(
             child: Column(
@@ -288,7 +288,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                                   ],
                                                 ),
                                                 Text(
-                                                  '班级: ${student?.className ?? ''}',
+                                                  '班级: ${group.studentClassModel.className}',
                                                   style: TextStyle(
                                                     color:
                                                         group

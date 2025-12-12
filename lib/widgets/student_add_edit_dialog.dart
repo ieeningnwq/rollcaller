@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:rollcall/utils/student_class_relation_dao.dart';
 
 import '../models/student_class_model.dart';
 import '../models/student_model.dart';
@@ -27,12 +28,12 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
       TextEditingController();
   final GlobalKey _formKey = GlobalKey<FormState>();
 
-  Future<Map<String, StudentClassModel>>? _allStudentClassesMapFuture;
+  Future<Map<int, StudentClassModel>>? _allStudentClassesMapFuture;
 
   // 选中的班级{id:bool}
-  Map<String, bool>? _selectedClasses;
+  Map<int, bool>? _selectedClasses;
   // 所有班级消息
-  late Map<String, StudentClassModel> _allStudentClassesMap;
+  late Map<int, StudentClassModel> _allStudentClassesMap;
 
   bool isAdd = false;
   @override
@@ -44,12 +45,12 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
     _studentNumberController.text = widget.student.studentNumber;
   }
 
-  Future<Map<String, StudentClassModel>> _getAllStudentClassesMap() async {
-    Map<String, StudentClassModel> allStudentClassesMap = {};
+  Future<Map<int, StudentClassModel>> _getAllStudentClassesMap() async {
+    Map<int, StudentClassModel> allStudentClassesMap = {};
     StudentClassDao studentClassDao = StudentClassDao();
     return await studentClassDao.getAllStudentClasses().then((value) {
       for (var element in value) {
-        allStudentClassesMap[element.className] = element;
+        allStudentClassesMap[element.id!] = element;
       }
       return allStudentClassesMap;
     });
@@ -57,7 +58,7 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<Map<String, StudentClassModel>>(
+    return FutureBuilder<Map<int, StudentClassModel>>(
       future: _allStudentClassesMapFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
@@ -70,9 +71,10 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
               for (var element in _allStudentClassesMap.keys) {
                 _selectedClasses![element] = false;
               }
-              if (widget.student.className.isNotEmpty) {
-                for (String element in widget.student.className.split(',')) {
-                  _selectedClasses![element] = true;
+              // 初始化学生所在的班级（可能有多个班级）
+              if (widget.student.allClasses.isNotEmpty) {
+                for (StudentClassModel element in widget.student.allClasses) {
+                  _selectedClasses![element.id!] = true;
                 }
               }
             }
@@ -210,46 +212,60 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
       // 更新学生信息
       widget.student.studentNumber = _studentNumberController.text;
       widget.student.studentName = _studentNameController.text;
-      List<String> classNames = [];
+      List<int> classIds = [];
       _selectedClasses!.forEach((key, value) {
         if (value) {
-          classNames.add(key);
+          classIds.add(key);
         }
       });
-      widget.student.className = classNames.join(',');
+      // 更新学生班级关系
+      widget.student.classesMap = {};
+      for (int classId in classIds) {
+        widget.student.classesMap[
+            classId] = _allStudentClassesMap[classId]!;
+      }
       // 判断是新增还是修改
       if (isAdd) {
         // 新增学生
         widget.student.created = DateTime.now();
-        studentDao
-            .insertStudent(widget.student)
-            .then(
-              (id) => {
-                if (id != 0)
-                  {
-                    // 添加学生列表，刷新数据
-                    if (context.mounted)
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(const SnackBar(content: Text('新增成功'))),
-                  }
-                else
-                  {
-                    if (context.mounted)
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(const SnackBar(content: Text('新增失败'))),
-                  },
-              },
-            );
+        int id=await studentDao
+            .insertStudent(widget.student);
+        // 添加学生列表成功
+        if (id != 0) {
+          // 添加学生班级关系
+          await StudentClassRelationDao().insertStudentClasses(
+            widget.student.id!,
+            classIds,
+          );
+          if (context.mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('新增成功')));
+          }
+        } else {
+          if (context.mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('新增失败')));
+          }
+        }
       } else {
         // 修改学生
         studentDao
             .updateStudentById(widget.student)
             .then(
-              (value) => {
+              (value) async => {
                 if (value != 0)
                   {
+                    // 删除该学生所有的班级关系
+                    await StudentClassRelationDao().deleteStudentClasses(
+                      widget.student.id!,
+                    ),
+                    // 添加该学生的班级关系
+                    await StudentClassRelationDao().insertStudentClasses(
+                      widget.student.id!,
+                      classIds,
+                    ),
                     if (context.mounted)
                       ScaffoldMessenger.of(
                         context,
