@@ -96,4 +96,27 @@ class StudentClassDao {
     return mapData.isNotEmpty ? StudentClassModel.fromMap(mapData.first) : null;
   }
 
+  Future<void> deleteAllStudentClasses() async {
+    final db = await dbHelper.database;
+    await db.delete(tableName);
+  }
+
+  Future<void> insertStudentClasses(List<dynamic> backupData) async {
+    final db = await dbHelper.database;
+    for (var map in backupData) {
+      await db.insert(
+        tableName,
+        map,
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getAllStudentClassesMap() async {
+    final db = await dbHelper.database;
+    return await db.query(tableName);
+  }
+
+
+
 }

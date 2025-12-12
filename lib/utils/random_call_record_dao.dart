@@ -1,3 +1,5 @@
+import 'package:sqflite/sqflite.dart';
+
 import '../configs/strings.dart';
 import '../models/random_call_record.dart';
 import 'database_helper.dart';
@@ -121,5 +123,26 @@ class RandomCallRecordDao {
       maps.length,
       (i) => RandomCallRecordModel.fromMap(maps[i]),
     );
+  }
+
+  Future<void> deleteAllRandomCallerRecords() async {
+    final db = await _databaseHelper.database;
+    await db.delete(tableName);
+  }
+
+  Future<void> insertRandomCallRecords(List<dynamic> backupData) async {
+    final db = await _databaseHelper.database;
+    for (var map in backupData) {
+      await db.insert(
+        tableName,
+        map,
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getAllRandomCallerRecordsMap() async {
+    final db = await _databaseHelper.database;
+    return await db.query(tableName);
   }
 }

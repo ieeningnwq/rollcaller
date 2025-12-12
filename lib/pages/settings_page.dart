@@ -53,7 +53,7 @@ class _SettingsState extends State<SettingsPage> {
   // 获取WebDav配置
   late Future<void> _getWebDavConfigFuture;
   // 备份进度
-  double _backupProgress=0;
+  double _procedureProgress = 0;
 
   @override
   initState() {
@@ -103,6 +103,7 @@ class _SettingsState extends State<SettingsPage> {
             'type': BackUpTypeExtension.fromString(f.name!.split('_')[2]),
             'dateTimeKey': f.name!.split('_')[3].replaceAll('.json', ''),
             'result': true,
+            'fileName': f.name!,
           }),
         )
         .toList();
@@ -112,10 +113,17 @@ class _SettingsState extends State<SettingsPage> {
       (map, e) => map..addAll({e.dateTimeKey: e}),
     );
     // 获取上次备份数据
-    _lastBackUpModel =
-        _allBackUpModels[list.last.name!.split('_')[3].replaceAll('.json', '')];
-    // 获取选中待回退的备份数据
-    _selectedBackUpModel = _lastBackUpModel;
+    if (list.isNotEmpty) {
+      _lastBackUpModel =
+          _allBackUpModels[list.last.name!
+              .split('_')[3]
+              .replaceAll('.json', '')];
+      // 获取选中待回退的备份数据
+      _selectedBackUpModel = _lastBackUpModel;
+    } else {
+      _selectedBackUpModel = null;
+      _lastBackUpModel = null;
+    }
   }
 
   @override
@@ -542,7 +550,7 @@ class _SettingsState extends State<SettingsPage> {
                 onPressed: () {
                   // 手动备份逻辑
                   setState(() {
-                    _backupProgress = 0;
+                    _procedureProgress = 0;
                   });
                   _backupData();
                 },
@@ -571,7 +579,7 @@ class _SettingsState extends State<SettingsPage> {
                   // 恢复数据逻辑
                   if (_selectedBackUpModel != null) {
                     // 这里可以添加实际的恢复逻辑，使用_selectedBackUpModel
-                    _restoreData(_selectedBackUpModel!);
+                    _restoreFromWebDav(_selectedBackUpModel!);
                   } else {
                     // 可以显示提示信息
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -612,7 +620,7 @@ class _SettingsState extends State<SettingsPage> {
         const SizedBox(height: 24),
         // 备份进度条
         LinearProgressIndicator(
-          value: _backupProgress,
+          value: _procedureProgress,
           backgroundColor: Colors.grey[300],
           valueColor: AlwaysStoppedAnimation<Color>(Colors.purple),
         ),
@@ -644,35 +652,42 @@ class _SettingsState extends State<SettingsPage> {
               ),
             ],
           ),
-          child: RadioGroup<String>(
-            groupValue: _selectedBackUpModel?.dateTimeText,
-            onChanged: (value) {
-              setState(() {
-                _selectedBackUpModel = _allBackUpModels[value];
-              });
-            },
-            child: Column(
-              children: _allBackUpModels.values.toList().reversed
-                  .map(
-                    (backUpModel) => RadioListTile<String>(
-                      value: backUpModel.dateTimeText,
-                      title: Text(
-                        backUpModel.dateTimeText,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      subtitle: Text(
-                        backUpModel.type.typeText,
-                        style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
-          ),
+          child: _allBackUpModels.isNotEmpty
+              ? RadioGroup<String>(
+                  groupValue: _selectedBackUpModel?.dateTimeText,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedBackUpModel = _allBackUpModels[value];
+                    });
+                  },
+                  child: Column(
+                    children: _allBackUpModels.values
+                        .toList()
+                        .reversed
+                        .map(
+                          (backUpModel) => RadioListTile<String>(
+                            value: backUpModel.dateTimeText,
+                            title: Text(
+                              backUpModel.dateTimeText,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            subtitle: Text(
+                              backUpModel.type.typeText,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
+                )
+              : const Center(child: Text('暂无备份历史')),
         ),
       ],
     );
@@ -703,7 +718,7 @@ class _SettingsState extends State<SettingsPage> {
         '/${KString.webDavServerFolder}/$fileName',
         onProgress: (c, t) {
           setState(() {
-            _backupProgress = c / t;
+            _procedureProgress = c / t;
           });
         },
         cancelToken: c,
@@ -724,6 +739,7 @@ class _SettingsState extends State<SettingsPage> {
       _allBackUpModels[timeKey] = BackUpModel()
         ..type = BackUpType.manual
         ..dateTimeKey = timeKey
+        ..fileName = fileName
         ..result = result;
       _selectedBackUpModel = _allBackUpModels[timeKey];
       _lastBackUpModel = _allBackUpModels[timeKey];
@@ -742,30 +758,86 @@ class _SettingsState extends State<SettingsPage> {
 
     // 导出各个数据表
     backupData[KString.studentClassTableName] = await StudentClassDao()
-        .getAllStudentClasses()
-        .then((value) => value.map((e) => e.toMap()).toList());
+        .getAllStudentClassesMap();
     backupData[KString.studentTableName] = await StudentDao()
-        .getAllStudents()
-        .then((value) => value.map((e) => e.toMap()).toList());
+        .getAllStudentsMap();
     backupData[KString.studentClassRelationTableName] =
         await StudentClassRelationDao().getAllClassStudentIds();
     backupData[KString.randomCallerTableName] = await RandomCallerDao()
-        .getAllRandomCallers()
-        .then((value) => value.map((e) => e.toMap()).toList());
+        .getAllRandomCallersMap();
     backupData[KString.randomCallerRecordTableName] =
-        await RandomCallRecordDao().getAllRandomCallerRecords().then(
-          (value) => value.map((e) => e.toMap()).toList(),
-        );
+        await RandomCallRecordDao().getAllRandomCallerRecordsMap();
     backupData[KString.attendanceCallerTableName] = await AttendanceCallerDao()
-        .getAllAttendanceCallers()
-        .then((value) => value.map((e) => e.toMap()).toList());
+        .getAllAttendanceCallersMap();
     backupData[KString.attendanceCallerRecordTableName] =
-        await AttendanceCallRecordDao().getAllAttendanceCallerRecords().then(
-          (value) => value.map((e) => e.toMap()).toList(),
-        );
+        await AttendanceCallRecordDao().getAllAttendanceCallerRecordsMap();
 
     return backupData;
   }
-  
-  void _restoreData(BackUpModel backUpModel) {}
+
+  Future<void> _restoreFromWebDav(BackUpModel backUpModel) async {
+    try {
+      // 1、确定文件路径
+      final filePath = join(
+        '/${KString.webDavServerFolder}',
+        backUpModel.fileName,
+      );
+      // 2、从WebDAV下载文件
+      final tempDir = await getTemporaryDirectory();
+      final tempFilePath = join(tempDir.path, backUpModel.fileName);
+      await _client.read2File(
+        filePath,
+        tempFilePath,
+        onProgress: (c, t) {
+          setState(() {
+            _procedureProgress = c / t - 0.1;
+          });
+        },
+      );
+      // 2、读取文件内容，转为json
+      final jsonString = await File(tempFilePath).readAsString();
+      final backupData = json.decode(jsonString) as Map<String, dynamic>;
+      // 3、删除现有所有数据
+      await StudentClassDao().deleteAllStudentClasses();
+      await StudentDao().deleteAllStudents();
+      await StudentClassRelationDao().deleteAllClassStudentIds();
+      await RandomCallerDao().deleteAllRandomCallers();
+      await RandomCallRecordDao().deleteAllRandomCallerRecords();
+      await AttendanceCallerDao().deleteAllAttendanceCallers();
+      await AttendanceCallRecordDao().deleteAllAttendanceCallerRecords();
+      // 4、插入新的班级数据
+      await StudentClassDao().insertStudentClasses(
+        backupData[KString.studentClassTableName],
+      );
+      // 5、插入新的学生数据
+      await StudentDao().insertStudents(backupData[KString.studentTableName]);
+      // 6、插入新的班级学生关系数据
+      await StudentClassRelationDao().insertClassStudentIds(
+        backupData[KString.studentClassRelationTableName],
+      );
+      // 7、插入新的随机调用数据
+      await RandomCallerDao().insertRandomCallers(
+        backupData[KString.randomCallerTableName],
+      );
+      // 8、插入新的随机调用记录数据
+      await RandomCallRecordDao().insertRandomCallRecords(
+        backupData[KString.randomCallerRecordTableName],
+      );
+      // 9、插入新的出勤调用数据
+      await AttendanceCallerDao().insertAttendanceCallers(
+        backupData[KString.attendanceCallerTableName],
+      );
+      // 10、插入新的出勤调用记录数据
+      await AttendanceCallRecordDao().insertAttendanceCallRecords(
+        backupData[KString.attendanceCallerRecordTableName],
+      );
+      // 11、刷新数据
+      setState(() {
+        _procedureProgress = 1.0;
+        Fluttertoast.showToast(msg: '恢复成功');
+      });
+    } catch (e) {
+      Fluttertoast.showToast(msg: '恢复失败：$e');
+    }
+  }
 }

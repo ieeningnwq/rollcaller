@@ -86,4 +86,20 @@ class StudentClassRelationDao {
     final db = await dbHelper.database;
     return await db.query(tableName);
   }
+
+  Future<void> deleteAllClassStudentIds() async {
+    final db = await dbHelper.database;
+    await db.delete(tableName);
+  }
+
+  Future<void> insertClassStudentIds(List<dynamic> backupData) async {
+    final db = await dbHelper.database;
+    for (var map in backupData) {
+      await db.insert(
+        tableName,
+        map,
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+    }
+  }
 }

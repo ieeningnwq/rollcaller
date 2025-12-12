@@ -1,4 +1,5 @@
 import 'package:rollcall/configs/strings.dart';
+import 'package:sqflite/sqflite.dart';
 
 import '../models/random_caller_model.dart';
 import 'database_helper.dart';
@@ -71,5 +72,26 @@ class RandomCallerDao {
     return maps.isNotEmpty
         ? maps.map((map) => RandomCallerModel.fromMap(map)).toList()
         : [];
+  }
+
+  Future<void> deleteAllRandomCallers() async {
+    final db = await dbHelper.database;
+    await db.delete(tableName);
+  }
+
+  Future<void> insertRandomCallers(List<dynamic> backupData) async {
+    final db = await dbHelper.database;
+    for (var map in backupData) {
+      await db.insert(
+        tableName,
+        map,
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getAllRandomCallersMap() async {
+    final db = await dbHelper.database;
+    return await db.query(tableName);
   }
 }

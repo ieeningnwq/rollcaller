@@ -73,4 +73,25 @@ class StudentDao {
     );
     return maps.map((map) => map['student_id'] as int).toList();
   }
+
+  Future<void> deleteAllStudents() async {
+    final db = await dbHelper.database;
+    await db.delete(tableName);
+  }
+
+  Future<void> insertStudents(List<dynamic> backupData) async {
+    final db = await dbHelper.database;
+    for (var map in backupData) {
+      await db.insert(
+        tableName,
+        map,
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getAllStudentsMap() async {
+    final db = await dbHelper.database;
+    return await db.query(tableName);
+  }
 }

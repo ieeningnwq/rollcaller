@@ -1,3 +1,5 @@
+import 'package:sqflite/sqflite.dart';
+
 import '../configs/strings.dart';
 import '../models/attendance_caller_model.dart';
 import 'database_helper.dart';
@@ -82,5 +84,26 @@ class AttendanceCallerDao {
     return maps.isNotEmpty
         ? maps.map((map) => AttendanceCallerModel.fromMap(map)).toList()
         : [];
+  }
+
+  Future<void> deleteAllAttendanceCallers() async {
+    final db = await _databaseHelper.database;
+    await db.delete(tableName);
+  }
+
+  Future<void> insertAttendanceCallers(List<dynamic> backupData) async {
+    final db = await _databaseHelper.database;
+    for (var map in backupData) {
+      await db.insert(
+        tableName,
+        map,
+        conflictAlgorithm: ConflictAlgorithm.ignore,
+      );
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getAllAttendanceCallersMap() async {
+    final db = await _databaseHelper.database;
+    return await db.query(tableName);
   }
 }
