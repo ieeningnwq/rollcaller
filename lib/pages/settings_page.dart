@@ -40,7 +40,7 @@ class _SettingsState extends State<SettingsPage> {
       TextEditingController();
 
   // 备份设置状态
-  bool _autoBackupEnabled = true;
+  bool _autoBackupEnabled = false;
   // 所有备份信息
   Map<String, BackUpModel> _allBackUpModels = {};
   // 选中待回退的备份数据
@@ -71,17 +71,14 @@ class _SettingsState extends State<SettingsPage> {
 
   Future<void> _getWebDavConfig() async {
     // 获取WebDav配置服务器
-    _webDavServerController.text = (await _storage.read(
-      key: KString.webDavServerKey,
-    ))!;
+    _webDavServerController.text =
+        (await _storage.read(key: KString.webDavServerKey)) ?? '';
     // 获取WebDav配置用户名
-    _webDavUsernameController.text = (await _storage.read(
-      key: KString.webDavUsernameKey,
-    ))!;
+    _webDavUsernameController.text =
+        (await _storage.read(key: KString.webDavUsernameKey)) ?? '';
     // 获取WebDav配置密码
-    _webDavPasswordController.text = (await _storage.read(
-      key: KString.webDavPasswordKey,
-    ))!;
+    _webDavPasswordController.text =
+        (await _storage.read(key: KString.webDavPasswordKey)) ?? '';
     // 设置WebDav连接客户端
     _client = newClient(
       _webDavServerController.text,
@@ -91,8 +88,11 @@ class _SettingsState extends State<SettingsPage> {
     );
     // 获取是否自动备份
     _autoBackupEnabled =
-        (await _storage.read(key: KString.autoBackUpKey))! == 'true';
-    // 获取历史备份数据，从服务器获取数据
+        ((await _storage.read(key: KString.autoBackUpKey)) ?? 'false') ==
+        'true';
+    try {
+      await _client.ping();
+      // 获取历史备份数据，从服务器获取数据
     var list = await _client.readDir('/${KString.webDavServerFolder}');
     // 过滤出备份文件，并排序
     list = list
@@ -132,6 +132,10 @@ class _SettingsState extends State<SettingsPage> {
       _selectedBackUpModel = null;
       _lastBackUpModel = null;
     }
+    } catch (e) {
+      ;
+    }
+    
   }
 
   @override
