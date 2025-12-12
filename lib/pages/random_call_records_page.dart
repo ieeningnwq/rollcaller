@@ -48,6 +48,13 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
   bool? _isArchiveFilter;
   // 获取所有点名器所有信息Future
   late Future<Map<int, RandomCallerGroupModel>> _allRandomCallerGroupFuture;
+  final TextEditingController scoreController = TextEditingController();
+
+  @override
+  dispose() {
+    super.dispose();
+    scoreController.dispose();
+  }
 
   @override
   initState() {
@@ -833,9 +840,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
   }
 
   void _showEditScoreDialog(RandomCallRecordModel record) {
-    final TextEditingController scoreController = TextEditingController(
-      text: record.score.toString(),
-    );
+    scoreController.text = record.score.toString();
 
     showDialog(
       context: this.context,

@@ -191,7 +191,11 @@ class _AttendencePageState extends State<AttendencePage> {
           .id!]!,
     );
   }
-
+  @override
+  dispose() {
+    super.dispose();
+    _searchController.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Expanded(

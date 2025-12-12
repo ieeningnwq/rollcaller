@@ -35,6 +35,12 @@ class _StudentClassState extends State<StudentClassPage> {
   }
 
   @override
+  dispose() {
+    super.dispose();
+    _refreshController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(

@@ -44,9 +44,9 @@ class _AttendanceCallerAddEditDialogState
 
   @override
   dispose() {
+    super.dispose();
     _attendanceCallerNameController.dispose();
     _notesController.dispose();
-    super.dispose();
   }
 
   Future<Map<int, StudentClassModel>> _getAllStudentClassesMap() async {

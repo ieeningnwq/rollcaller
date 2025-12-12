@@ -45,6 +45,13 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
     _studentNumberController.text = widget.student.studentNumber;
   }
 
+  @override
+  dispose() {
+    super.dispose();
+    _studentNameController.dispose();
+    _studentNumberController.dispose();
+  }
+
   Future<Map<int, StudentClassModel>> _getAllStudentClassesMap() async {
     Map<int, StudentClassModel> allStudentClassesMap = {};
     StudentClassDao studentClassDao = StudentClassDao();

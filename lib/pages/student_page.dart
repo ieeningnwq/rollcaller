@@ -74,6 +74,12 @@ class _StudentPageState extends State<StudentPage> {
   }
 
   @override
+  dispose() {
+    super.dispose();
+    _searchController.dispose();
+    _refreshController.dispose();
+  }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
@@ -248,14 +254,6 @@ class _StudentPageState extends State<StudentPage> {
     classGroups[-1] = classGroup;
     _filterClassGroups = classGroups;
     return classGroups;
-  }
-
-  @override
-  dispose() {
-    studentNumberController.dispose();
-    studentNameController.dispose();
-    _searchController.dispose();
-    super.dispose();
   }
 
   void _refreshClassGroupData() async {

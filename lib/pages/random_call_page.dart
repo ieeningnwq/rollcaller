@@ -87,6 +87,12 @@ class _RandomCallPageState extends State<RandomCallPage>
     _randomCallerFuture = _getRandomCallerPageInfo();
   }
 
+  @override
+  dispose() {
+    super.dispose();
+    _controller.dispose();
+  }
+
   Future<RandomCallerGroupModel?> _getRandomCallerPageInfo() async {
     Map<int, List<RandomCallRecordModel>> randomCallRecords = {};
 

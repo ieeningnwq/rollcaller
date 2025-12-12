@@ -56,6 +56,14 @@ class _SettingsState extends State<SettingsPage> {
   double _procedureProgress = 0;
 
   @override
+  dispose() {
+    super.dispose();
+    _webDavServerController.dispose();
+    _webDavUsernameController.dispose();
+    _webDavPasswordController.dispose();
+  }
+
+  @override
   initState() {
     super.initState();
     _getWebDavConfigFuture = _getWebDavConfig();
