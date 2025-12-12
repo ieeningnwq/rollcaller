@@ -227,16 +227,17 @@ class _StudentClassState extends State<StudentClassPage> {
     _refreshController.loadComplete();
   }
 
-  Row _classNameQuantityStatusWidget(
+  _classNameQuantityStatusWidget(
     StudentClassModel studentClass,
     Icon statusIcon,
     Color statusColor,
     String quantityInfo,
     Color deprecationColor,
-  ) => Row(
-    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  ) => Wrap(
     children: [
       Text(
+        softWrap: true,
+        overflow: TextOverflow.ellipsis,
         studentClass.className,
         style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
       ),
