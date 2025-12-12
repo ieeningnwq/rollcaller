@@ -81,14 +81,12 @@ class RandomCallRecordDao {
 
   Future<int> delete(int id) async {
     final db = await _databaseHelper.database;
-    return await db.delete(
-      tableName,
-      where: 'id = ?',
-      whereArgs: [id],
-    );
+    return await db.delete(tableName, where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<List<RandomCallRecordModel>> getRandomCallRecordsByStudentId(int studentId) async {
+  Future<List<RandomCallRecordModel>> getRandomCallRecordsByStudentId(
+    int studentId,
+  ) async {
     final db = await _databaseHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       tableName,
@@ -101,13 +99,24 @@ class RandomCallRecordDao {
     );
   }
 
-  Future<List<RandomCallRecordModel>> getRandomCallRecordsByCallerId(int callerId) async {
+  Future<List<RandomCallRecordModel>> getRandomCallRecordsByCallerId(
+    int callerId,
+  ) async {
     final db = await _databaseHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
       tableName,
       where: 'random_caller_id = ?',
       whereArgs: [callerId],
     );
+    return List.generate(
+      maps.length,
+      (i) => RandomCallRecordModel.fromMap(maps[i]),
+    );
+  }
+
+  Future<List<RandomCallRecordModel>> getAllRandomCallerRecords() async {
+    final db = await _databaseHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(tableName);
     return List.generate(
       maps.length,
       (i) => RandomCallRecordModel.fromMap(maps[i]),

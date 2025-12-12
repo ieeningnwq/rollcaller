@@ -148,7 +148,7 @@ class WebDavBackupRestore {
     final client = webdav.newClient(webdavUrl, user: username, password: password);
     
     // 上传文件
-    await client.writeFromFile(file.path, '/$backupFileName');
+    // await client.writeFromFile(file.path, '/$backupFileName', cancelToken: c);
     
     // 关闭客户端
     // client.close();

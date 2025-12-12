@@ -14,6 +14,19 @@ class KString {
   static const String randomCallerTableName = 'random_caller';
   static const String randomCallerRecordTableName = 'random_caller_record';
   static const String attendanceCallerTableName = 'attendance_caller';
-  static const String attendanceCallerRecordTableName = 'attendance_caller_record';
+  static const String attendanceCallerRecordTableName =
+      'attendance_caller_record';
   static const String studentClassRelationTableName = 'student_class_relation';
+  // WebDav配置服务器键
+  static const String webDavServerKey = 'webDavServer';
+  // WebDav配置用户名键
+  static const String webDavUsernameKey = 'webDavUsername';
+  // WebDav配置密码键
+  static const String webDavPasswordKey = 'webDavPassword';
+  // 备份历史记录键
+  static const String backUpHistoryKey = 'backUpHistory';
+  // 是否自动备份
+  static const String autoBackUpKey = 'autoBackUp';
+  static const String backupFileName = 'rollcaller_backup';
+  static const String webDavServerFolder = 'rollCaller';
 }

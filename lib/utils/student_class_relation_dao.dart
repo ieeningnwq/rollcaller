@@ -4,7 +4,8 @@ import '../configs/strings.dart';
 import 'database_helper.dart';
 
 class StudentClassRelationDao {
-  static final StudentClassRelationDao _instance = StudentClassRelationDao._internal();
+  static final StudentClassRelationDao _instance =
+      StudentClassRelationDao._internal();
   final DatabaseHelper dbHelper = DatabaseHelper(); // 使用单例数据库帮助类实例
   final String tableName = KString.studentClassRelationTableName;
 
@@ -37,18 +38,14 @@ class StudentClassRelationDao {
   Future<void> insertStudentClasses(int studentId, List<int> classIds) async {
     final db = await dbHelper.database;
     for (int classId in classIds) {
-      await db.insert(
-        tableName,
-        {
-          'student_id': studentId,
-          'class_id': classId,
-        },
-        conflictAlgorithm: ConflictAlgorithm.ignore,
-      );
+      await db.insert(tableName, {
+        'student_id': studentId,
+        'class_id': classId,
+      }, conflictAlgorithm: ConflictAlgorithm.ignore);
     }
   }
 
-   Future<int> deleteStudentClasses(int studentId) async {
+  Future<int> deleteStudentClasses(int studentId) async {
     final db = await dbHelper.database;
     return await db.delete(
       tableName,
@@ -83,5 +80,10 @@ class StudentClassRelationDao {
       'SELECT DISTINCT student_id FROM $tableName',
     );
     return maps.map((map) => map['student_id'] as int).toList();
+  }
+
+  Future<List<Map<String, dynamic>>> getAllClassStudentIds() async {
+    final db = await dbHelper.database;
+    return await db.query(tableName);
   }
 }

@@ -34,4 +34,16 @@ extension BackUpTypeExtension on BackUpType {
         return BackUpType.auto;
     }
   }
+
+  static BackUpType fromString(String value) {
+    switch (value) {
+      case '手动备份':
+        return BackUpType.auto;
+      case '自动备份':
+        return BackUpType.manual;
+      
+      default:
+        return BackUpType.auto;
+    }
+  }
 }

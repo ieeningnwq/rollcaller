@@ -104,4 +104,15 @@ class AttendanceCallRecordDao {
       (i) => AttendanceCallRecordModel.fromMap(maps[i]),
     );
   }
+
+  Future<List<AttendanceCallRecordModel>> getAllAttendanceCallerRecords() async {
+    final db = await _databaseHelper.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableName,
+    );
+    return List.generate(
+      maps.length,
+      (i) => AttendanceCallRecordModel.fromMap(maps[i]),
+    );
+  }
 }
