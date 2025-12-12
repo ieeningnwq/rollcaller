@@ -218,7 +218,7 @@ class _SettingsState extends State<SettingsPage> {
                   ),
                 ),
                 Text(
-                  _lastBackUpModel?.dateTimeText ?? '从未备份过',
+                  '${_lastBackUpModel?.dateTimeText.substring(0, 4)}-${_lastBackUpModel?.dateTimeText.substring(4, 6)}-${_lastBackUpModel?.dateTimeText.substring(6, 8)} ${_lastBackUpModel?.dateTimeText.substring(8, 10)}:${_lastBackUpModel?.dateTimeText.substring(10, 12)}:${_lastBackUpModel?.dateTimeText.substring(12, 14)}',
                   style: TextStyle(
                     color: _lastBackUpModel?.result == true
                         ? Colors.green
@@ -676,7 +676,7 @@ class _SettingsState extends State<SettingsPage> {
                           (backUpModel) => RadioListTile<String>(
                             value: backUpModel.dateTimeText,
                             title: Text(
-                              backUpModel.dateTimeText,
+                              '${backUpModel.dateTimeText.substring(0, 4)}-${backUpModel.dateTimeText.substring(4, 6)}-${backUpModel.dateTimeText.substring(6, 8)} ${backUpModel.dateTimeText.substring(8, 10)}:${backUpModel.dateTimeText.substring(10, 12)}:${backUpModel.dateTimeText.substring(12, 14)}',
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
@@ -701,7 +701,7 @@ class _SettingsState extends State<SettingsPage> {
     );
   }
 
-  Future<void> _backupData() async {
+  Future<void> _backupData({BackUpType backUpType = BackUpType.manual}) async {
     // ! 1、获取所有表格数据
     final backupData = await _exportAllTables();
     // ! 2、转换为JSON字符串
@@ -713,7 +713,7 @@ class _SettingsState extends State<SettingsPage> {
     final timeKey =
         '${t.year}${t.month.toString().padLeft(2, '0')}${t.day.toString().padLeft(2, '0')}${t.hour.toString().padLeft(2, '0')}${t.minute.toString().padLeft(2, '0')}${t.second.toString().padLeft(2, '0')}';
     final fileName =
-        '${KString.backupFileName}_${BackUpType.manual.typeText}_$timeKey.json';
+        '${KString.backupFileName}_${backUpType.typeText}_$timeKey.json';
     final tempFilePath = join(tempDir.path, fileName);
     final tempFile = File(tempFilePath);
     await tempFile.writeAsString(jsonString);

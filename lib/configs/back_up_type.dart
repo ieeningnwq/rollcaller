@@ -38,9 +38,9 @@ extension BackUpTypeExtension on BackUpType {
   static BackUpType fromString(String value) {
     switch (value) {
       case '手动备份':
-        return BackUpType.auto;
-      case '自动备份':
         return BackUpType.manual;
+      case '自动备份':
+        return BackUpType.auto;
       
       default:
         return BackUpType.auto;
