@@ -50,10 +50,10 @@ class _StudentClassState extends State<StudentClassPage> {
           children: [
             // 顶部标题栏
             Container(
-              padding: const EdgeInsets.all(12),
+              padding:  EdgeInsets.all(12.w),
               child: Text(
                 KString.studentClassAppBarTitle,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headlineLarge,
               ),
             ),
             Expanded(
@@ -89,8 +89,7 @@ class _StudentClassState extends State<StudentClassPage> {
                               return Center(
                                 child: Text(
                                   '暂无班级',
-                                  style: TextStyle(
-                                    color: Colors.black54,
+                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                     fontStyle: FontStyle.italic,
                                   ),
                                 ),
@@ -100,17 +99,18 @@ class _StudentClassState extends State<StudentClassPage> {
                                 .values
                                 .elementAt(index);
                             return Card(
+                              color: Theme.of(context).colorScheme.surface,
                               elevation: 10.0.w,
                               margin: EdgeInsets.symmetric(
-                                horizontal: 16.0,
-                                vertical: 8.0,
+                                horizontal: 16.0.h,
+                                vertical: 8.0.w,
                               ),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
+                                borderRadius: BorderRadius.circular(8.0.r),
                               ),
 
                               child: Padding(
-                                padding: EdgeInsets.all(8.0),
+                                padding: EdgeInsets.all(8.0.w),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -124,20 +124,19 @@ class _StudentClassState extends State<StudentClassPage> {
                                         studentClass,
                                       ),
                                     ),
-                                    const SizedBox(height: 4.0),
+                                    SizedBox(height: 4.0.h),
 
                                     // 中间：班级信息
                                     _classInfoWidget(studentClass),
-                                    SizedBox(height: 16.0),
+                                    SizedBox(height: 16.0.h),
                                     // 班级备注
                                     Text(
                                       studentClass.notes,
-                                      style: TextStyle(
-                                        fontSize: 14.0,
-                                        color: Colors.grey.shade700,
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: Theme.of(context).colorScheme.onSurface.withAlpha(150),
                                       ),
                                     ),
-                                    SizedBox(height: 12.0),
+                                    SizedBox(height: 12.0.h),
                                     // 底部操作按钮
                                     _actionsWidget(context, studentClass),
                                   ],
@@ -158,6 +157,7 @@ class _StudentClassState extends State<StudentClassPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).colorScheme.primary,
         onPressed: () {
           showDialog(
             context: context,
@@ -180,7 +180,7 @@ class _StudentClassState extends State<StudentClassPage> {
           });
         },
         tooltip: '添加班级',
-        child: Icon(Icons.add),
+        child: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary),
       ),
     );
   }
@@ -235,29 +235,31 @@ class _StudentClassState extends State<StudentClassPage> {
     String quantityInfo,
     Color deprecationColor,
   ) => Wrap(
+    spacing: 8.0.w,
     children: [
       Text(
         softWrap: true,
         overflow: TextOverflow.ellipsis,
         studentClass.className,
-        style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
+        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+          color: Theme.of(context).colorScheme.onSurface,
+        ),
       ),
       Container(
-        padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+        padding: EdgeInsets.symmetric(horizontal: 16.0.h, vertical: 8.0.w),
         decoration: BoxDecoration(
           color: deprecationColor,
-          borderRadius: BorderRadius.circular(12.0),
+          borderRadius: BorderRadius.circular(12.0.r),
         ),
         child: Row(
           children: [
             statusIcon,
-            SizedBox(width: 4.0),
+            SizedBox(width: 4.0.w),
             Text(
               quantityInfo,
-              style: TextStyle(
-                fontSize: 12.0,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: statusColor,
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w800,
               ),
             ),
           ],
@@ -274,22 +276,30 @@ class _StudentClassState extends State<StudentClassPage> {
         children: [
           Text(
             '班级现有人数',
-            style: TextStyle(fontSize: 14.0, color: Colors.grey.shade600),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(150),
+            ),
           ),
-          SizedBox(height: 4.0),
+          SizedBox(height: 4.0.h),
           Text(
             '${studentClass.classQuantity}',
-            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
-          SizedBox(height: 12.0),
+          SizedBox(height: 12.0.h),
           Text(
             '学生现有人数',
-            style: TextStyle(fontSize: 14.0, color: Colors.grey.shade600),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(150),
+            ),
           ),
-          SizedBox(height: 4.0),
+          SizedBox(height: 4.0.h),
           Text(
             '${studentClass.studentQuantity}',
-            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
         ],
       ),
@@ -298,22 +308,30 @@ class _StudentClassState extends State<StudentClassPage> {
         children: [
           Text(
             '教师',
-            style: TextStyle(fontSize: 14.0, color: Colors.grey.shade600),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(150),
+            ),
           ),
-          SizedBox(height: 4.0),
+          SizedBox(height: 4.0.h),
           Text(
             studentClass.teacherName,
-            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
-          SizedBox(height: 12.0),
+          SizedBox(height: 12.0.h),
           Text(
             '创建时间',
-            style: TextStyle(fontSize: 14.0, color: Colors.grey.shade600),
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface.withAlpha(150),
+            ),
           ),
-          SizedBox(height: 4.0),
+          SizedBox(height: 4.0.h),
           Text(
             '${studentClass.created.year}-${studentClass.created.month.toString().padLeft(2, '0')}-${studentClass.created.day.toString().padLeft(2, '0')}',
-            style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.w500),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
         ],
       ),
@@ -343,8 +361,10 @@ class _StudentClassState extends State<StudentClassPage> {
             }
           });
         },
-        icon: Icon(Icons.edit, color: Colors.blue),
-        label: Text('编辑', style: TextStyle(color: Colors.blue)),
+        icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.secondary),
+        label: Text('编辑', style: Theme.of(context).textTheme.labelLarge?.copyWith(
+          color: Theme.of(context).colorScheme.secondary,
+        )),
       ),
       SizedBox(width: 8.0),
       TextButton.icon(
@@ -402,15 +422,19 @@ class _StudentClassState extends State<StudentClassPage> {
                         // 关闭确认弹窗
                       }
                     },
-                    child: Text('删除', style: TextStyle(color: Colors.red)),
+                    child: Text('删除', style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.error,
+                    )),
                   ),
                 ],
               );
             },
           );
         },
-        icon: Icon(Icons.delete, color: Colors.red),
-        label: Text('删除', style: TextStyle(color: Colors.red)),
+        icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
+        label: Text('删除', style: Theme.of(context).textTheme.labelLarge?.copyWith(
+          color: Theme.of(context).colorScheme.error,
+        )),
       ),
     ],
   );
@@ -420,7 +444,7 @@ class _StudentClassState extends State<StudentClassPage> {
     return classQuantity == studentClass.studentQuantity
         ? Icon(Icons.check_circle, size: 16, color: Colors.green)
         : classQuantity < studentClass.studentQuantity
-        ? Icon(Icons.warning_amber, size: 16, color: Colors.yellow)
+        ? Icon(Icons.warning_amber, size: 16, color: Color.fromARGB(170, 146, 64, 14))
         : Icon(Icons.error, size: 16, color: Colors.red);
   }
 
@@ -429,7 +453,7 @@ class _StudentClassState extends State<StudentClassPage> {
     return classQuantity == studentClass.studentQuantity
         ? Colors.green
         : classQuantity < studentClass.studentQuantity
-        ? Colors.yellow
+        ? Color.fromARGB(170, 146, 64, 14)
         : Colors.red;
   }
 
@@ -447,7 +471,7 @@ class _StudentClassState extends State<StudentClassPage> {
     return classQuantity == studentClass.studentQuantity
         ? Colors.green.shade100
         : classQuantity < studentClass.studentQuantity
-        ? Colors.yellow.shade100
+        ? Color.fromARGB(170, 254, 243, 199)
         : Colors.red.shade100;
   }
 }
