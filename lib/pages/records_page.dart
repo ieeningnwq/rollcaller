@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 
 import 'attendance_call_records_page.dart';
 import 'random_call_records_page.dart';
@@ -23,10 +24,10 @@ class _RecordState extends State<RecordPage> {
           children: [
             // 顶部标题栏
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(12.w),
               child: Text(
                 '点名记录管理',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headlineLarge,
               ),
             ),
             Row(
@@ -50,7 +51,7 @@ class _RecordState extends State<RecordPage> {
     return Expanded(
       flex: 1,
       child: Container(
-        margin: const EdgeInsets.only(left: 4, right: 3),
+        margin:  EdgeInsets.only(left: 8.w, right: 4.w),
         child: ElevatedButton(
           onPressed: () {
             setState(() {
@@ -59,14 +60,14 @@ class _RecordState extends State<RecordPage> {
             // 随机点名功能
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: _selectedIndex == 0 ? Colors.blue : Colors.white,
-            foregroundColor: _selectedIndex == 0 ? Colors.white : Colors.blue,
+            backgroundColor: _selectedIndex == 0 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onPrimary,
+            foregroundColor: _selectedIndex == 0 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
             side: BorderSide(
-              color: _selectedIndex == 0 ? Colors.blue : Colors.blue,
+              color: Theme.of(context).colorScheme.onPrimary,
             ),
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            padding: EdgeInsets.symmetric(vertical: 12.0.h),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(8.0.r),
             ),
           ),
           child: Row(
@@ -74,14 +75,14 @@ class _RecordState extends State<RecordPage> {
             children: [
               Icon(
                 Icons.shuffle,
-                color: _selectedIndex == 0 ? Colors.white : Colors.blue,
+                size: Theme.of(context).textTheme.titleLarge?.fontSize,
+                color: _selectedIndex == 0 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
               ),
-              const SizedBox(width: 8.0),
+              SizedBox(width: 8.0.w),
               Text(
                 '随机点名记录',
-                style: TextStyle(
-                  fontSize: 16.0,
-                  color: _selectedIndex == 0 ? Colors.white : Colors.blue,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: _selectedIndex == 0 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
                 ),
               ),
             ],
@@ -95,7 +96,7 @@ class _RecordState extends State<RecordPage> {
     return Expanded(
       flex: 1,
       child: Container(
-        margin: const EdgeInsets.only(left: 3, right: 4),
+        margin:  EdgeInsets.only(left: 4.w, right: 8.w),
         child: ElevatedButton(
           onPressed: () {
             setState(() {
@@ -104,14 +105,14 @@ class _RecordState extends State<RecordPage> {
             // 签到点名功能
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: _selectedIndex == 1 ? Colors.blue : Colors.white,
-            foregroundColor: _selectedIndex == 1 ? Colors.white : Colors.blue,
+            backgroundColor: _selectedIndex == 1 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onPrimary,
+            foregroundColor: _selectedIndex == 1 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
             side: BorderSide(
-              color: _selectedIndex == 1 ? Colors.blue : Colors.blue,
+              color: _selectedIndex == 1 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onPrimary,
             ),
-            padding: const EdgeInsets.symmetric(vertical: 8),
+            padding: EdgeInsets.symmetric(vertical: 12.h),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(8.0.r),
             ),
           ),
           child: Row(
@@ -119,14 +120,13 @@ class _RecordState extends State<RecordPage> {
             children: [
               Icon(
                 Icons.check_circle,
-                color: _selectedIndex == 1 ? Colors.white : Colors.blue,
+                                color: _selectedIndex == 1 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
               ),
-              const SizedBox(width: 8.0),
+              SizedBox(width: 8.0.w),
               Text(
                 '签到点名记录',
-                style: TextStyle(
-                  fontSize: 16.0,
-                  color: _selectedIndex == 1 ? Colors.white : Colors.blue,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: _selectedIndex == 1 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
                 ),
               ),
             ],
