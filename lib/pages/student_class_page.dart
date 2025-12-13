@@ -227,7 +227,7 @@ class _StudentClassState extends State<StudentClassPage> {
     _refreshController.loadComplete();
   }
 
-  _classNameQuantityStatusWidget(
+  Wrap _classNameQuantityStatusWidget(
     StudentClassModel studentClass,
     Icon statusIcon,
     Color statusColor,

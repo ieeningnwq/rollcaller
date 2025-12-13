@@ -63,7 +63,18 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           // 定制主题
-          theme: ThemeData(colorScheme: .fromSeed(seedColor: KColor.seedColor)),
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(seedColor: KColor.seedColor),
+            textTheme:  TextTheme(
+              headlineLarge: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold),
+              headlineMedium: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
+              headlineSmall: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
+              bodyMedium: TextStyle(fontSize: 16.sp),
+              titleLarge: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
+              titleMedium: TextStyle(fontSize: 20.sp),
+              bodySmall: TextStyle(fontSize: 14.sp),
+            ),
+          ),
           home: IndexPage(),
         );
       },

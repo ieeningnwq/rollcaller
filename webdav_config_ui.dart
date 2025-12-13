@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 void main() {
-  runApp(const MaterialApp(
-    home: WebDavConfigPage(),
-    debugShowCheckedModeBanner: false,
-  ));
+  runApp(
+    ScreenUtilInit(
+      designSize: const Size(540, 960),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (_, child) {
+        return const MaterialApp(
+          home: WebDavConfigPage(),
+          debugShowCheckedModeBanner: false,
+        );
+      },
+    ),
+  );
 }
 
 class WebDavConfigPage extends StatefulWidget {
@@ -31,29 +41,33 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
         backgroundColor: Colors.white,
         elevation: 1,
         foregroundColor: Colors.black87,
+        titleTextStyle: TextStyle(
+          fontSize: 18.sp,
+          fontWeight: FontWeight.w600,
+        ),
       ),
       backgroundColor: Colors.grey[50],
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(12.w),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // 备份状态显示
             Container(
-              padding: const EdgeInsets.all(12.0),
+              padding: EdgeInsets.all(10.w),
               decoration: BoxDecoration(
                 color: Colors.green[100],
-                borderRadius: BorderRadius.circular(8.0),
+                borderRadius: BorderRadius.circular(6.w),
               ),
               child: Row(
                 children: [
-                  const Icon(
+                  Icon(
                     Icons.check_circle,
                     color: Colors.green,
-                    size: 20,
+                    size: 18.w,
                   ),
-                  const SizedBox(width: 8),
-                  const Column(
+                  SizedBox(width: 6.w),
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -61,13 +75,14 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                         style: TextStyle(
                           color: Colors.green,
                           fontWeight: FontWeight.w500,
+                          fontSize: 14.sp,
                         ),
                       ),
                       Text(
                         '2024-05-20 22:00',
                         style: TextStyle(
                           color: Colors.green,
-                          fontSize: 12,
+                          fontSize: 11.sp,
                         ),
                       ),
                     ],
@@ -75,31 +90,31 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 16.h),
 
             // WebDAV配置标题
-            const Text(
+            Text(
               'WebDAV配置',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16.sp,
                 fontWeight: FontWeight.w600,
                 color: Colors.black87,
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 16.h),
 
             // 输入框容器
             Container(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(8.0),
+                borderRadius: BorderRadius.circular(6.w),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
+                    spreadRadius: 1.w,
+                    blurRadius: 2.w,
+                    offset: Offset(0, 1.w),
                   ),
                 ],
               ),
@@ -112,33 +127,34 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                       labelText: 'WebDAV服务器地址',
                       labelStyle: TextStyle(
                         color: Colors.grey[600],
+                        fontSize: 14.sp,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: BorderRadius.circular(6.w),
                         borderSide: BorderSide(
                           color: Colors.grey[300]!,
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: BorderRadius.circular(6.w),
                         borderSide: BorderSide(
                           color: Colors.grey[300]!,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: const BorderSide(
+                        borderRadius: BorderRadius.circular(6.w),
+                        borderSide: BorderSide(
                           color: Colors.purple,
-                          width: 2,
+                          width: 2.w,
                         ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                        vertical: 14.0,
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 12.h,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 12.h),
 
                   // 用户名输入框
                   TextField(
@@ -146,33 +162,34 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                       labelText: '用户名',
                       labelStyle: TextStyle(
                         color: Colors.grey[600],
+                        fontSize: 14.sp,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: BorderRadius.circular(6.w),
                         borderSide: BorderSide(
                           color: Colors.grey[300]!,
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: BorderRadius.circular(6.w),
                         borderSide: BorderSide(
                           color: Colors.grey[300]!,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: const BorderSide(
+                        borderRadius: BorderRadius.circular(6.w),
+                        borderSide: BorderSide(
                           color: Colors.purple,
-                          width: 2,
+                          width: 2.w,
                         ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                        vertical: 14.0,
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 12.h,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 12.h),
 
                   // 密码输入框
                   TextField(
@@ -181,33 +198,34 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                       labelText: '密码',
                       labelStyle: TextStyle(
                         color: Colors.grey[600],
+                        fontSize: 14.sp,
                       ),
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: BorderRadius.circular(6.w),
                         borderSide: BorderSide(
                           color: Colors.grey[300]!,
                         ),
                       ),
                       enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: BorderRadius.circular(6.w),
                         borderSide: BorderSide(
                           color: Colors.grey[300]!,
                         ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                        borderSide: const BorderSide(
+                        borderRadius: BorderRadius.circular(6.w),
+                        borderSide: BorderSide(
                           color: Colors.purple,
-                          width: 2,
+                          width: 2.w,
                         ),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                        vertical: 14.0,
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 10.w,
+                        vertical: 12.h,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 16.h),
 
                   // 按钮行
                   Row(
@@ -222,31 +240,31 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                           },
                           style: OutlinedButton.styleFrom(
                             backgroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 14.0,
+                            padding: EdgeInsets.symmetric(
+                              vertical: 12.h,
                             ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
+                              borderRadius: BorderRadius.circular(6.w),
                             ),
-                            side: const BorderSide(
+                            side: BorderSide(
                               color: Colors.purple,
-                              width: 1,
+                              width: 1.w,
                             ),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
+                            children: [
                               Icon(
                                 Icons.network_check,
                                 color: Colors.purple,
-                                size: 18,
+                                size: 16.w,
                               ),
-                              SizedBox(width: 8),
+                              SizedBox(width: 6.w),
                               Text(
                                 '测试连接',
                                 style: TextStyle(
                                   color: Colors.purple,
-                                  fontSize: 16,
+                                  fontSize: 14.sp,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -254,8 +272,8 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      
+                      SizedBox(width: 8.w),
+                       
                       // 保存配置按钮
                       Expanded(
                         child: ElevatedButton(
@@ -265,28 +283,28 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.purple,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 14.0,
+                            padding: EdgeInsets.symmetric(
+                              vertical: 12.h,
                             ),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
+                              borderRadius: BorderRadius.circular(6.w),
                             ),
                             elevation: 0,
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
+                            children: [
                               Icon(
                                 Icons.save,
                                 color: Colors.white,
-                                size: 18,
+                                size: 16.w,
                               ),
-                              SizedBox(width: 8),
+                              SizedBox(width: 6.w),
                               Text(
                                 '保存配置',
                                 style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 16,
+                                  fontSize: 14.sp,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -299,20 +317,20 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 16.h),
             
             // 备份设置
             Container(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(8.0),
+                borderRadius: BorderRadius.circular(6.w),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
+                    spreadRadius: 1.w,
+                    blurRadius: 2.w,
+                    offset: Offset(0, 1.w),
                   ),
                 ],
               ),
@@ -320,24 +338,24 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // 备份设置标题
-                  const Text(
+                  Text(
                     '备份设置',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16.sp,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  
+                  SizedBox(height: 12.h),
+                   
                   // 自动备份选项
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         '自动备份',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14.sp,
                           color: Colors.black87,
                         ),
                       ),
@@ -349,30 +367,31 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                           });
                         },
                         activeColor: Colors.purple,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4.h),
                   // 提示语句
                   Text(
                     '若打开自动备份则每次推出app时自动备份',
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 11.sp,
                       color: Colors.grey[500],
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: 10.h),
                   
                   // 备份频率下拉选择
                   if (_autoBackupEnabled) // 只有开启自动备份时显示
                     Padding(
-                      padding: const EdgeInsets.only(left: 0),
+                      padding: EdgeInsets.only(left: 0),
                       child: Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 14.0),
+                        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 10.h),
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey[300]!),
-                          borderRadius: BorderRadius.circular(8.0),
+                          borderRadius: BorderRadius.circular(6.w),
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
@@ -389,31 +408,32 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                                 child: Text(
                                   value,
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 14.sp,
                                     color: Colors.black87,
                                   ),
                                 ),
                               );
                             }).toList(),
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.arrow_drop_down,
                               color: Colors.black87,
+                              size: 20.w,
                             ),
                             isExpanded: true,
                           ),
                         ),
                       ),
                     ),
-                  const SizedBox(height: 12),
-                  
+                  SizedBox(height: 10.h),
+                   
                   // 退出时备份选项
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         '退出时备份',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14.sp,
                           color: Colors.black87,
                         ),
                       ),
@@ -425,13 +445,14 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                           });
                         },
                         activeColor: Colors.purple,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 16.h),
 
             // 备份和恢复按钮
             Row(
@@ -444,25 +465,25 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.purple,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 14.0,
+                      padding: EdgeInsets.symmetric(
+                        vertical: 12.h,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: BorderRadius.circular(6.w),
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
+                    child: Text(
                       '手动备份',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: 8.w),
                 Expanded(
                   child: OutlinedButton(
                     onPressed: () {
@@ -474,40 +495,41 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                         print('请先选择要恢复的备份');
                         // 可以显示提示信息
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('请先选择要恢复的备份'),
+                          SnackBar(
+                            content: const Text('请先选择要恢复的备份'),
                             backgroundColor: Colors.red,
+                            duration: const Duration(seconds: 2),
                           ),
                         );
                       }
                     },
                     style: OutlinedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 14.0,
+                      padding: EdgeInsets.symmetric(
+                        vertical: 12.h,
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: BorderRadius.circular(6.w),
                       ),
-                      side: const BorderSide(
+                      side: BorderSide(
                         color: Colors.grey,
-                        width: 1,
+                        width: 1.w,
                       ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Icon(
                           Icons.restore,
                           color: Colors.black87,
-                          size: 18,
+                          size: 16.w,
                         ),
-                        SizedBox(width: 8),
+                        SizedBox(width: 6.w),
                         Text(
                           '恢复数据',
                           style: TextStyle(
                             color: Colors.black87,
-                            fontSize: 16,
+                            fontSize: 14.sp,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -517,31 +539,31 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
 
             // 备份历史标题
             const Text(
               '备份历史',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: Colors.black87,
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 10.h),
 
             // 备份历史列表容器
             Container(
-              padding: const EdgeInsets.all(16.0),
+              padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(8.0),
+                borderRadius: BorderRadius.circular(6.w),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.grey.withOpacity(0.1),
-                    spreadRadius: 1,
-                    blurRadius: 2,
-                    offset: const Offset(0, 1),
+                    spreadRadius: 1.w,
+                    blurRadius: 2.w,
+                    offset: Offset(0, 1.w),
                   ),
                 ],
               ),
@@ -549,9 +571,9 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
                 children: [
                   // 备份历史记录项
                   buildBackupHistoryItem('2024-05-20 22:00', '自动备份'),
-                  const Divider(height: 24, thickness: 1, color: Colors.grey),
+                  Divider(height: 20.h, thickness: 1.w, color: Colors.grey),
                   buildBackupHistoryItem('2024-05-19 22:00', '自动备份'),
-                  const Divider(height: 24, thickness: 1, color: Colors.grey),
+                  Divider(height: 20.h, thickness: 1.w, color: Colors.grey),
                   buildBackupHistoryItem('2024-05-18 15:30', '手动备份'),
                 ],
               ),
@@ -572,17 +594,17 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
           children: [
             Text(
               time,
-              style: const TextStyle(
-                fontSize: 16,
+              style: TextStyle(
+                fontSize: 14.sp,
                 fontWeight: FontWeight.w500,
                 color: Colors.black87,
               ),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 4.h),
             Text(
               type,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12.sp,
                 color: Colors.grey[600],
               ),
             ),
@@ -597,6 +619,7 @@ class _WebDavConfigPageState extends State<WebDavConfigPage> {
             });
           },
           activeColor: Colors.purple,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         ),
       ],
     );
