@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:rollcall/models/student_class_model.dart';
@@ -79,6 +80,7 @@ class _StudentPageState extends State<StudentPage> {
     _searchController.dispose();
     _refreshController.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,10 +90,10 @@ class _StudentPageState extends State<StudentPage> {
           children: [
             // 顶部标题栏
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(12.w),
               child: Text(
                 '学生名单管理',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headlineLarge,
               ),
             ),
             Row(
@@ -103,7 +105,11 @@ class _StudentPageState extends State<StudentPage> {
                   onPressed: () {
                     _importStudentsFromExcel();
                   },
-                  icon: Icon(Icons.download),
+                  icon: Icon(
+                    Icons.download,
+                    color: Theme.of(context).colorScheme.secondary,
+                    size: Theme.of(context).textTheme.headlineLarge?.fontSize,
+                  ),
                 ),
               ],
             ),
@@ -147,9 +153,9 @@ class _StudentPageState extends State<StudentPage> {
                                   Column(
                                     children: group.students.map((student) {
                                       return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 2,
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 8.h,
+                                          vertical: 2.w,
                                         ),
                                         child: _studentItemWidget(student),
                                       );
@@ -172,6 +178,7 @@ class _StudentPageState extends State<StudentPage> {
       ),
       // 浮动添加按钮
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).colorScheme.primary,
         onPressed: () => {
           showDialog(
             context: context,
@@ -189,7 +196,7 @@ class _StudentPageState extends State<StudentPage> {
             }
           }),
         },
-        child: const Icon(Icons.add),
+        child: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary),
       ),
     );
   }
@@ -215,7 +222,9 @@ class _StudentPageState extends State<StudentPage> {
         var classIds = await StudentClassRelationDao()
             .getAllClassIdsByStudentId(studentId);
         for (int classId in classIds) {
-          student!.classesMap[classId] = await classDao.getStudentClass(classId);
+          student!.classesMap[classId] = await classDao.getStudentClass(
+            classId,
+          );
         }
         if (student != null) {
           students.add(student);
@@ -276,21 +285,20 @@ class _StudentPageState extends State<StudentPage> {
 
   Expanded _searchWidget() => Expanded(
     child: Padding(
-      padding: const EdgeInsets.all(8),
+      padding: EdgeInsets.all(8.r),
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
           prefixIcon: const Icon(Icons.search),
           hintText: '搜索学号或姓名...',
-          hintStyle: TextStyle(fontSize: 14),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+          hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
           focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(8.r),
           ),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 6,
-            vertical: 4,
-          ),
+          contentPadding: EdgeInsets.symmetric(horizontal: 6.h, vertical: 4.w),
           filled: true,
         ),
       ),
@@ -308,17 +316,26 @@ class _StudentPageState extends State<StudentPage> {
                 .isExpanded;
       }),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.only(
+          left: 8.h,
+          right: 8.h,
+          top: 12.w,
+          bottom: 12.w,
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
               group.studentClass.className,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface,
+              ),
             ),
             Text(
               '${group.students.length}人',
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                color: Theme.of(context).colorScheme.onSurface.withAlpha(110),
+              ),
             ),
           ],
         ),
@@ -328,13 +345,13 @@ class _StudentPageState extends State<StudentPage> {
 
   Widget _studentItemWidget(StudentModel student) {
     return Container(
-      padding: const EdgeInsets.all(4),
+      padding: EdgeInsets.all(4.r),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(8.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 2,
+            color: Theme.of(context).colorScheme.surfaceContainer,
+            blurRadius: 2.r,
             offset: const Offset(0, 1),
           ),
         ],
@@ -350,32 +367,39 @@ class _StudentPageState extends State<StudentPage> {
                   children: [
                     Text(
                       student.studentName,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    SizedBox(width: 8.w),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 8.h,
+                        vertical: 2.w,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.purple.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Text(
                         student.studentNumber,
-                        style: TextStyle(fontSize: 12),
+                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4.h),
                 Text(
                   '创建时间: ${'${student.created.year}-${student.created.month.toString().padLeft(2, '0')}-${student.created.day.toString().padLeft(2, '0')}'}',
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withAlpha(100),
+                  ),
                 ),
               ],
             ),
@@ -383,7 +407,10 @@ class _StudentPageState extends State<StudentPage> {
           Row(
             children: [
               IconButton(
-                icon: const Icon(Icons.visibility, color: Colors.grey),
+                icon: Icon(
+                  Icons.visibility,
+                  color: Theme.of(context).colorScheme.tertiary,
+                ),
                 onPressed: () {
                   // 查看功能
                   showDialog(
@@ -393,7 +420,10 @@ class _StudentPageState extends State<StudentPage> {
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.edit, color: Colors.grey),
+                icon: Icon(
+                  Icons.edit,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
                 onPressed: () {
                   // 编辑功能
                   showDialog(
@@ -412,7 +442,10 @@ class _StudentPageState extends State<StudentPage> {
                 },
               ),
               IconButton(
-                icon: const Icon(Icons.delete, color: Colors.grey),
+                icon: Icon(
+                  Icons.delete,
+                  color: Theme.of(context).colorScheme.error,
+                ),
                 onPressed: () {
                   // 删除功能
                   showDialog(

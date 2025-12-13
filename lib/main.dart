@@ -77,7 +77,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               bodySmall: TextStyle(fontSize: 20.sp),
               labelLarge: TextStyle(fontSize: 22.sp),
               labelMedium: TextStyle(fontSize: 18.sp),
-              labelSmall: TextStyle(fontSize: 14.sp),
+              labelSmall: TextStyle(fontSize: 16.sp),
             ),
           ),
           home: IndexPage(),
