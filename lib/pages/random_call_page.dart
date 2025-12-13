@@ -312,8 +312,8 @@ class _RandomCallPageState extends State<RandomCallPage>
           color: Theme.of(context).colorScheme.surface,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(10),
-              blurRadius: 10.0.r,
+              color: Theme.of(context).colorScheme.shadow.withAlpha(100),
+              blurRadius: 15.0.r,
             ),
           ],
         ),
