@@ -76,20 +76,18 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     if (state == AppLifecycleState.paused) {
       // 获取是否自动备份
       bool autoBackupEnabled =
-          (await _storage.read(key: KString.autoBackUpKey))! == 'true';
+          ((await _storage.read(key: KString.autoBackUpKey)) ?? 'false') ==
+          'true';
       if (autoBackupEnabled) {
         // 获取WebDav配置服务器
-        final webDavServer = (await _storage.read(
-          key: KString.webDavServerKey,
-        ))!;
+        final webDavServer =
+            (await _storage.read(key: KString.webDavServerKey)) ?? '';
         // 获取WebDav配置用户名
-        final webDavUsername = (await _storage.read(
-          key: KString.webDavUsernameKey,
-        ))!;
+        final webDavUsername =
+            (await _storage.read(key: KString.webDavUsernameKey)) ?? '';
         // 获取WebDav配置密码
-        final webDavPassword = (await _storage.read(
-          key: KString.webDavPasswordKey,
-        ))!;
+        final webDavPassword =
+            (await _storage.read(key: KString.webDavPasswordKey)) ?? '';
         // 设置WebDav连接客户端
         Client client = newClient(
           webDavServer,
@@ -97,8 +95,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           password: webDavPassword,
           debug: false,
         );
-        // 开始备份
-        await _backupData(client: client, backUpType: BackUpType.auto);
+        try {
+          await client.ping();
+          // 开始备份
+          await _backupData(client: client, backUpType: BackUpType.auto);
+        } catch (e) {
+          log('WebDav连接失败：$e');
+          return;
+        }
       }
     }
   }
