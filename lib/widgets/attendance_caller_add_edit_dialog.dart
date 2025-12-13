@@ -103,9 +103,6 @@ class _AttendanceCallerAddEditDialogState
                         toastLength: Toast.LENGTH_SHORT,
                         gravity: ToastGravity.BOTTOM,
                         timeInSecForIosWeb: 1,
-                        backgroundColor: Colors.grey,
-                        textColor: Colors.white,
-                        fontSize: 16.0,
                       );
                       return;
                     }
@@ -188,10 +185,9 @@ class _AttendanceCallerAddEditDialogState
                 value: e.id!,
                 title: Text(
                   e.className,
-                  style: TextStyle(color: _isAdd ? Colors.black : Colors.grey),
                 ),
                 fillColor: WidgetStateProperty.all(
-                  _isAdd ? Colors.black : Colors.grey,
+                  _isAdd ? Theme.of(context).colorScheme.onSurface : Theme.of(context).disabledColor,
                 ),
               ),
             )

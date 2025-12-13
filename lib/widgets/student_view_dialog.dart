@@ -84,12 +84,10 @@ class _StudentViewDialogState extends State<StudentViewDialog> {
         children: [
           Text(
             '$label: ',
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontSize: 16),
               overflow: TextOverflow.ellipsis,
               maxLines: 3,
             ),

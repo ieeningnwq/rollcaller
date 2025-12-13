@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 
 import '../models/student_class_model.dart';
 import '../utils/student_class_dao.dart';
@@ -56,7 +57,7 @@ class _StudentClassAddEditDialogState extends State<StudentClassAddEditDialog> {
           width: double.maxFinite,
           child: ListView(
             shrinkWrap: true,
-            padding: const EdgeInsets.symmetric(vertical: 4),
+            padding:  EdgeInsets.symmetric(vertical: 4.w),
             children: [
               _buildClassNameInfoRow('班级名称（必填）'),
               _buildClassQuantityInfoRowInt('学生数量（必填）'),
@@ -89,7 +90,7 @@ class _StudentClassAddEditDialogState extends State<StudentClassAddEditDialog> {
 
   Padding _buildInfoRow(String label, TextEditingController controller) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding:  EdgeInsets.symmetric(vertical: 8.0.w),
       child: TextField(
         decoration: InputDecoration(labelText: label),
         controller: controller,
@@ -100,7 +101,7 @@ class _StudentClassAddEditDialogState extends State<StudentClassAddEditDialog> {
   Padding _buildClassNameInfoRow(String label) {
     bool isClassNameUnique = true;
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding:  EdgeInsets.symmetric(vertical: 8.0.w),
       child: TextFormField(
         decoration: InputDecoration(labelText: label),
         controller: classNameController,
@@ -141,7 +142,7 @@ class _StudentClassAddEditDialogState extends State<StudentClassAddEditDialog> {
 
   Padding _buildClassQuantityInfoRowInt(String label) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      padding:  EdgeInsets.symmetric(vertical: 8.0.w),
       child: TextFormField(
         keyboardType: TextInputType.number,
         // 设置键盘类型为数字键盘

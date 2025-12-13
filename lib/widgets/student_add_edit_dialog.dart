@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:rollcall/utils/student_class_relation_dao.dart';
 
 import '../models/student_class_model.dart';
@@ -99,9 +100,9 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
                       _buildStudentNumberField(),
                       // 学生姓名
                       _buildStudengNameField(),
-                      const SizedBox(height: 4),
+                       SizedBox(height: 4.h),
                       // 班级选择
-                      const Text('所在班级', style: TextStyle(fontSize: 16)),
+                      const Text('所在班级', ),
                       _buildClassSelectField(),
                     ],
                   ),

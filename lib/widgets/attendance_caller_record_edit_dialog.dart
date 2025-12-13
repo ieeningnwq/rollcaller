@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:rollcall/configs/attendance_status.dart';
 
 import '../models/attendance_call_record.dart';
@@ -30,10 +31,10 @@ class _AttendanceCallerRecordEditDialogState
       title: const Text('编辑分数'),
       content: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          padding: EdgeInsets.symmetric(horizontal: 12.h, vertical: 4.w),
           decoration: BoxDecoration(
             color: _record.present.statusColor,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12.r),
           ),
           child: InkWell(
             onTap: () {
@@ -43,11 +44,6 @@ class _AttendanceCallerRecordEditDialogState
             child: Text(
               _record.present.statusText,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
             ),
           ),
         ),
