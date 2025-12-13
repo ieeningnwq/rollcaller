@@ -311,11 +311,10 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                                         1
                                                     ? null
                                                     : Theme.of(context)
-                                                          .colorScheme.secondaryContainer,
+                                                          .colorScheme
+                                                          .secondaryContainer,
                                                 child: Padding(
-                                                  padding: EdgeInsets.all(
-                                                    12.w,
-                                                  ),
+                                                  padding: EdgeInsets.all(12.w),
                                                   child: Column(
                                                     crossAxisAlignment:
                                                         CrossAxisAlignment
@@ -337,16 +336,20 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                                               Text(
                                                                 student?.studentName ??
                                                                     '未知学生',
-                                                                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                                                  color: group
-                                                                          .randomCallerModel
-                                                                          .isArchive ==
-                                                                      1
-                                                                  ? Theme.of(context).disabledColor
-                                                                  : Theme.of(context)
-                                                                      .colorScheme
-                                                                      .onSecondaryContainer,
-                                                                ),
+                                                                style: Theme.of(context)
+                                                                    .textTheme
+                                                                    .titleMedium
+                                                                    ?.copyWith(
+                                                                      color:
+                                                                          group.randomCallerModel.isArchive ==
+                                                                              1
+                                                                          ? Theme.of(
+                                                                              context,
+                                                                            ).disabledColor
+                                                                          : Theme.of(
+                                                                              context,
+                                                                            ).colorScheme.onSecondaryContainer,
+                                                                    ),
                                                               ),
                                                               SizedBox(
                                                                 width: 12.w,
@@ -354,35 +357,49 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                                               Text(
                                                                 student?.studentNumber ??
                                                                     '未知',
-                                                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                                  color: group
-                                                                          .randomCallerModel
-                                                                          .isArchive ==
-                                                                      1
-                                                                  ? Theme.of(context).disabledColor
-                                                                  : Theme.of(context)
-                                                                      .colorScheme
-                                                                      .onSecondaryContainer,
-                                                                ),
+                                                                style: Theme.of(context)
+                                                                    .textTheme
+                                                                    .bodySmall
+                                                                    ?.copyWith(
+                                                                      color:
+                                                                          group.randomCallerModel.isArchive ==
+                                                                              1
+                                                                          ? Theme.of(
+                                                                              context,
+                                                                            ).disabledColor
+                                                                          : Theme.of(
+                                                                              context,
+                                                                            ).colorScheme.onSecondaryContainer,
+                                                                    ),
                                                               ),
                                                             ],
                                                           ),
                                                           Text(
                                                             '分数: ${record.score}',
                                                             style: TextStyle(
-                                                              fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
+                                                              fontSize:
+                                                                  Theme.of(
+                                                                        context,
+                                                                      )
+                                                                      .textTheme
+                                                                      .bodyMedium
+                                                                      ?.fontSize,
                                                               color:
                                                                   group
                                                                           .randomCallerModel
                                                                           .isArchive ==
                                                                       1
-                                                                  ? Theme.of(context).disabledColor
+                                                                  ? Theme.of(
+                                                                      context,
+                                                                    ).disabledColor
                                                                   : (record.score >=
                                                                             8
                                                                         ? Colors
-                                                                              .green.shade900
+                                                                              .green
+                                                                              .shade900
                                                                         : Colors
-                                                                              .orange.shade900),
+                                                                              .orange
+                                                                              .shade900),
                                                               fontWeight:
                                                                   FontWeight
                                                                       .bold,
@@ -392,31 +409,47 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                                       ),
                                                       Text(
                                                         '班级: ${group.studentClassModel.className}',
-                                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                          color: group
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodySmall
+                                                            ?.copyWith(
+                                                              color:
+                                                                  group
                                                                           .randomCallerModel
                                                                           .isArchive ==
                                                                       1
-                                                                  ? Theme.of(context).disabledColor
-                                                                  : Theme.of(context)
-                                                                      .colorScheme
-                                                                      .onSecondaryContainer,
-                                                        ),
+                                                                  ? Theme.of(
+                                                                      context,
+                                                                    ).disabledColor
+                                                                  : Theme.of(
+                                                                          context,
+                                                                        )
+                                                                        .colorScheme
+                                                                        .onSecondaryContainer,
+                                                            ),
                                                       ),
                                                       Text(
                                                         '时间: ${record.created.toString().substring(0, 19)}',
-                                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                          color: group
+                                                        style: Theme.of(context)
+                                                            .textTheme
+                                                            .bodySmall
+                                                            ?.copyWith(
+                                                              color:
+                                                                  group
                                                                           .randomCallerModel
                                                                           .isArchive ==
                                                                       1
-                                                                  ? Theme.of(context).disabledColor
-                                                                  : Theme.of(context)
-                                                                      .colorScheme
-                                                                      .onSecondaryContainer,
-                                                        ),
+                                                                  ? Theme.of(
+                                                                      context,
+                                                                    ).disabledColor
+                                                                  : Theme.of(
+                                                                          context,
+                                                                        )
+                                                                        .colorScheme
+                                                                        .onSecondaryContainer,
+                                                            ),
                                                       ),
-                                                     
+
                                                       // 操作按钮（只有未归档的记录才显示）
                                                       if (group
                                                               .randomCallerModel
@@ -433,19 +466,29 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                                                   record,
                                                                 );
                                                               },
-                                                              icon:  Icon(
+                                                              icon: Icon(
                                                                 Icons.edit,
-                                                                color: Theme.of(context).colorScheme.tertiary,
-                                                                size: Theme.of(context).textTheme.bodyMedium?.fontSize,
+                                                                color: Theme.of(
+                                                                  context,
+                                                                ).colorScheme.tertiary,
+                                                                size: Theme.of(context)
+                                                                    .textTheme
+                                                                    .bodyMedium
+                                                                    ?.fontSize,
                                                               ),
-                                                              label:  Text(
+                                                              label: Text(
                                                                 '编辑',
-                                                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                                  color: Theme.of(context).colorScheme.tertiary,
-                                                                ),
+                                                                style: Theme.of(context)
+                                                                    .textTheme
+                                                                    .bodyMedium
+                                                                    ?.copyWith(
+                                                                      color: Theme.of(
+                                                                        context,
+                                                                      ).colorScheme.tertiary,
+                                                                    ),
                                                               ),
                                                             ),
-                                                             SizedBox(
+                                                            SizedBox(
                                                               width: 8.w,
                                                             ),
                                                             TextButton.icon(
@@ -454,20 +497,34 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                                                   record,
                                                                 );
                                                               },
-                                                              icon:  Icon(
+                                                              icon: Icon(
                                                                 Icons.delete,
-                                                                color: Theme.of(context).colorScheme.error,
-                                                                size: Theme.of(context).textTheme.bodyMedium?.fontSize,
+                                                                color: Theme.of(
+                                                                  context,
+                                                                ).colorScheme.error,
+                                                                size: Theme.of(context)
+                                                                    .textTheme
+                                                                    .bodyMedium
+                                                                    ?.fontSize,
                                                               ),
-                                                              label:  Text(
+                                                              label: Text(
                                                                 '删除',
-                                                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                                                  color: Theme.of(context).colorScheme.error,
-                                                                ),
+                                                                style: Theme.of(context)
+                                                                    .textTheme
+                                                                    .bodyMedium
+                                                                    ?.copyWith(
+                                                                      color: Theme.of(
+                                                                        context,
+                                                                      ).colorScheme.error,
+                                                                    ),
                                                               ),
                                                               style: TextButton.styleFrom(
                                                                 foregroundColor:
-                                                                    Theme.of(context).colorScheme.error,
+                                                                    Theme.of(
+                                                                          context,
+                                                                        )
+                                                                        .colorScheme
+                                                                        .error,
                                                               ),
                                                             ),
                                                           ],
@@ -513,7 +570,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                   Text(
+                  Text(
                     '筛选条件',
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
@@ -549,20 +606,28 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                     // 点名器筛选
                     Row(
                       children: [
-                         SizedBox(
+                        SizedBox(
                           width: 80,
-                          child: Text('点名器: ', textAlign: TextAlign.justify, style: Theme.of(context).textTheme.bodyMedium,),
+                          child: Text(
+                            '点名器: ',
+                            textAlign: TextAlign.justify,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
                         ),
                         Expanded(
                           child: DropdownButtonFormField<int>(
                             initialValue: _selectedCallerId,
                             hint: const Text('全部'),
                             items: [
-                               DropdownMenuItem(
+                              DropdownMenuItem(
                                 value: null,
                                 child: Text(
                                   '全部',
-                                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
                                 ),
                               ),
                               ..._allCallers.values.toList().map(
@@ -570,7 +635,11 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                   value: caller.id,
                                   child: Text(
                                     caller.randomCallerName,
-                                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -582,7 +651,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                 _applyFilters();
                               });
                             },
-                            decoration:  InputDecoration(
+                            decoration: InputDecoration(
                               border: OutlineInputBorder(),
                               contentPadding: EdgeInsets.symmetric(
                                 horizontal: 8.0.h,
@@ -607,11 +676,15 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                             initialValue: _selectedClassId,
                             hint: const Text('全部'),
                             items: [
-                               DropdownMenuItem(
+                              DropdownMenuItem(
                                 value: null,
                                 child: Text(
                                   '全部',
-                                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
                                 ),
                               ),
                               ..._allClasses.values.toList().map(
@@ -619,7 +692,11 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                   value: cls.id,
                                   child: Text(
                                     cls.className,
-                                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -631,7 +708,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                 _applyFilters();
                               });
                             },
-                            decoration:  InputDecoration(
+                            decoration: InputDecoration(
                               border: OutlineInputBorder(),
                               contentPadding: EdgeInsets.symmetric(
                                 horizontal: 8.0.h,
@@ -642,7 +719,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                         ),
                       ],
                     ),
-                     SizedBox(height: 10.h),
+                    SizedBox(height: 10.h),
 
                     // 时间范围筛选
                     Row(
@@ -664,7 +741,11 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                               child: Container(
                                 padding: EdgeInsets.all(10.w),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: Theme.of(context).colorScheme.outline),
+                                  border: Border.all(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.outline,
+                                  ),
                                   borderRadius: BorderRadius.circular(4.r),
                                 ),
                                 alignment: Alignment.centerLeft,
@@ -677,17 +758,33 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                       _startDate != null
                                           ? '${_startDate!.year}-${_startDate!.month.toString().padLeft(2, '0')}-${_startDate!.day.toString().padLeft(2, '0')}'
                                           : '开始',
-                                      style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onSurface),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium
+                                          ?.copyWith(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                          ),
                                     ),
-                                     Text(
+                                    Text(
                                       '至',
-                                      style: Theme.of(context).textTheme.labelMedium,
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.labelMedium,
                                     ),
                                     Text(
                                       _endDate != null
                                           ? '${_endDate!.subtract(const Duration(days: 1)).year}-${_endDate!.subtract(const Duration(days: 1)).month.toString().padLeft(2, '0')}-${_endDate!.subtract(const Duration(days: 1)).day.toString().padLeft(2, '0')}'
                                           : '结束',
-                                      style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onSurface),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium
+                                          ?.copyWith(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -711,25 +808,40 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                             initialValue: _isArchiveFilter,
                             hint: const Text('全部'),
                             items: [
-                               DropdownMenuItem(
+                              DropdownMenuItem(
                                 value: null,
                                 child: Text(
                                   '全部',
-                                  style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onSurface),
+                                  style: Theme.of(context).textTheme.labelMedium
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
                                 ),
                               ),
-                               DropdownMenuItem(
+                              DropdownMenuItem(
                                 value: false,
                                 child: Text(
                                   '未归档',
-                                  style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onSurface),
+                                  style: Theme.of(context).textTheme.labelMedium
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
                                 ),
                               ),
-                               DropdownMenuItem(
+                              DropdownMenuItem(
                                 value: true,
                                 child: Text(
                                   '已归档',
-                                  style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onSurface),
+                                  style: Theme.of(context).textTheme.labelMedium
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
                                 ),
                               ),
                             ],
@@ -740,19 +852,24 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                 _applyFilters();
                               });
                             },
-                            decoration:  InputDecoration(
+                            decoration: InputDecoration(
                               border: OutlineInputBorder(),
                               contentPadding: EdgeInsets.symmetric(
                                 horizontal: 8.0.h,
                                 vertical: 12.0.w,
                               ),
                             ),
-                            style: Theme.of(context).textTheme.labelMedium?.copyWith(color: Theme.of(context).colorScheme.onSurface),
+                            style: Theme.of(context).textTheme.labelMedium
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
                           ),
                         ),
                       ],
                     ),
-                     SizedBox(height: 12.h),
+                    SizedBox(height: 12.h),
                   ],
                 ),
               ),
@@ -795,7 +912,9 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
               backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
               // 设置选中样式
               selectionColor: Theme.of(context).colorScheme.primary,
-              rangeSelectionColor: Theme.of(context).colorScheme.primary.withAlpha(100),
+              rangeSelectionColor: Theme.of(
+                context,
+              ).colorScheme.primary.withAlpha(100),
               onCancel: () {
                 Navigator.pop(context);
               },
@@ -1057,7 +1176,9 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                 });
                 Navigator.pop(context);
               },
-              style: ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.error),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.error,
+              ),
               child: const Text('删除'),
             ),
           ],
@@ -1104,7 +1225,9 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                 });
                 Navigator.pop(context);
               },
-              style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.error,
+              ),
               child: const Text('确认归档'),
             ),
           ],
@@ -1131,7 +1254,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text('请选择要导出的点名器：'),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12.h),
                     ..._allCallers.values.toList().map((caller) {
                       return CheckboxListTile(
                         title: Text(caller.randomCallerName),
@@ -1169,7 +1292,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                   _exportToExcel(selectedCallerIds);
                 } else {
                   ScaffoldMessenger.of(this.context).showSnackBar(
-                     SnackBar(
+                    SnackBar(
                       content: Text('请至少选择一个点名器'),
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       duration: Duration(seconds: 2),

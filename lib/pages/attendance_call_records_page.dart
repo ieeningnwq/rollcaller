@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart'
     show getExternalStorageDirectory;
@@ -81,25 +82,40 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                 children: [
                                   Icon(
                                     Icons.inbox_outlined,
-                                    size: 64,
-                                    color: Colors.grey[400],
+                                    size:
+                                        Theme.of(
+                                          context,
+                                        ).textTheme.headlineLarge!.fontSize! *
+                                        4,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.primary.withAlpha(100),
                                   ),
-                                  const SizedBox(height: 16),
-                                  const Text(
+                                  SizedBox(height: 16.h),
+                                  Text(
                                     '没有找到点名记录',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey,
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineLarge!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withAlpha(100),
+                                        ),
                                   ),
-                                  const SizedBox(height: 8),
+                                  SizedBox(height: 8.h),
                                   Text(
                                     '请尝试调整筛选条件',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[600],
-                                    ),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodyMedium!
+                                        .copyWith(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withAlpha(100),
+                                        ),
                                   ),
                                 ],
                               ),
@@ -125,8 +141,20 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                                   .attendanceCallerModel
                                                   .isArchive ==
                                               1
-                                          ? TextStyle(color: Colors.grey)
-                                          : null,
+                                          ? Theme.of(
+                                              context,
+                                            ).textTheme.titleLarge!.copyWith(
+                                              color: Theme.of(
+                                                context,
+                                              ).disabledColor,
+                                            )
+                                          : Theme.of(
+                                              context,
+                                            ).textTheme.titleLarge!.copyWith(
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.primary,
+                                            ),
                                     ),
                                     subtitle: Text(
                                       '班级: ${cls.className} | 记录数: ${group.allRecords.length}',
@@ -135,8 +163,20 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                                   .attendanceCallerModel
                                                   .isArchive ==
                                               1
-                                          ? TextStyle(color: Colors.grey)
-                                          : null,
+                                          ? Theme.of(
+                                              context,
+                                            ).textTheme.titleMedium!.copyWith(
+                                              color: Theme.of(
+                                                context,
+                                              ).disabledColor,
+                                            )
+                                          : Theme.of(
+                                              context,
+                                            ).textTheme.titleMedium!.copyWith(
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.tertiary,
+                                            ),
                                     ),
                                     trailing: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -147,9 +187,17 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                                 .isArchive ==
                                             0)
                                           IconButton(
-                                            icon: const Icon(
+                                            icon: Icon(
                                               Icons.archive_outlined,
-                                              color: Colors.orange,
+                                              size:
+                                                  Theme.of(context)
+                                                      .textTheme
+                                                      .titleMedium!
+                                                      .fontSize! *
+                                                  1.5,
+                                              color: Theme.of(
+                                                context,
+                                              ).colorScheme.secondary,
                                             ),
                                             onPressed: () =>
                                                 _showArchiveConfirmationDialog(
@@ -161,14 +209,24 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                                 .attendanceCallerModel
                                                 .isArchive ==
                                             1)
-                                          const Text(
+                                          Text(
                                             '已归档',
-                                            style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: 12,
-                                            ),
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .labelLarge!
+                                                .copyWith(
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).disabledColor,
+                                                ),
                                           ),
                                         Icon(
+                                          size:
+                                              Theme.of(context)
+                                                  .textTheme
+                                                  .titleMedium!
+                                                  .fontSize! *
+                                              1.5,
                                           group.isExpanded
                                               ? Icons.expand_less
                                               : Icons.expand_more,
@@ -177,34 +235,41 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                                       .attendanceCallerModel
                                                       .isArchive ==
                                                   1
-                                              ? Colors.grey
-                                              : null,
+                                              ? Theme.of(context).disabledColor
+                                              : Theme.of(
+                                                  context,
+                                                ).colorScheme.tertiary,
                                         ),
                                       ],
                                     ),
                                     onTap: () => _toggleGroupExpanded(index),
-                                    tileColor: Colors.grey[100],
                                   ),
 
                                   // 展开时显示记录列表
                                   if (group.isExpanded)
                                     if (group.attendanceCallRecords.isEmpty)
                                       Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 32,
-                                          horizontal: 16,
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 32.w,
+                                          horizontal: 16.h,
                                         ),
                                         child: Text(
                                           '该点名器下没有点名记录',
                                           textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey[600],
-                                          ),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodyLarge!
+                                              .copyWith(
+                                                color: Theme.of(
+                                                  context,
+                                                ).disabledColor,
+                                              ),
                                         ),
                                       )
                                     else
                                       ListView.builder(
+                                        padding: EdgeInsets.only(top: 16.h),
+
                                         shrinkWrap: true,
                                         physics:
                                             const NeverScrollableScrollPhysics(),
@@ -217,19 +282,21 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                               group.students[record.studentId];
 
                                           return Card(
-                                            margin: const EdgeInsets.symmetric(
-                                              horizontal: 16,
-                                              vertical: 4,
+                                            margin: EdgeInsets.symmetric(
+                                              horizontal: 16.h,
+                                              vertical: 4.w,
                                             ),
                                             color:
                                                 group
                                                         .attendanceCallerModel
                                                         .isArchive ==
                                                     1
-                                                ? Colors.grey[50]
-                                                : null,
+                                                ? null
+                                                : Theme.of(context)
+                                                      .colorScheme
+                                                      .secondaryContainer,
                                             child: Padding(
-                                              padding: const EdgeInsets.all(12),
+                                              padding: EdgeInsets.all(12.w),
                                               child: Column(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
@@ -250,46 +317,47 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                                           Text(
                                                             student?.studentName ??
                                                                 '未知学生',
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 16,
-                                                              color:
-                                                                  group
-                                                                          .attendanceCallerModel
-                                                                          .isArchive ==
-                                                                      1
-                                                                  ? Colors.grey
-                                                                  : null,
-                                                            ),
+                                                            style: Theme.of(context)
+                                                                .textTheme
+                                                                .titleMedium
+                                                                ?.copyWith(
+                                                                  color:
+                                                                      group.attendanceCallerModel.isArchive ==
+                                                                          1
+                                                                      ? Theme.of(
+                                                                          context,
+                                                                        ).disabledColor
+                                                                      : Theme.of(
+                                                                          context,
+                                                                        ).colorScheme.onSecondaryContainer,
+                                                                ),
                                                           ),
-                                                          const SizedBox(
-                                                            width: 12,
-                                                          ),
+                                                          SizedBox(width: 12.w),
                                                           Text(
                                                             student?.studentNumber ??
                                                                 '未知',
-                                                            style: TextStyle(
-                                                              fontSize: 14,
-                                                              color:
-                                                                  group
-                                                                          .attendanceCallerModel
-                                                                          .isArchive ==
-                                                                      1
-                                                                  ? Colors
-                                                                        .grey[500]
-                                                                  : Colors
-                                                                        .grey[600],
-                                                            ),
+                                                            style: Theme.of(context)
+                                                                .textTheme
+                                                                .bodySmall
+                                                                ?.copyWith(
+                                                                  color:
+                                                                      group.attendanceCallerModel.isArchive ==
+                                                                          1
+                                                                      ? Theme.of(
+                                                                          context,
+                                                                        ).disabledColor
+                                                                      : Theme.of(
+                                                                          context,
+                                                                        ).colorScheme.onSecondaryContainer,
+                                                                ),
                                                           ),
                                                         ],
                                                       ),
                                                       Container(
                                                         padding:
                                                             EdgeInsets.symmetric(
-                                                              horizontal: 12,
-                                                              vertical: 4,
+                                                              horizontal: 12.h,
+                                                              vertical: 4.w,
                                                             ),
                                                         decoration: BoxDecoration(
                                                           color:
@@ -297,7 +365,9 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                                                       .attendanceCallerModel
                                                                       .isArchive ==
                                                                   1
-                                                              ? Colors.grey[500]
+                                                              ? Theme.of(
+                                                                  context,
+                                                                ).disabledColor
                                                               : group
                                                                     .attendanceCallRecords[student!
                                                                         .id]!
@@ -305,7 +375,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                                                     .statusColor,
                                                           borderRadius:
                                                               BorderRadius.circular(
-                                                                12,
+                                                                12.r,
                                                               ),
                                                         ),
                                                         child: Text(
@@ -314,42 +384,63 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                                                   .id!]!
                                                               .present
                                                               .statusText,
-                                                          style: TextStyle(
-                                                            fontSize: 12,
-                                                            color: Colors.white,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
+                                                          style: Theme.of(context)
+                                                              .textTheme
+                                                              .labelMedium
+                                                              ?.copyWith(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
                                                         ),
                                                       ),
                                                     ],
                                                   ),
                                                   Text(
                                                     '班级: ${group.studentClassModel.className}',
-                                                    style: TextStyle(
-                                                      color:
-                                                          group
-                                                                  .attendanceCallerModel
-                                                                  .isArchive ==
-                                                              1
-                                                          ? Colors.grey
-                                                          : null,
-                                                    ),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodySmall
+                                                        ?.copyWith(
+                                                          color:
+                                                              group
+                                                                      .attendanceCallerModel
+                                                                      .isArchive ==
+                                                                  1
+                                                              ? Theme.of(
+                                                                  context,
+                                                                ).disabledColor
+                                                              : Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .colorScheme
+                                                                    .onSecondaryContainer,
+                                                        ),
                                                   ),
                                                   Text(
                                                     '时间: ${record.created.toString().substring(0, 19)}',
-                                                    style: TextStyle(
-                                                      fontSize: 12,
-                                                      color:
-                                                          group
-                                                                  .attendanceCallerModel
-                                                                  .isArchive ==
-                                                              1
-                                                          ? Colors.grey[500]
-                                                          : Colors.grey[600],
-                                                    ),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .bodySmall
+                                                        ?.copyWith(
+                                                          color:
+                                                              group
+                                                                      .attendanceCallerModel
+                                                                      .isArchive ==
+                                                                  1
+                                                              ? Theme.of(
+                                                                  context,
+                                                                ).disabledColor
+                                                              : Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .colorScheme
+                                                                    .onSecondaryContainer,
+                                                        ),
                                                   ),
-                                                  const SizedBox(height: 12),
+                                                  SizedBox(height: 12.h),
                                                   // 操作按钮（只有未归档的记录才显示）
                                                   if (group
                                                           .attendanceCallerModel
@@ -365,17 +456,35 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                                               record,
                                                             );
                                                           },
-                                                          icon: const Icon(
+                                                          icon: Icon(
                                                             Icons.edit,
-                                                            size: 16,
+                                                            color:
+                                                                Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .colorScheme
+                                                                    .tertiary,
+                                                            size:
+                                                                Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .textTheme
+                                                                    .bodyMedium
+                                                                    ?.fontSize,
                                                           ),
-                                                          label: const Text(
+                                                          label: Text(
                                                             '编辑',
+                                                            style: Theme.of(context)
+                                                                .textTheme
+                                                                .bodyMedium
+                                                                ?.copyWith(
+                                                                  color: Theme.of(
+                                                                    context,
+                                                                  ).colorScheme.tertiary,
+                                                                ),
                                                           ),
                                                         ),
-                                                        const SizedBox(
-                                                          width: 8,
-                                                        ),
+                                                        SizedBox(width: 8.w),
                                                       ],
                                                     ),
                                                 ],
@@ -462,18 +571,18 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
         });
       },
       child: Card(
-        margin: const EdgeInsets.all(8.0),
+        margin: EdgeInsets.all(8.0.w),
         child: Column(
           children: [
             // 筛选条件标题和展开/折叠按钮
             Padding(
-              padding: const EdgeInsets.all(12.0),
+              padding: EdgeInsets.all(12.0.w),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     '筛选条件',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: Theme.of(context).textTheme.headlineMedium,
                   ),
 
                   TextButton.icon(
@@ -488,7 +597,6 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                   ),
                   Icon(
                     _isFilterExpanded ? Icons.expand_less : Icons.expand_more,
-                    size: 20,
                   ),
                 ],
               ),
@@ -498,9 +606,9 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
             AnimatedCrossFade(
               firstChild: const SizedBox(height: 0, width: 0),
               secondChild: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12.0,
-                  vertical: 0,
+                padding: EdgeInsets.symmetric(
+                  horizontal: 12.0.h,
+                  vertical: 0.w,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -529,7 +637,11 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                   value: caller.id,
                                   child: Text(
                                     caller.attendanceCallerName,
-                                    style: TextStyle(color: Colors.black),
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -541,18 +653,18 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                 _applyFilters();
                               });
                             },
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               border: OutlineInputBorder(),
                               contentPadding: EdgeInsets.symmetric(
-                                horizontal: 8.0,
+                                horizontal: 8.0.h,
                               ),
                             ),
-                            style: const TextStyle(fontSize: 14),
+                            style: Theme.of(context).textTheme.labelMedium,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 10.h),
 
                     // 班级筛选
                     Row(
@@ -566,11 +678,15 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                             initialValue: _selectedClassId,
                             hint: const Text('全部'),
                             items: [
-                              const DropdownMenuItem(
+                              DropdownMenuItem(
                                 value: null,
                                 child: Text(
                                   '全部',
-                                  style: TextStyle(color: Colors.black),
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
                                 ),
                               ),
                               ..._allClasses.values.toList().map(
@@ -578,7 +694,11 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                   value: cls.id,
                                   child: Text(
                                     cls.className,
-                                    style: TextStyle(color: Colors.black),
+                                    style: TextStyle(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSurface,
+                                    ),
                                   ),
                                 ),
                               ),
@@ -590,18 +710,18 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                 _applyFilters();
                               });
                             },
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               border: OutlineInputBorder(),
                               contentPadding: EdgeInsets.symmetric(
-                                horizontal: 8.0,
+                                horizontal: 8.0.h,
                               ),
                             ),
-                            style: const TextStyle(fontSize: 14),
+                            style: Theme.of(context).textTheme.labelMedium,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 10.h),
 
                     // 时间范围筛选
                     Row(
@@ -621,10 +741,15 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                 padding: EdgeInsets.zero,
                               ),
                               child: Container(
-                                padding: const EdgeInsets.all(8),
+                                padding: EdgeInsets.all(10.w),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.grey),
-                                  borderRadius: BorderRadius.circular(4),
+                                  border: Border.all(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.outline,
+                                  ),
+
+                                  borderRadius: BorderRadius.circular(4.r),
                                 ),
                                 alignment: Alignment.centerLeft,
                                 height: double.infinity,
@@ -636,23 +761,38 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                       _startDate != null
                                           ? '${_startDate!.year}-${_startDate!.month.toString().padLeft(2, '0')}-${_startDate!.day.toString().padLeft(2, '0')}'
                                           : '开始',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium
+                                          ?.copyWith(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                          ),
                                     ),
-                                    const Text(
+                                    Text(
                                       '至',
-                                      style: TextStyle(fontSize: 14),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium
+                                          ?.copyWith(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                          ),
                                     ),
                                     Text(
                                       _endDate != null
                                           ? '${_endDate!.subtract(const Duration(days: 1)).year}-${_endDate!.subtract(const Duration(days: 1)).month.toString().padLeft(2, '0')}-${_endDate!.subtract(const Duration(days: 1)).day.toString().padLeft(2, '0')}'
                                           : '结束',
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.black,
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium
+                                          ?.copyWith(
+                                            color: Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                          ),
                                     ),
                                   ],
                                 ),
@@ -662,7 +802,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12.h),
 
                     // 归档状态筛选
                     Row(
@@ -676,25 +816,40 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                             initialValue: _isArchiveFilter,
                             hint: const Text('全部'),
                             items: [
-                              const DropdownMenuItem(
+                              DropdownMenuItem(
                                 value: null,
                                 child: Text(
                                   '全部',
-                                  style: TextStyle(color: Colors.black),
+                                  style: Theme.of(context).textTheme.labelMedium
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
                                 ),
                               ),
-                              const DropdownMenuItem(
+                              DropdownMenuItem(
                                 value: false,
                                 child: Text(
                                   '未归档',
-                                  style: TextStyle(color: Colors.black),
+                                  style: Theme.of(context).textTheme.labelMedium
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
                                 ),
                               ),
-                              const DropdownMenuItem(
+                              DropdownMenuItem(
                                 value: true,
                                 child: Text(
                                   '已归档',
-                                  style: TextStyle(color: Colors.black),
+                                  style: Theme.of(context).textTheme.labelMedium
+                                      ?.copyWith(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
                                 ),
                               ),
                             ],
@@ -705,18 +860,24 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                 _applyFilters();
                               });
                             },
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               border: OutlineInputBorder(),
                               contentPadding: EdgeInsets.symmetric(
-                                horizontal: 8.0,
+                                horizontal: 8.0.h,
+                                vertical: 12.w,
                               ),
                             ),
-                            style: const TextStyle(fontSize: 14),
+                            style: Theme.of(context).textTheme.labelMedium
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
+                                ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 12.h),
                   ],
                 ),
               ),
@@ -853,8 +1014,10 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                     });
                 Navigator.pop(context);
               },
-              style: TextButton.styleFrom(foregroundColor: Colors.red),
-              child: const Text('确认归档'),
+              style: TextButton.styleFrom(
+                foregroundColor: Theme.of(context).colorScheme.error,
+              ),
+              child: Text('确认归档'),
             ),
           ],
         );
@@ -880,7 +1043,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text('请选择要导出的点名器：'),
-                    const SizedBox(height: 12),
+                    SizedBox(height: 24.h),
                     ..._allCallers.values.toList().map((caller) {
                       return CheckboxListTile(
                         title: Text(caller.attendanceCallerName),
@@ -918,9 +1081,10 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                   _exportToExcel(selectedCallerIds);
                 } else {
                   ScaffoldMessenger.of(this.context).showSnackBar(
-                    const SnackBar(
+                    SnackBar(
                       content: Text('请至少选择一个点名器'),
-                      backgroundColor: Colors.orange,
+                      backgroundColor: Theme.of(context).colorScheme.primary,
+
                       duration: Duration(seconds: 2),
                     ),
                   );
@@ -1002,9 +1166,10 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
       // 如果没有导出任何记录，显示提示
       if (totalExportedRecords == 0) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
+          SnackBar(
             content: Text('没有找到可导出的记录'),
-            backgroundColor: Colors.orange,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+
             duration: Duration(seconds: 2),
           ),
         );
@@ -1032,13 +1197,14 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
         ..writeAsBytesSync(fileBytes!);
       // 显示导出成功信息
       if (mounted) {
-        ScaffoldMessenger.of(this.context).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               '导出成功！共导出 $totalExportedRecords 条记录到文件：$fileName',
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: Theme.of(context).colorScheme.primary,
+
             duration: const Duration(seconds: 3),
           ),
         );
@@ -1046,13 +1212,14 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
     } catch (e) {
       if (mounted) {
         // 显示导出失败信息
-        ScaffoldMessenger.of(this.context).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               '导出失败：${e.toString()}',
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: Theme.of(context).colorScheme.onError),
             ),
-            backgroundColor: Colors.red,
+            backgroundColor: Theme.of(context).colorScheme.error,
+
             duration: const Duration(seconds: 3),
           ),
         );
@@ -1063,12 +1230,12 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
   // 显示时间范围选择器弹窗
   void _showDateRangePicker() {
     showDialog(
-      context: this.context,
+      context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('选择时间范围'),
           content: SizedBox(
-            height: 300,
+            height: 300.h,
             width: MediaQuery.of(context).size.width * 0.8,
             child: SfDateRangePicker(
               confirmText: '确定',
@@ -1086,8 +1253,11 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
               maxDate: DateTime.now(),
               showActionButtons: true,
               // 设置选中样式
-              selectionColor: Colors.blue,
-              rangeSelectionColor: const Color.fromARGB(25, 0, 0, 255),
+              selectionColor: Theme.of(context).colorScheme.primary,
+              rangeSelectionColor: Theme.of(
+                context,
+              ).colorScheme.primary.withAlpha(100),
+
               onCancel: () {
                 Navigator.pop(context);
               },
