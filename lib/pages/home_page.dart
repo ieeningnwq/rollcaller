@@ -83,7 +83,7 @@ class _HomePageState extends State<HomePage> {
               SizedBox(width: 8.w),
               Text(
                 '随机点名',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: _selectedIndex == 0 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
                 ),
               ),
@@ -128,7 +128,7 @@ class _HomePageState extends State<HomePage> {
               SizedBox(width: 8.w),
               Text(
                 '签到点名',
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: _selectedIndex == 1 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
                 ),
               ),
