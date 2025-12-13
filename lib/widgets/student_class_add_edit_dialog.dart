@@ -71,7 +71,6 @@ class _StudentClassAddEditDialogState extends State<StudentClassAddEditDialog> {
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
-            (context);
           },
           child: const Text('取消'),
         ),

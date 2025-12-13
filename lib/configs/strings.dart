@@ -29,4 +29,6 @@ class KString {
   static const String autoBackUpKey = 'autoBackUp';
   static const String backupFileName = 'rollcaller_backup';
   static const String webDavServerFolder = 'rollCaller';
+
+  static const String themeModeStyleOptionKey = 'themeModeStyleOption';
 }

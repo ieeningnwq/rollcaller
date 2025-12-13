@@ -25,9 +25,9 @@ import 'package:rollcall/utils/student_class_relation_dao.dart'
     show StudentClassRelationDao;
 import 'package:rollcall/utils/student_dao.dart' show StudentDao;
 import 'package:webdav_client/webdav_client.dart' show Client, newClient;
-import './configs/color.dart';
 import 'pages/index_page.dart';
 import './providers/current_index_provider.dart';
+import 'providers/them_switcher_provider.dart';
 
 void main() {
   runApp(
@@ -35,6 +35,9 @@ void main() {
       providers: [
         ChangeNotifierProvider<CurrentIndexProvider>(
           create: (_) => CurrentIndexProvider(),
+        ),
+        ChangeNotifierProvider<ThemeSwitcherProvider>(
+          create: (_) => ThemeSwitcherProvider(),
         ),
       ],
       child: MyApp(),
@@ -53,6 +56,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   // 安全存储
   final _storage = const FlutterSecureStorage();
 
+
+
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
@@ -62,24 +67,11 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       builder: (_, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
+          themeMode: context.watch<ThemeSwitcherProvider>().themeMode,
           // 定制主题
-          theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: KColor.seedColor),
-            textTheme:  TextTheme(
-              headlineLarge: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold),
-              headlineMedium: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
-              headlineSmall: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
-              titleLarge: TextStyle(fontSize: 26.sp, fontWeight: FontWeight.bold),
-              titleMedium: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
-              titleSmall: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
-              bodyLarge: TextStyle(fontSize: 24.sp),
-              bodyMedium: TextStyle(fontSize: 22.sp),
-              bodySmall: TextStyle(fontSize: 20.sp),
-              labelLarge: TextStyle(fontSize: 22.sp),
-              labelMedium: TextStyle(fontSize: 18.sp),
-              labelSmall: TextStyle(fontSize: 16.sp),
-            ),
-          ),
+          theme: context.watch<ThemeSwitcherProvider>().theme,
+
+          darkTheme: context.watch<ThemeSwitcherProvider>().darkTheme,
           home: IndexPage(),
         );
       },
@@ -127,6 +119,19 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    // 获取主题模式
+    // _storage.read(key: KString.themeModeStyleOptionKey).then((onValue)=>{
+    //   if(onValue==null){}else{
+    //     _themeMode=ThemeStyleOptionExtension.fromStringToThemeMode(onValue),
+    //     _themeStyleOption=ThemeStyleOptionExtension.fromString(onValue),
+    //   }
+    //   String mode='',
+    //   String
+    //   onValue.split(',').forEach((element) {
+    //     ThemeStyleOption.fromStringToThemeMode(element);
+    //   }),
+    //   ThemeMode themeMode=ThemeStyleOption.fromStringToThemeMode(onValue),
+    // });
   }
 
   @override

@@ -787,7 +787,7 @@ class _RandomCallPageState extends State<RandomCallPage>
             margin: EdgeInsets.only(bottom: 8.0.h),
             padding: EdgeInsets.all(8.0.w),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(8.0.r),
               border: Border.all(
                 color: studentRecord.values.first.isNotEmpty

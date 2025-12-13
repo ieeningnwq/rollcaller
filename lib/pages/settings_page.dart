@@ -13,6 +13,7 @@ import 'package:rollcall/utils/student_class_dao.dart';
 import 'package:webdav_client/webdav_client.dart' show Client, newClient;
 
 import '../configs/strings.dart';
+import '../configs/theme_style_option_enum.dart';
 import '../models/back_up_model.dart';
 import '../utils/attendance_call_record_dao.dart';
 import '../utils/attendance_caller_dao.dart';
@@ -56,6 +57,10 @@ class _SettingsState extends State<SettingsPage> {
   // 备份进度
   double _procedureProgress = 0;
 
+  ThemeMode _selectedThemeMode = ThemeMode.system;
+
+  ThemeStyleOption _selectedThemeStyle = ThemeStyleOption.values.first;
+
   @override
   dispose() {
     super.dispose();
@@ -94,49 +99,48 @@ class _SettingsState extends State<SettingsPage> {
     try {
       await _client.ping();
       // 获取历史备份数据，从服务器获取数据
-    var list = await _client.readDir('/${KString.webDavServerFolder}');
-    // 过滤出备份文件，并排序
-    list = list
-        .where(
-          (f) =>
-              f.isDir == false &&
-              f.name!.startsWith(KString.backupFileName) &&
-              f.name!.endsWith('.json'),
-        )
-        .toList();
-    list.sort((a, b) => a.name!.compareTo(b.name!));
-    // 转换为备份模型
-    var backUpModels = list
-        .map(
-          (f) => BackUpModel.fromMap({
-            'type': BackUpTypeExtension.fromString(f.name!.split('_')[2]),
-            'dateTimeKey': f.name!.split('_')[3].replaceAll('.json', ''),
-            'result': true,
-            'fileName': f.name!,
-          }),
-        )
-        .toList();
-    // 转换为Map
-    _allBackUpModels = backUpModels.fold(
-      {},
-      (map, e) => map..addAll({e.dateTimeKey: e}),
-    );
-    // 获取上次备份数据
-    if (list.isNotEmpty) {
-      _lastBackUpModel =
-          _allBackUpModels[list.last.name!
-              .split('_')[3]
-              .replaceAll('.json', '')];
-      // 获取选中待回退的备份数据
-      _selectedBackUpModel = _lastBackUpModel;
-    } else {
-      _selectedBackUpModel = null;
-      _lastBackUpModel = null;
-    }
+      var list = await _client.readDir('/${KString.webDavServerFolder}');
+      // 过滤出备份文件，并排序
+      list = list
+          .where(
+            (f) =>
+                f.isDir == false &&
+                f.name!.startsWith(KString.backupFileName) &&
+                f.name!.endsWith('.json'),
+          )
+          .toList();
+      list.sort((a, b) => a.name!.compareTo(b.name!));
+      // 转换为备份模型
+      var backUpModels = list
+          .map(
+            (f) => BackUpModel.fromMap({
+              'type': BackUpTypeExtension.fromString(f.name!.split('_')[2]),
+              'dateTimeKey': f.name!.split('_')[3].replaceAll('.json', ''),
+              'result': true,
+              'fileName': f.name!,
+            }),
+          )
+          .toList();
+      // 转换为Map
+      _allBackUpModels = backUpModels.fold(
+        {},
+        (map, e) => map..addAll({e.dateTimeKey: e}),
+      );
+      // 获取上次备份数据
+      if (list.isNotEmpty) {
+        _lastBackUpModel =
+            _allBackUpModels[list.last.name!
+                .split('_')[3]
+                .replaceAll('.json', '')];
+        // 获取选中待回退的备份数据
+        _selectedBackUpModel = _lastBackUpModel;
+      } else {
+        _selectedBackUpModel = null;
+        _lastBackUpModel = null;
+      }
     } catch (e) {
       ;
     }
-    
   }
 
   @override
@@ -148,12 +152,15 @@ class _SettingsState extends State<SettingsPage> {
           children: [
             // 顶部标题栏
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(12.w),
               child: Text(
                 '设置',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headlineLarge,
               ),
             ),
+            // 主题选择
+            _buildThemeSelectWidget(),
+
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
@@ -852,5 +859,263 @@ class _SettingsState extends State<SettingsPage> {
     } catch (e) {
       Fluttertoast.showToast(msg: '恢复失败：$e');
     }
+  }
+
+  // 主题设置
+  // 主题控制组件
+  Widget _buildThemeSelectWidget() {
+    return Container(
+      padding: EdgeInsets.all(8.w),
+      margin: EdgeInsets.symmetric(horizontal: 8.w),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(6.w),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).shadowColor.withAlpha(100),
+            spreadRadius: 1.w,
+            blurRadius: 2.w,
+            offset: Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 主题控制标题
+          Text('主题控制', style: Theme.of(context).textTheme.titleLarge),
+          SizedBox(height: 12.h),
+          // 主题模式
+          Text('主题模式:', style: Theme.of(context).textTheme.titleMedium),
+          SizedBox(height: 8.h),
+          Row(
+            children: [
+              // 跟随系统
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _changeThemeMode(ThemeMode.system),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 8.h,
+                      horizontal: 12.w,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _selectedThemeMode == ThemeMode.system
+                          ? _selectedThemeStyle.color
+                          : Colors.grey[200],
+                      borderRadius: BorderRadius.circular(6.w),
+                    ),
+                    child: Text(
+                      '跟随系统',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: _selectedThemeMode == ThemeMode.system
+                            ? Colors.white
+                            : Colors.black87,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 8.w),
+
+              // 浅色
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _changeThemeMode(ThemeMode.light),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 8.h,
+                      horizontal: 12.w,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _selectedThemeMode == ThemeMode.light
+                          ? _selectedThemeStyle.color
+                          : Colors.grey[200],
+                      borderRadius: BorderRadius.circular(6.w),
+                    ),
+                    child: Text(
+                      '浅色',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: _selectedThemeMode == ThemeMode.light
+                            ? Colors.white
+                            : Colors.black87,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 8.w),
+
+              // 深色
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _changeThemeMode(ThemeMode.dark),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 8.h,
+                      horizontal: 12.w,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _selectedThemeMode == ThemeMode.dark
+                          ? _selectedThemeStyle.color
+                          : Colors.grey[200],
+                      borderRadius: BorderRadius.circular(6.w),
+                    ),
+                    child: Text(
+                      '深色',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: _selectedThemeMode == ThemeMode.dark
+                            ? Colors.white
+                            : Colors.black87,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16.h),
+
+          // 主题风格
+          Text('主题风格:', style: Theme.of(context).textTheme.titleMedium),
+          SizedBox(height: 8.h),
+          Row(
+            children: [
+              // 蓝色
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _changeThemeStyle(ThemeStyleOption.blue),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 8.h,
+                      horizontal: 12.w,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _selectedThemeStyle == ThemeStyleOption.blue
+                          ? _selectedThemeStyle.color
+                          : Colors.grey[200],
+                      borderRadius: BorderRadius.circular(6.w),
+                    ),
+                    child: Text(
+                      '蓝色',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: _selectedThemeStyle == ThemeStyleOption.blue
+                            ? Colors.white
+                            : Colors.black87,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 8.w),
+
+              // 紫色
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _changeThemeStyle(ThemeStyleOption.purple),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 8.h,
+                      horizontal: 12.w,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _selectedThemeStyle == ThemeStyleOption.purple
+                          ? _selectedThemeStyle.color
+                          : Colors.grey[200],
+                      borderRadius: BorderRadius.circular(6.w),
+                    ),
+                    child: Text(
+                      '紫色',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: _selectedThemeStyle == ThemeStyleOption.purple
+                            ? Colors.white
+                            : Colors.black87,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 8.w),
+
+              // 绿色
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _changeThemeStyle(ThemeStyleOption.green),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 8.h,
+                      horizontal: 12.w,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _selectedThemeStyle == ThemeStyleOption.green
+                          ? _selectedThemeStyle.color
+                          : Colors.grey[200],
+                      borderRadius: BorderRadius.circular(6.w),
+                    ),
+                    child: Text(
+                      '绿色',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: _selectedThemeStyle == ThemeStyleOption.green
+                            ? Colors.white
+                            : Colors.black87,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 8.w),
+
+              // 橙色
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => _changeThemeStyle(ThemeStyleOption.orange),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 8.h,
+                      horizontal: 12.w,
+                    ),
+                    decoration: BoxDecoration(
+                      color: _selectedThemeStyle == ThemeStyleOption.orange
+                          ? _selectedThemeStyle.color
+                          : Colors.grey[200],
+                      borderRadius: BorderRadius.circular(6.w),
+                    ),
+                    child: Text(
+                      '橙色',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: _selectedThemeStyle == ThemeStyleOption.orange
+                            ? Colors.white
+                            : Colors.black87,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 切换主题模式
+  void _changeThemeMode(ThemeMode mode) {
+    setState(() {
+      _selectedThemeMode = mode;
+    });
+  }
+
+  // 切换主题风格
+  void _changeThemeStyle(ThemeStyleOption style) {
+    setState(() {
+      _selectedThemeStyle = style;
+    });
   }
 }

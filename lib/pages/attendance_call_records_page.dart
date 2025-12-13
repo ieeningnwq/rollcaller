@@ -676,7 +676,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                         Expanded(
                           child: DropdownButtonFormField<int>(
                             initialValue: _selectedClassId,
-                            hint: const Text('全部'),
+                            hint: const Text('全部', ),
                             items: [
                               DropdownMenuItem(
                                 value: null,
