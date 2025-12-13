@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:rollcall/utils/random_caller_dao.dart';
 
@@ -184,7 +185,7 @@ class _RandomCallPageState extends State<RandomCallPage>
           return Expanded(
             child: SingleChildScrollView(
               controller: _scrollController, // 添加滚动控制器
-              padding: const EdgeInsets.all(4.0),
+              padding: EdgeInsets.all(4.w),
               child: Column(
                 children: [
                   _buildRandomCallerInfoWidget(),
@@ -205,25 +206,21 @@ class _RandomCallPageState extends State<RandomCallPage>
       children: [
         // 学生抽取卡片
         Card(
-          elevation: 4.0,
+          elevation: 10.w,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12.0),
+            borderRadius: BorderRadius.circular(12.0.r),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(4.0),
+            padding: EdgeInsets.all(10.w),
             child: Column(
               children: [
                 // 学生姓名显示
                 Text(
                   _currentStudent?.studentName ?? '没有学生',
-                  style: const TextStyle(
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
 
-                const SizedBox(height: 4.0),
+                SizedBox(height: 4.0.h),
 
                 // 学号显示
                 AnimatedBuilder(
@@ -238,40 +235,34 @@ class _RandomCallPageState extends State<RandomCallPage>
                     _currentStudent == null
                         ? '没有学生'
                         : _currentStudent?.studentNumber ?? '没有学号',
-                    style: const TextStyle(
-                      fontSize: 18.0,
-                      color: Colors.black54,
-                    ),
+                        style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
 
-                const SizedBox(height: 8.0),
+                 SizedBox(height: 8.0.h),
 
                 // 开始随机抽取按钮
                 SizedBox(
                   width: double.infinity,
-                  height: 40.0,
+                  height: 50.0.h,
                   child: ElevatedButton(
                     onPressed: _currentStudent != null
                         ? _toggleRandomPick
                         : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6C4AB6), // 紫色背景
-                      foregroundColor: Colors.white, // 白色文字
+                      backgroundColor: Theme.of(context).colorScheme.secondary, 
+                      foregroundColor: Theme.of(context).colorScheme.onSecondary, 
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
+                        borderRadius: BorderRadius.circular(8.0.r),
                       ),
-                      textStyle: const TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      elevation: 4.0,
+                      textStyle: Theme.of(context).textTheme.titleLarge,
+                      elevation: 10.0.w,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.shuffle, size: 20.0),
-                        const SizedBox(width: 8.0),
+                        Icon(Icons.shuffle, size: Theme.of(context).textTheme.titleLarge?.fontSize),
+                        SizedBox(width: 8.0.w),
                         Text(_isPicking ? '停止抽取' : '开始随机抽取'),
                       ],
                     ),
@@ -314,16 +305,15 @@ class _RandomCallPageState extends State<RandomCallPage>
         });
       },
       child: Container(
-        margin: const EdgeInsets.all(4.0),
-        padding: const EdgeInsets.all(8.0),
+        margin: EdgeInsets.all(4.w),
+        padding: EdgeInsets.all(8.w),
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12.0),
-          color: Colors.white,
+          borderRadius: BorderRadius.circular(12.0.r),
+          color: Theme.of(context).colorScheme.surface,
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha(10),
-              blurRadius: 10.0,
-              offset: const Offset(0, 2),
+              blurRadius: 10.0.r,
             ),
           ],
         ),
@@ -332,28 +322,20 @@ class _RandomCallPageState extends State<RandomCallPage>
           mainAxisSize: MainAxisSize.min,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              padding: EdgeInsets.symmetric(vertical: 8.0.w),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // 顶部标题和管理链接
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         '选择点名器',
-                        style: TextStyle(
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
+                        style: Theme.of(context).textTheme.titleLarge,
                       ),
                       Text(
                         '    ${_randomCallerGroup == null ? '无选中点名器' : (_randomCallerGroup!.randomCallerModel.isDuplicate == 0 ? '${_randomCallerGroup!.randomCallerModel.randomCallerName}：不可重复' : '${_randomCallerGroup!.randomCallerModel.randomCallerName}：可重复')}',
-                        style: const TextStyle(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black54,
-                        ),
+                        style: Theme.of(context).textTheme.labelMedium,
                       ),
                     ],
                   ),
@@ -361,7 +343,7 @@ class _RandomCallPageState extends State<RandomCallPage>
                     _isRandomCallerInfoWidgetExpanded
                         ? Icons.expand_less
                         : Icons.expand_more,
-                    size: 20,
+                    size: Theme.of(context).textTheme.titleLarge?.fontSize,
                   ),
                 ],
               ),
@@ -371,7 +353,7 @@ class _RandomCallPageState extends State<RandomCallPage>
             AnimatedCrossFade(
               firstChild: const SizedBox(height: 0, width: 0),
               secondChild: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                padding:  EdgeInsets.symmetric(vertical: 4.0.w),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -384,7 +366,7 @@ class _RandomCallPageState extends State<RandomCallPage>
                         _buildDeleteIconButton(),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8.h),
                     _buildDropdownButton(),
                   ],
                 ),
@@ -415,7 +397,7 @@ class _RandomCallPageState extends State<RandomCallPage>
           Fluttertoast.showToast(msg: '请先选择点名器');
         }
       },
-      icon: const Icon(Icons.remove_red_eye, color: Colors.grey),
+      icon:  Icon(Icons.remove_red_eye, color: Theme.of(context).colorScheme.secondary),
     );
   }
 
@@ -440,7 +422,7 @@ class _RandomCallPageState extends State<RandomCallPage>
           Fluttertoast.showToast(msg: '请先选择点名器');
         }
       },
-      icon: const Icon(Icons.edit, color: Colors.blue),
+      icon:  Icon(Icons.edit, color: Theme.of(context).colorScheme.tertiary),
     );
   }
 
@@ -468,7 +450,7 @@ class _RandomCallPageState extends State<RandomCallPage>
           }
         }),
       },
-      icon: Icon(Icons.add, color: Colors.green),
+      icon: Icon(Icons.add, color: Theme.of(context).colorScheme.primary),
     );
   }
 
@@ -532,7 +514,7 @@ class _RandomCallPageState extends State<RandomCallPage>
           Fluttertoast.showToast(msg: '请先选择点名器');
         }
       },
-      icon: const Icon(Icons.delete, color: Colors.red),
+      icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
     );
   }
 
@@ -541,20 +523,20 @@ class _RandomCallPageState extends State<RandomCallPage>
       initialValue: _selectedCallerId,
       decoration: InputDecoration(
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(8.0.r),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(8.0.r),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8.0),
-          borderSide: const BorderSide(color: Colors.blue),
+          borderRadius: BorderRadius.circular(8.0.r),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
         ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12.0,
-          vertical: 10.0,
+        contentPadding:  EdgeInsets.symmetric(
+          horizontal: 12.0.h,
+          vertical: 10.0.w,
         ),
       ),
       items: _allRandomCallersMap.values.map((RandomCallerModel randomCaller) {
@@ -571,25 +553,25 @@ class _RandomCallPageState extends State<RandomCallPage>
           });
         }
       },
-      style: const TextStyle(fontSize: 16.0, color: Colors.black),
-      dropdownColor: Colors.white,
-      icon: const Icon(Icons.arrow_drop_down),
-      iconSize: 24.0,
-      iconEnabledColor: Colors.grey,
+      style: Theme.of(context).textTheme.bodyLarge,
+      dropdownColor: Theme.of(context).colorScheme.surface,
+      icon: Icon(Icons.arrow_drop_down, color: Theme.of(context).colorScheme.secondary),
+      iconSize: Theme.of(context).textTheme.bodyLarge?.fontSize ?? 24.0,
+      iconEnabledColor: Theme.of(context).colorScheme.secondary,
     );
   }
 
   Padding _buildStudentScoreWidget() {
     // 评分组件 - 一直显示
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
+      padding: EdgeInsets.only(top: 8.0.h),
       child: Card(
-        elevation: 4.0,
+        elevation: 10.0.w,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
+          borderRadius: BorderRadius.circular(12.0.r),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(8.0.w),
           child: Column(
             children: [
               // 分数范围和滑动条
@@ -597,33 +579,32 @@ class _RandomCallPageState extends State<RandomCallPage>
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: const [
-                      Text('1分', style: TextStyle(color: Colors.black54)),
-                      Text('10分', style: TextStyle(color: Colors.black54)),
+                    children: [
+                      Text('1分', style: Theme.of(context).textTheme.labelMedium),
+                      Text('10分', style: Theme.of(context).textTheme.labelMedium),
                     ],
                   ),
-                  const SizedBox(height: 8.0),
+                  SizedBox(height: 8.0.h),
                   Slider(
                     value: _score.toDouble(),
                     min: 1,
                     max: 10,
                     divisions: 9,
                     label: '$_score分',
-                    activeColor: const Color(0xFF6C4AB6),
-                    inactiveColor: Colors.grey.shade300,
+                    activeColor: Theme.of(context).colorScheme.secondary,
+                    inactiveColor: Theme.of(context).colorScheme.onSecondary,
                     onChanged: (value) {
                       setState(() {
                         _score = value.round();
                       });
                     },
                   ),
-                  const SizedBox(height: 4.0),
+                  SizedBox(height: 2.0.h),
                   Text(
                     '$_score分',
-                    style: const TextStyle(
-                      fontSize: 18.0,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF6C4AB6),
+                      color: Theme.of(context).colorScheme.secondary,
                     ),
                   ),
                 ],
@@ -633,26 +614,23 @@ class _RandomCallPageState extends State<RandomCallPage>
               // 评分按钮组
               SizedBox(
                 width: double.infinity,
-                height: 40.0,
+                height: 50.0.h,
                 child: ElevatedButton(
                   onPressed: _currentStudent != null ? _saveScore : null,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6C4AB6), // 紫色背景
-                    foregroundColor: Colors.white, // 白色文字
+                    backgroundColor: Theme.of(context).colorScheme.secondary, // 紫色背景
+                    foregroundColor: Theme.of(context).colorScheme.onSecondary, // 白色文字
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
+                      borderRadius: BorderRadius.circular(8.0.r),
                     ),
-                    textStyle: const TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    elevation: 4.0,
+                    textStyle: Theme.of(context).textTheme.titleLarge,
+                    elevation: 10.0.w,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.save, size: 20.0),
-                      SizedBox(width: 8.0),
+                    children: [
+                      Icon(Icons.save, size:  Theme.of(context).textTheme.titleLarge?.fontSize ?? 24.0),
+                      SizedBox(width: 8.0.w),
                       Text('保存评分'),
                     ],
                   ),
@@ -712,9 +690,9 @@ class _RandomCallPageState extends State<RandomCallPage>
   // 构建学生组列表
   Widget _buildStudentGroup({required bool isPickedGroup}) {
     if (_randomCallerGroup == null || _randomCallerGroup!.students.isEmpty) {
-      return const Text(
+      return  Text(
         '暂无学生',
-        style: TextStyle(color: Colors.black54, fontStyle: FontStyle.italic),
+        style: Theme.of(context).textTheme.headlineLarge
       );
     }
     List<Map<StudentModel, List<RandomCallRecordModel>>> studentRecords = [];
@@ -777,16 +755,16 @@ class _RandomCallPageState extends State<RandomCallPage>
             );
           },
           child: Container(
-            margin: const EdgeInsets.only(bottom: 12.0),
-            padding: const EdgeInsets.all(16.0),
+            margin: EdgeInsets.only(bottom: 12.0.h),  
+            padding: EdgeInsets.all(8.0.w),
             decoration: BoxDecoration(
               color: Colors.grey.shade50,
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(8.0.r),
               border: Border.all(
                 color: studentRecord.values.first.isNotEmpty
-                    ? Color(0xFF6C4AB6)
-                    : Colors.grey.shade200,
-                width: 1.0,
+                    ? Theme.of(context).colorScheme.tertiary
+                    : Theme.of(context).colorScheme.outline,
+                width: 2.0.w,
               ),
             ),
             child: Row(
@@ -797,19 +775,12 @@ class _RandomCallPageState extends State<RandomCallPage>
                   children: [
                     Text(
                       studentRecord.keys.first.studentName,
-                      style: const TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    const SizedBox(height: 4.0),
+                     SizedBox(height: 4.0.h),
                     Text(
                       studentRecord.keys.first.studentNumber,
-                      style: const TextStyle(
-                        fontSize: 14.0,
-                        color: Colors.black54,
-                      ),
+                      style: Theme.of(context).textTheme.labelMedium,
                     ),
                   ],
                 ),
@@ -820,24 +791,25 @@ class _RandomCallPageState extends State<RandomCallPage>
                       children: [
                         Text(
                           '抽取: ${studentRecord.values.first.length}次',
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.bold,
-                            color: studentRecord.values.first.isNotEmpty
-                                ? Color(0xFF6C4AB6)
-                                : Colors.black54,
-                          ),
+                          style: studentRecord.values.first.isNotEmpty
+                              ? Theme.of(context).textTheme.labelMedium?.copyWith(
+                                    color: Theme.of(context).colorScheme.tertiary,
+                                  )
+                              : Theme.of(context).textTheme.labelMedium?.copyWith(
+                                    color: Theme.of(context).colorScheme.outline,
+                                  ),
+                 
                         ),
                         const SizedBox(height: 4.0),
                         Text(
                           '平均分: ${average > 0 ? average.toStringAsFixed(1) : '—'}',
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.bold,
-                            color: average > 0
-                                ? Color(0xFF6C4AB6)
-                                : Colors.black54,
-                          ),
+                          style: average > 0
+                              ? Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: Theme.of(context).colorScheme.tertiary,
+                                  )
+                              : Theme.of(context).textTheme.labelSmall?.copyWith(
+                                    color: Theme.of(context).colorScheme.outline,
+                                  ),
                         ),
                       ],
                     ),
@@ -853,26 +825,22 @@ class _RandomCallPageState extends State<RandomCallPage>
 
   Padding _buildStudentCardsWidget() {
     return Padding(
-      padding: const EdgeInsets.only(top: 8.0),
+      padding:  EdgeInsets.only(top: 8.0.h),
       child: Card(
-        elevation: 4.0,
+        elevation: 10.0.w,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
+          borderRadius: BorderRadius.circular(12.0.r),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(8.0.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
+              Text(
                 '学生列表',
-                style: TextStyle(
-                  fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
+                style: Theme.of(context).textTheme.headlineMedium,
               ),
-              const SizedBox(height: 16.0),
+              SizedBox(height: 8.0.h),
 
               // 已抽取学生组
               GestureDetector(
@@ -884,24 +852,22 @@ class _RandomCallPageState extends State<RandomCallPage>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                     Text(
                       '已抽取学生',
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF6C4AB6),
-                      ),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: Theme.of(context).colorScheme.tertiary,
+                          ) ,
                     ),
                     Icon(
                       _isPickedGroupExpanded
                           ? Icons.expand_less
                           : Icons.expand_more,
-                      color: Color(0xFF6C4AB6),
+                      color: Theme.of(context).colorScheme.tertiary,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 4.0),
+              SizedBox(height: 8.0.h),
               AnimatedCrossFade(
                 firstChild: Container(height: 0),
                 secondChild: _buildStudentGroup(isPickedGroup: true),
@@ -912,7 +878,7 @@ class _RandomCallPageState extends State<RandomCallPage>
                 sizeCurve: Curves.easeInOut,
               ),
 
-              const SizedBox(height: 8.0),
+              SizedBox(height: 8.0.h),
 
               // 未抽取学生组
               GestureDetector(
@@ -924,24 +890,22 @@ class _RandomCallPageState extends State<RandomCallPage>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                     Text(
                       '未抽取学生',
-                      style: TextStyle(
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF6C4AB6),
-                      ),
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            color: Theme.of(context).colorScheme.tertiary,
+                          ) ,
                     ),
                     Icon(
                       _isUnpickedGroupExpanded
                           ? Icons.expand_less
                           : Icons.expand_more,
-                      color: Color(0xFF6C4AB6),
+                      color: Theme.of(context).colorScheme.tertiary,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 12.0),
+              SizedBox(height: 12.0.h),
               AnimatedCrossFade(
                 firstChild: Container(height: 0),
                 secondChild: _buildStudentGroup(isPickedGroup: false),

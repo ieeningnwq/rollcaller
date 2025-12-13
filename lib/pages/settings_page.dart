@@ -3,6 +3,7 @@ import 'dart:io' show File;
 
 import 'package:dio/dio.dart' show CancelToken;
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path/path.dart' show join;
@@ -457,7 +458,7 @@ class _SettingsState extends State<SettingsPage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
-                        elevation: 0,
+                        elevation: 10.w,
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -572,7 +573,7 @@ class _SettingsState extends State<SettingsPage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),
-                  elevation: 0,
+                  elevation: 10.w,
                 ),
                 child: const Text(
                   '手动备份',

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:rollcall/models/student_model.dart';
@@ -99,7 +100,7 @@ class _StudentClassState extends State<StudentClassPage> {
                                 .values
                                 .elementAt(index);
                             return Card(
-                              elevation: 2.0,
+                              elevation: 10.0.w,
                               margin: EdgeInsets.symmetric(
                                 horizontal: 16.0,
                                 vertical: 8.0,

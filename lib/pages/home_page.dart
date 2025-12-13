@@ -67,7 +67,7 @@ class _HomePageState extends State<HomePage> {
             side: BorderSide(
               color:  Theme.of(context).colorScheme.onPrimary,
             ),
-            padding: EdgeInsets.symmetric(vertical: 8.h),
+            padding: EdgeInsets.symmetric(vertical: 12.h),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0.r),
             ),
@@ -77,13 +77,13 @@ class _HomePageState extends State<HomePage> {
             children: [
               Icon(
                 Icons.shuffle,
-                size: Theme.of(context).textTheme.titleMedium?.fontSize,
+                size: Theme.of(context).textTheme.titleLarge?.fontSize,
                 color: _selectedIndex == 0 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
               ),
               SizedBox(width: 8.w),
               Text(
                 '随机点名',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: _selectedIndex == 0 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
                 ),
               ),
@@ -112,7 +112,7 @@ class _HomePageState extends State<HomePage> {
             side: BorderSide(
               color: _selectedIndex == 1 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onPrimary,
             ),
-            padding: EdgeInsets.symmetric(vertical: 8.h),
+            padding: EdgeInsets.symmetric(vertical: 12.h),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0.r),
             ),
@@ -122,13 +122,13 @@ class _HomePageState extends State<HomePage> {
             children: [
               Icon(
                 Icons.check_circle,
-                size: Theme.of(context).textTheme.titleMedium?.fontSize,
+                size: Theme.of(context).textTheme.titleLarge?.fontSize,
                 color: _selectedIndex == 1 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
               ),
               SizedBox(width: 8.w),
               Text(
                 '签到点名',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   color: _selectedIndex == 1 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
                 ),
               ),
