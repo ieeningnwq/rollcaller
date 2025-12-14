@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import '../configs/strings.dart';
 import 'home_page.dart';
@@ -14,23 +13,23 @@ class IndexPage extends StatelessWidget {
 
   static const List<BottomNavigationBarItem> bottomTabs = [
     BottomNavigationBarItem(
-      icon: FaIcon(FontAwesomeIcons.house),
+      icon: Icon(Icons.home),
       label: KString.homeTitle, // 首页
     ),
     BottomNavigationBarItem(
-      icon: FaIcon(FontAwesomeIcons.users),
+      icon: Icon(Icons.group),
       label: KString.studentClassTitle, // 班级
     ),
     BottomNavigationBarItem(
-      icon: FaIcon(FontAwesomeIcons.user),
+      icon: Icon(Icons.person),
       label: KString.studentTitle, // 学生
     ),
     BottomNavigationBarItem(
-      icon: FaIcon(FontAwesomeIcons.clockRotateLeft),
+      icon: Icon(Icons.access_time),
       label: KString.recordTitle, // 记录
     ),
     BottomNavigationBarItem(
-      icon: FaIcon(FontAwesomeIcons.gear),
+      icon: Icon(Icons.settings),
       label: KString.settingsTitle, // 设置
     ),
   ];

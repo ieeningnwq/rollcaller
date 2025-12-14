@@ -3,9 +3,13 @@ import 'dart:io';
 
 import 'package:excel/excel.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:file_saver/file_saver.dart' show FileSaver, MimeType;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:permission_handler/permission_handler.dart'
+    show Permission, PermissionActions, PermissionStatusGetters;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:rollcall/models/student_class_model.dart';
 import 'package:rollcall/utils/attendance_call_record_dao.dart';
@@ -100,6 +104,17 @@ class _StudentPageState extends State<StudentPage> {
               children: [
                 // 搜索栏
                 _searchWidget(),
+                // 下载学生导入模板
+                IconButton(
+                  onPressed: () {
+                    _copyStudentImportTemplateExcel();
+                  },
+                  icon: Icon(
+                    Icons.file_copy,
+                    color: Theme.of(context).colorScheme.secondary,
+                    size: Theme.of(context).textTheme.headlineLarge?.fontSize,
+                  ),
+                ),
                 // 导入学生
                 IconButton(
                   onPressed: () {
@@ -297,7 +312,9 @@ class _StudentPageState extends State<StudentPage> {
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.r),
-            borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
+            borderSide: BorderSide(
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
           contentPadding: EdgeInsets.symmetric(horizontal: 6.h, vertical: 4.w),
           filled: true,
@@ -602,5 +619,51 @@ class _StudentPageState extends State<StudentPage> {
     } catch (e) {
       Fluttertoast.showToast(msg: '导入学生错误：${e.toString()}');
     }
+  }
+
+  void _copyStudentImportTemplateExcel() {
+    // 读取模板文件 Saves as: student_import_template.xlsx
+    // 请求权限
+    Permission.storage.request().then((status) {
+      if (!status.isGranted) {
+        // 处理权限拒绝
+        Fluttertoast.showToast(msg: '请授予存储权限');
+      } else {
+        // 权限已授予，执行文件保存操作
+        rootBundle.load('assets/templates/student_import_template.xlsx').then((
+          value,
+        ) {
+          FileSaver.instance
+              .saveFile(
+                bytes: value.buffer.asUint8List(),
+                name: "student_import_template",
+                fileExtension: "xlsx",
+                mimeType: MimeType.microsoftExcel,
+              )
+              .then((value) {
+                if(context.mounted) {
+                  showDialog(
+                  context: context,
+                  builder: (context) => SimpleDialog(
+                    title: const Text('提示'),
+                    children: [
+                      Container(
+                        padding:  EdgeInsets.only(left: 24.0.w,right: 8.0.w),
+                        child: Text('模板文件已复制到：$value'),
+                      ),
+                      SimpleDialogOption(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('确定'),
+                      ),
+                    ],
+                  ),
+                );
+                }
+              });
+        });
+      }
+    });
   }
 }

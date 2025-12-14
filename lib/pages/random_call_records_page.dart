@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:rollcall/models/random_caller_group.dart';
 import 'package:rollcall/models/student_class_model.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
@@ -1384,6 +1385,24 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
         );
         return;
       }
+      // 请求存储权限
+      var status = await Permission.storage.request();
+      if (!status.isGranted) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '需要存储权限才能导出文件',
+                style: TextStyle(color: Theme.of(context).colorScheme.onError),
+              ),
+              backgroundColor: Theme.of(context).colorScheme.error,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+        return;
+      }
+      
       // 保存Excel文件
 
       String fileName =

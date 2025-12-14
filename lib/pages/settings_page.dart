@@ -580,7 +580,7 @@ class _SettingsState extends State<SettingsPage> {
                     );
                   });
                 },
-                activeThumbColor: Theme.of(context).colorScheme.secondary,
+                // activeThumbColor: Theme.of(context).colorScheme.secondary,
               ),
             ],
           ),
@@ -691,9 +691,11 @@ class _SettingsState extends State<SettingsPage> {
         LinearProgressIndicator(
           value: _procedureProgress,
           backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-          valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
+          valueColor: AlwaysStoppedAnimation<Color>(
+            Theme.of(context).colorScheme.primary,
+          ),
         ),
-         SizedBox(height: 12.h),
+        SizedBox(height: 12.h),
         // 备份历史标题
         Text(
           '备份历史',
@@ -734,15 +736,21 @@ class _SettingsState extends State<SettingsPage> {
                             value: backUpModel.dateTimeText,
                             title: Text(
                               '${backUpModel.dateTimeText.substring(0, 4)}-${backUpModel.dateTimeText.substring(4, 6)}-${backUpModel.dateTimeText.substring(6, 8)} ${backUpModel.dateTimeText.substring(8, 10)}:${backUpModel.dateTimeText.substring(10, 12)}:${backUpModel.dateTimeText.substring(12, 14)}',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onSecondaryContainer,
-                              ),
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSecondaryContainer,
+                                  ),
                             ),
                             subtitle: Text(
                               backUpModel.type.typeText,
-                              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.onSecondaryContainer,
-                              ),
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSecondaryContainer,
+                                  ),
                             ),
                           ),
                         )
