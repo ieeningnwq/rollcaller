@@ -1088,10 +1088,16 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                 } else {
                   ScaffoldMessenger.of(this.context).showSnackBar(
                     SnackBar(
-                      content: Text('请至少选择一个点名器'),
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-
-                      duration: Duration(seconds: 2),
+                      content: Text(
+                        '请至少选择一个点名器',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onInverseSurface,
+                        ),
+                      ),
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.inverseSurface,
+                      duration: Duration(seconds: 3),
                     ),
                   );
                 }
@@ -1173,9 +1179,13 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
       if (totalExportedRecords == 0) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('没有找到可导出的记录'),
-            backgroundColor: Theme.of(context).colorScheme.primary,
-
+            content: Text(
+              '没有找到可导出的记录',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onInverseSurface,
+              ),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.inverseSurface,
             duration: Duration(seconds: 2),
           ),
         );
@@ -1189,9 +1199,9 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
             SnackBar(
               content: Text(
                 '需要存储权限才能导出文件',
-                style: TextStyle(color: Theme.of(context).colorScheme.onError),
+                style: TextStyle(color: Theme.of(context).colorScheme.onInverseSurface),
               ),
-              backgroundColor: Theme.of(context).colorScheme.error,
+              backgroundColor: Theme.of(context).colorScheme.inverseSurface,
               duration: const Duration(seconds: 3),
             ),
           );
@@ -1225,9 +1235,9 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
           SnackBar(
             content: Text(
               '导出成功！共导出 $totalExportedRecords 条记录到文件：$fileName',
-              style: TextStyle(color: Theme.of(context).colorScheme.onPrimary),
+              style: TextStyle(color: Theme.of(context).colorScheme.onInverseSurface),
             ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
+            backgroundColor: Theme.of(context).colorScheme.inverseSurface,
 
             duration: const Duration(seconds: 3),
           ),
@@ -1240,9 +1250,9 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
           SnackBar(
             content: Text(
               '导出失败：${e.toString()}',
-              style: TextStyle(color: Theme.of(context).colorScheme.onError),
+              style: TextStyle(color: Theme.of(context).colorScheme.onInverseSurface),
             ),
-            backgroundColor: Theme.of(context).colorScheme.error,
+            backgroundColor: Theme.of(context).colorScheme.inverseSurface,
 
             duration: const Duration(seconds: 3),
           ),

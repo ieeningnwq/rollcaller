@@ -57,7 +57,7 @@ class _StudentClassAddEditDialogState extends State<StudentClassAddEditDialog> {
           width: double.maxFinite,
           child: ListView(
             shrinkWrap: true,
-            padding:  EdgeInsets.symmetric(vertical: 4.w),
+            padding: EdgeInsets.symmetric(vertical: 4.w),
             children: [
               _buildClassNameInfoRow('班级名称（必填）'),
               _buildClassQuantityInfoRowInt('学生数量（必填）'),
@@ -89,7 +89,7 @@ class _StudentClassAddEditDialogState extends State<StudentClassAddEditDialog> {
 
   Padding _buildInfoRow(String label, TextEditingController controller) {
     return Padding(
-      padding:  EdgeInsets.symmetric(vertical: 8.0.w),
+      padding: EdgeInsets.symmetric(vertical: 8.0.w),
       child: TextField(
         decoration: InputDecoration(labelText: label),
         controller: controller,
@@ -100,7 +100,7 @@ class _StudentClassAddEditDialogState extends State<StudentClassAddEditDialog> {
   Padding _buildClassNameInfoRow(String label) {
     bool isClassNameUnique = true;
     return Padding(
-      padding:  EdgeInsets.symmetric(vertical: 8.0.w),
+      padding: EdgeInsets.symmetric(vertical: 8.0.w),
       child: TextFormField(
         decoration: InputDecoration(labelText: label),
         controller: classNameController,
@@ -141,7 +141,7 @@ class _StudentClassAddEditDialogState extends State<StudentClassAddEditDialog> {
 
   Padding _buildClassQuantityInfoRowInt(String label) {
     return Padding(
-      padding:  EdgeInsets.symmetric(vertical: 8.0.w),
+      padding: EdgeInsets.symmetric(vertical: 8.0.w),
       child: TextFormField(
         keyboardType: TextInputType.number,
         // 设置键盘类型为数字键盘
@@ -180,16 +180,32 @@ class _StudentClassAddEditDialogState extends State<StudentClassAddEditDialog> {
         if (id != 0) {
           widget.studentClass.id = id;
           if (context.mounted) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('添加成功')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '添加成功',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onInverseSurface,
+                  ),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+              ),
+            );
             Navigator.of(context).pop(true);
           }
         } else {
           if (context.mounted) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('添加失败')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '添加失败',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onInverseSurface,
+                  ),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+              ),
+            );
             Navigator.of(context).pop(false);
           }
         }
@@ -199,16 +215,32 @@ class _StudentClassAddEditDialogState extends State<StudentClassAddEditDialog> {
       classDao.updateStudentClassById(widget.studentClass).then((onValue) {
         if (onValue != 0) {
           if (context.mounted) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('更新成功')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '更新成功',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onInverseSurface,
+                  ),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+              ),
+            );
             Navigator.of(context).pop(true);
           }
         } else {
           if (context.mounted) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('更新失败')));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '更新失败',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onInverseSurface,
+                  ),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+              ),
+            );
             Navigator.of(context).pop(false);
           }
         }

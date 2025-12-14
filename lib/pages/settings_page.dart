@@ -649,8 +649,13 @@ class _SettingsState extends State<SettingsPage> {
                     // 可以显示提示信息
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('请先选择要恢复的备份'),
-                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        content: Text(
+                          '请先选择要恢复的备份',
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onInverseSurface,
+                          ),
+                        ),
+                        backgroundColor: Theme.of(context).colorScheme.inverseSurface,
                       ),
                     );
                   }

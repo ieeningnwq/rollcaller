@@ -212,12 +212,36 @@ class _AttendanceCallerAddEditDialogState
                 if (value != 0) {
                   ScaffoldMessenger.of(
                     context,
-                  ).showSnackBar(const SnackBar(content: Text('添加成功')));
+                  ).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '添加成功',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onInverseSurface,
+                        ),
+                      ),
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.inverseSurface,
+                    ),
+                  );
                   Navigator.of(context).pop(true);
                 } else {
                   ScaffoldMessenger.of(
                     context,
-                  ).showSnackBar(const SnackBar(content: Text('添加失败')));
+                  ).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '添加失败',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onInverseSurface,
+                        ),
+                      ),
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.inverseSurface,
+                    ),
+                  );
                   Navigator.of(context).pop(false);
                 }
               }
@@ -230,12 +254,36 @@ class _AttendanceCallerAddEditDialogState
                 if (value != 0) {
                   ScaffoldMessenger.of(
                     context,
-                  ).showSnackBar(const SnackBar(content: Text('更新成功')));
+                  ).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '更新成功',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onInverseSurface,
+                        ),
+                      ),
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.inverseSurface,
+                    ),
+                  );
                   Navigator.of(context).pop(true);
                 } else {
                   ScaffoldMessenger.of(
                     context,
-                  ).showSnackBar(const SnackBar(content: Text('更新失败')));
+                  ).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '更新失败',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onInverseSurface,
+                        ),
+                      ),
+                      backgroundColor: Theme.of(
+                        context,
+                      ).colorScheme.inverseSurface,
+                    ),
+                  );
                   Navigator.of(context).pop(false);
                 }
               }

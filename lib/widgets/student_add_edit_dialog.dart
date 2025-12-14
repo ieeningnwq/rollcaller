@@ -236,13 +236,37 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
           if (context.mounted) {
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(const SnackBar(content: Text('新增成功')));
+            ).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '新增成功',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onInverseSurface,
+                  ),
+                ),
+                backgroundColor: Theme.of(
+                  context,
+                ).colorScheme.inverseSurface,
+              ),
+            );
           }
         } else {
           if (context.mounted) {
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(const SnackBar(content: Text('新增失败')));
+            ).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '新增失败',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onInverseSurface,
+                  ),
+                ),
+                backgroundColor: Theme.of(
+                  context,
+                ).colorScheme.inverseSurface,
+              ),
+            );
           }
         }
       } else {
@@ -265,14 +289,38 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
                     if (context.mounted)
                       ScaffoldMessenger.of(
                         context,
-                      ).showSnackBar(const SnackBar(content: Text('修改成功'))),
+                      ).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            '修改成功',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onInverseSurface,
+                            ),
+                          ),
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.inverseSurface,
+                        ),
+                      ),
                   }
                 else
                   {
                     if (context.mounted)
                       ScaffoldMessenger.of(
                         context,
-                      ).showSnackBar(const SnackBar(content: Text('修改失败'))),
+                      ).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            '修改失败',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onInverseSurface,
+                            ),
+                          ),
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.inverseSurface,
+                        ),
+                      ),
                   },
               },
             );

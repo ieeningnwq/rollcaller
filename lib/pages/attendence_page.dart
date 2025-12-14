@@ -660,7 +660,18 @@ class _AttendencePageState extends State<AttendencePage> {
         } else {
           ScaffoldMessenger.of(
             context,
-          ).showSnackBar(SnackBar(content: Text('请先选择点名器')));
+          ).showSnackBar(
+            SnackBar(
+              content: Text(
+                '请先选择点名器',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onInverseSurface,
+                ),
+              ),
+              backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+              duration: const Duration(seconds: 3),
+            ),
+          );
         }
       },
       icon: Icon(
@@ -755,13 +766,31 @@ class _AttendencePageState extends State<AttendencePage> {
                                   _refreshPageData();
                                   Navigator.of(context).pop();
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('删除成功')),
+                                    SnackBar(
+                                      content: Text(
+                                        '删除成功',
+                                        style: TextStyle(
+                                          color: Theme.of(context).colorScheme.onInverseSurface,
+                                        ),
+                                      ),
+                                      backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                                      duration: const Duration(seconds: 3),
+                                    ),
                                   );
                                 }
                               } else {
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('删除失败')),
+                                    SnackBar(
+                                      content: Text(
+                                        '删除失败',
+                                        style: TextStyle(
+                                          color: Theme.of(context).colorScheme.onInverseSurface,
+                                        ),
+                                      ),
+                                      backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                                      duration: const Duration(seconds: 3),
+                                    ),  
                                   );
                                 }
                               }
