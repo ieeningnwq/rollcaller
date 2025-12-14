@@ -170,7 +170,7 @@ class _SettingsState extends State<SettingsPage> {
             ),
             // 主题选择
             _buildThemeSelectWidget(),
-            SizedBox(height: 8.h),
+
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(8.0.w),
@@ -297,11 +297,15 @@ class _SettingsState extends State<SettingsPage> {
                         labelStyle: Theme.of(context).textTheme.labelLarge,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.0.r),
-                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                          borderSide: BorderSide(
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.0.r),
-                          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                          borderSide: BorderSide(
+                            color: Theme.of(context).colorScheme.outline,
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8.0.r),
@@ -310,7 +314,7 @@ class _SettingsState extends State<SettingsPage> {
                             width: 2,
                           ),
                         ),
-                        contentPadding:  EdgeInsets.symmetric(
+                        contentPadding: EdgeInsets.symmetric(
                           horizontal: 12.0.w,
                           vertical: 14.0.h,
                         ),
@@ -330,11 +334,15 @@ class _SettingsState extends State<SettingsPage> {
                   labelStyle: Theme.of(context).textTheme.labelLarge,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0.r),
-                    borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0.r),
-                    borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0.r),
@@ -360,11 +368,15 @@ class _SettingsState extends State<SettingsPage> {
                   labelStyle: Theme.of(context).textTheme.labelLarge,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0.r),
-                    borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0.r),
-                    borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0.r),
@@ -430,24 +442,31 @@ class _SettingsState extends State<SettingsPage> {
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children:  [
+                        children: [
                           Icon(
                             Icons.network_check,
                             color: Theme.of(context).colorScheme.onPrimary,
-                            size: Theme.of(context).textTheme.titleMedium?.fontSize ?? 24.0.sp,
+                            size:
+                                Theme.of(
+                                  context,
+                                ).textTheme.titleMedium?.fontSize ??
+                                24.0.sp,
                           ),
                           SizedBox(width: 8.0.w),
                           Text(
                             '测试连接',
-                            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                            ),
+                            style: Theme.of(context).textTheme.titleMedium!
+                                .copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary,
+                                ),
                           ),
                         ],
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12.w),
 
                   // 保存配置按钮
                   Expanded(
@@ -477,14 +496,25 @@ class _SettingsState extends State<SettingsPage> {
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children:  [
-                          Icon(Icons.save, color: Theme.of(context).colorScheme.onPrimary, size: Theme.of(context).textTheme.titleMedium?.fontSize ?? 24.0.sp),
+                        children: [
+                          Icon(
+                            Icons.save,
+                            color: Theme.of(context).colorScheme.onPrimary,
+                            size:
+                                Theme.of(
+                                  context,
+                                ).textTheme.titleMedium?.fontSize ??
+                                24.0.sp,
+                          ),
                           SizedBox(width: 8.0.w),
                           Text(
                             '保存配置',
-                            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                              color: Theme.of(context).colorScheme.onPrimary,
-                            ),
+                            style: Theme.of(context).textTheme.titleMedium!
+                                .copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onPrimary,
+                                ),
                           ),
                         ],
                       ),
@@ -493,11 +523,10 @@ class _SettingsState extends State<SettingsPage> {
                 ],
               ),
               SizedBox(height: 8.h),
-
             ],
           ),
         ),
-        SizedBox(height: 24.h),
+        SizedBox(height: 8.h),
       ],
     );
   }
@@ -505,15 +534,15 @@ class _SettingsState extends State<SettingsPage> {
   Container _buildBackUpSetting() {
     // 备份设置
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: EdgeInsets.all(8.0.w),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8.0),
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(8.0.r),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withAlpha(10),
-            spreadRadius: 1,
-            blurRadius: 2,
+            color: Theme.of(context).colorScheme.shadow.withAlpha(100),
+            spreadRadius: 1.r,
+            blurRadius: 2.r,
             offset: const Offset(0, 1),
           ),
         ],
@@ -522,23 +551,23 @@ class _SettingsState extends State<SettingsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 备份设置标题
-          const Text(
+          Text(
             '备份设置',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
+              color: Theme.of(context).colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 8.r),
 
           // 自动备份选项
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 '自动备份',
-                style: TextStyle(fontSize: 16, color: Colors.black87),
+                style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               Switch(
                 value: _autoBackupEnabled,
@@ -551,15 +580,15 @@ class _SettingsState extends State<SettingsPage> {
                     );
                   });
                 },
-                activeThumbColor: Colors.purple,
+                activeThumbColor: Theme.of(context).colorScheme.secondary,
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4.r),
           // 提示语句
           Text(
-            '若打开自动备份则每次推出app时自动备份',
-            style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+            '若打开自动备份则每次退出app时自动备份',
+            style: Theme.of(context).textTheme.labelSmall,
           ),
         ],
       ),
@@ -583,24 +612,32 @@ class _SettingsState extends State<SettingsPage> {
                   _backupData();
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.purple,
-                  padding: const EdgeInsets.symmetric(vertical: 14.0),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  padding: EdgeInsets.symmetric(vertical: 14.0.h),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: BorderRadius.circular(8.0.r),
                   ),
                   elevation: 10.w,
                 ),
-                child: const Text(
-                  '手动备份',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.backup,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                    SizedBox(width: 8.w),
+                    Text(
+                      '手动备份',
+                      style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12.w),
             Expanded(
               child: OutlinedButton(
                 onPressed: () {
@@ -611,32 +648,36 @@ class _SettingsState extends State<SettingsPage> {
                   } else {
                     // 可以显示提示信息
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text('请先选择要恢复的备份'),
-                        backgroundColor: Colors.red,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                       ),
                     );
                   }
                 },
                 style: OutlinedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 14.0),
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                  padding: EdgeInsets.symmetric(vertical: 14.0.h),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
+                    borderRadius: BorderRadius.circular(8.0.r),
                   ),
-                  side: const BorderSide(color: Colors.grey, width: 1),
+                  side: BorderSide(
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    width: 1.w,
+                  ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.restore, color: Colors.black87, size: 18),
-                    SizedBox(width: 8),
+                  children: [
+                    Icon(
+                      Icons.restore,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                    SizedBox(width: 8.w),
                     Text(
                       '恢复数据',
-                      style: TextStyle(
-                        color: Colors.black87,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                      style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
                     ),
                   ],
@@ -645,37 +686,33 @@ class _SettingsState extends State<SettingsPage> {
             ),
           ],
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: 24.h),
         // 备份进度条
         LinearProgressIndicator(
           value: _procedureProgress,
-          backgroundColor: Colors.grey[300],
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.purple),
+          backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+          valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
         ),
-        const SizedBox(height: 12),
+         SizedBox(height: 12.h),
         // 备份历史标题
-        const Text(
+        Text(
           '备份历史',
           textAlign: TextAlign.left,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
+          style: Theme.of(context).textTheme.titleMedium,
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12.h),
 
         // 备份历史列表容器
         Container(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0.r),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8.0),
+            color: Theme.of(context).colorScheme.secondaryContainer,
+            borderRadius: BorderRadius.circular(8.0.r),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withAlpha(10),
-                spreadRadius: 1,
-                blurRadius: 2,
+                color: Theme.of(context).colorScheme.shadow.withAlpha(100),
+                spreadRadius: 1.r,
+                blurRadius: 2.r,
                 offset: const Offset(0, 1),
               ),
             ],
@@ -697,17 +734,14 @@ class _SettingsState extends State<SettingsPage> {
                             value: backUpModel.dateTimeText,
                             title: Text(
                               '${backUpModel.dateTimeText.substring(0, 4)}-${backUpModel.dateTimeText.substring(4, 6)}-${backUpModel.dateTimeText.substring(6, 8)} ${backUpModel.dateTimeText.substring(8, 10)}:${backUpModel.dateTimeText.substring(10, 12)}:${backUpModel.dateTimeText.substring(12, 14)}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black87,
+                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                color: Theme.of(context).colorScheme.onSecondaryContainer,
                               ),
                             ),
                             subtitle: Text(
                               backUpModel.type.typeText,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
+                              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                                color: Theme.of(context).colorScheme.onSecondaryContainer,
                               ),
                             ),
                           ),
@@ -1479,7 +1513,9 @@ class _SettingsState extends State<SettingsPage> {
 
   // 切换主题模式
   Future<void> _changeThemeMode(ThemeMode mode) async {
-    _selectedThemeMode = mode;
+    setState(() {
+      _selectedThemeMode = mode;
+    });
     if (mounted) {
       context.read<ThemeSwitcherProvider>().setThemeMode(mode);
       // 将主题风格数据写入安全存储
@@ -1526,8 +1562,9 @@ class _SettingsState extends State<SettingsPage> {
         ),
       );
     }
-
-    _selectedThemeStyle = style;
+    setState(() {
+      _selectedThemeStyle = style;
+    });
     if (mounted) {
       context.read<ThemeSwitcherProvider>().setThemeStyle(style);
       // 将主题风格数据写入安全存储
