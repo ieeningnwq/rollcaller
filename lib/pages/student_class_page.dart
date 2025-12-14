@@ -99,7 +99,7 @@ class _StudentClassState extends State<StudentClassPage> {
                                 .values
                                 .elementAt(index);
                             return Card(
-                              color: Theme.of(context).colorScheme.surface,
+                              color: Theme.of(context).colorScheme.surfaceContainerHigh,
                               elevation: 10.0.w,
                               margin: EdgeInsets.symmetric(
                                 horizontal: 16.0.h,
@@ -107,7 +107,12 @@ class _StudentClassState extends State<StudentClassPage> {
                               ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0.r),
+                                side: BorderSide(
+                                  color: Theme.of(context).colorScheme.outline.withAlpha(150),
+                                  width: 1.0.w,
+                                ),
                               ),
+                              
 
                               child: Padding(
                                 padding: EdgeInsets.all(8.0.w),

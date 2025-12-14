@@ -1,7 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:excel/excel.dart';
+import 'package:excel/excel.dart' hide Border;
 import 'package:file_picker/file_picker.dart';
 import 'package:file_saver/file_saver.dart' show FileSaver, MimeType;
 import 'package:flutter/material.dart';
@@ -363,8 +363,16 @@ class _StudentPageState extends State<StudentPage> {
 
   Widget _studentItemWidget(StudentModel student) {
     return Container(
+      margin: EdgeInsets.only(
+        bottom: 8.0.h,
+      ),
       padding: EdgeInsets.all(4.r),
       decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surfaceContainerHigh,
+        border: Border.all(
+          color: Theme.of(context).colorScheme.outline.withAlpha(150),
+          width: 1.0.w,
+        ),
         borderRadius: BorderRadius.circular(8.r),
         boxShadow: [
           BoxShadow(
@@ -373,7 +381,9 @@ class _StudentPageState extends State<StudentPage> {
             offset: const Offset(0, 1),
           ),
         ],
+        
       ),
+      
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
