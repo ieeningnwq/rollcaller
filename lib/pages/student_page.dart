@@ -297,6 +297,7 @@ class _StudentPageState extends State<StudentPage> {
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.r)),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.r),
+            borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
           ),
           contentPadding: EdgeInsets.symmetric(horizontal: 6.h, vertical: 4.w),
           filled: true,

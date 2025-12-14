@@ -544,7 +544,7 @@ class _RandomCallPageState extends State<RandomCallPage>
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0.r),
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.outline),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
         ),
         contentPadding: EdgeInsets.symmetric(
           horizontal: 12.0.h,
