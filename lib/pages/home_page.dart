@@ -88,7 +88,7 @@ class _HomePageState extends State<HomePage> {
               ),
               SizedBox(width: 8.w),
               Text(
-                '随机点名',
+                KString.callFunctionSwitchButtonTitle, //'随机点名'
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: _selectedIndex == 0
                       ? Theme.of(context).colorScheme.onPrimary
@@ -143,7 +143,7 @@ class _HomePageState extends State<HomePage> {
               ),
               SizedBox(width: 8.w),
               Text(
-                '签到点名',
+                KString.attendanceCallFunctionSwitchButtonTitle, //'签到点名'
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: _selectedIndex == 1
                       ? Theme.of(context).colorScheme.onPrimary

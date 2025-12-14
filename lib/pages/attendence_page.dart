@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../configs/attendance_status.dart';
+import '../configs/strings.dart';
 import '../models/attendance_call_record.dart';
 import '../models/attendance_caller_group.dart';
 import '../models/attendance_caller_model.dart';
@@ -207,7 +208,7 @@ class _AttendencePageState extends State<AttendencePage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const CircularProgressIndicator();
           } else if (snapshot.hasError) {
-            return Text('Error: ${snapshot.error}');
+            return Text('${KString.errorPrefix}${snapshot.error}');
           } else {
             _attendanceCallerGroup = snapshot.data;
             // 更新签到数据
@@ -256,7 +257,7 @@ class _AttendencePageState extends State<AttendencePage> {
                                   context,
                                 ).textTheme.labelLarge?.fontSize,
                               ),
-                              hintText: '搜索学生',
+                              hintText: KString.searchStudent, // 搜索学生
                               hintStyle: Theme.of(context).textTheme.labelLarge
                                   ?.copyWith(
                                     color: Theme.of(
@@ -297,7 +298,7 @@ class _AttendencePageState extends State<AttendencePage> {
                                     Row(
                                       children: [
                                         Text(
-                                          '签到状态',
+                                          KString.attendanceStatus, // 签到状态
                                           style: Theme.of(context)
                                               .textTheme
                                               .titleMedium
@@ -310,7 +311,7 @@ class _AttendencePageState extends State<AttendencePage> {
                                         ),
                                         SizedBox(width: 8.w),
                                         Text(
-                                          '共$totalCount人',
+                                          '${KString.totalCountPrefix}$totalCount${KString.peopleountSuffix}', // 共X人
                                           style: Theme.of(context)
                                               .textTheme
                                               .labelSmall
@@ -362,7 +363,7 @@ class _AttendencePageState extends State<AttendencePage> {
                                                     ),
                                               ),
                                               subtitle: Text(
-                                                '学号: ${student.studentNumber}',
+                                                '${KString.studentNumberPrefix}${student.studentNumber}', // 学号：X
                                                 style: Theme.of(context)
                                                     .textTheme
                                                     .labelSmall
@@ -419,7 +420,7 @@ class _AttendencePageState extends State<AttendencePage> {
                                     )
                                   : Center(
                                       child: Text(
-                                        '暂无学生',
+                                        KString.noStudent, // 暂无学生
                                         style: Theme.of(context)
                                             .textTheme
                                             .titleMedium
@@ -467,7 +468,7 @@ class _AttendencePageState extends State<AttendencePage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              '签到统计',
+                              KString.attendanceStatistics, // 签到统计
                               style: Theme.of(context).textTheme.titleSmall
                                   ?.copyWith(
                                     color: Theme.of(
@@ -597,7 +598,7 @@ class _AttendencePageState extends State<AttendencePage> {
                 children: [
                   // 顶部标题和管理链接
                   Text(
-                    '选择点名器',
+                    KString.chooseACaller, // 选择点名器
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       color: Theme.of(context).colorScheme.onSurface,
                     ),
@@ -660,7 +661,7 @@ class _AttendencePageState extends State<AttendencePage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                '请先选择点名器',
+                KString.pleaseChooseACaller, // 请先选择点名器
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onInverseSurface,
                 ),
@@ -686,7 +687,7 @@ class _AttendencePageState extends State<AttendencePage> {
           showDialog(
             context: context,
             builder: (context) => AttendanceCallerAddEditDialog(
-              title: '编辑点名器',
+              title: KString.editCaller, // 编辑点名器
               attendanceCaller: _allAttendaceCallersMap[_selectedCallerId!]!,
             ),
           ).then((value) {
@@ -699,7 +700,7 @@ class _AttendencePageState extends State<AttendencePage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                '请先选择点名器',
+                KString.pleaseChooseACaller, // 请先选择点名器
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onInverseSurface,
                 ),
@@ -721,7 +722,7 @@ class _AttendencePageState extends State<AttendencePage> {
         showDialog(
           context: context,
           builder: (context) => AttendanceCallerAddEditDialog(
-            title: '新增点名器',
+            title: KString.addCaller, // 新增点名器
             attendanceCaller: AttendanceCallerModel(),
           ),
         ).then((value) {
@@ -749,7 +750,7 @@ class _AttendencePageState extends State<AttendencePage> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    '该点名器下有签到点名记录，无法删除。请先删除该点名器下的所有签到点名记录。',
+                    KString.forbitDeleteAttendanceCallerInfo, // 该点名器下有签到点名记录，无法删除。请先删除该点名器下的所有签到点名记录。
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onInverseSurface,
                     ),
@@ -767,12 +768,12 @@ class _AttendencePageState extends State<AttendencePage> {
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  title: const Text('确认删除'),
-                  content: const Text('确定要删除选中的点名器吗？此操作不可撤销。'),
+                  title: Text(KString.confirmDeleteCallerTitle), // 确认删除
+                  content: Text(KString.confirmDeleteCallerRecordContent), // 确定要删除选中的点名器吗？此操作不可撤销。
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
-                      child: const Text('取消'),
+                      child: Text(KString.cancel), // 取消
                     ),
                     TextButton(
                       onPressed: () async {
@@ -788,7 +789,7 @@ class _AttendencePageState extends State<AttendencePage> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                        '删除成功',
+                                        KString.deleteSuccess, // 删除成功
                                         style: TextStyle(
                                           color: Theme.of(
                                             context,
@@ -807,7 +808,7 @@ class _AttendencePageState extends State<AttendencePage> {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                        '删除失败',
+                                        KString.deleteFail, // 删除失败
                                         style: TextStyle(
                                           color: Theme.of(
                                             context,
@@ -824,7 +825,7 @@ class _AttendencePageState extends State<AttendencePage> {
                               }
                             });
                       },
-                      child: const Text('删除'),
+                      child: Text(KString.delete), // 删除
                     ),
                   ],
                 );
@@ -836,7 +837,7 @@ class _AttendencePageState extends State<AttendencePage> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
-                  '请先选择点名器',
+                  KString.pleaseChooseACaller, // 请先选择点名器
                   style: TextStyle(
                     color: Theme.of(context).colorScheme.onInverseSurface,
                   ),

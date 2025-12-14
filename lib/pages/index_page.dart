@@ -26,7 +26,7 @@ class IndexPage extends StatelessWidget {
     ),
     BottomNavigationBarItem(
       icon: Icon(Icons.access_time),
-      label: KString.recordTitle, // 记录
+      label: KString.recordsTitle, // 记录
     ),
     BottomNavigationBarItem(
       icon: Icon(Icons.settings),

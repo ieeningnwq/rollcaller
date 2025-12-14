@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../configs/strings.dart';
 import '../models/random_caller_model.dart';
 import '../models/student_class_model.dart';
 import '../utils/random_caller_dao.dart';
@@ -36,7 +37,7 @@ class _RandomCallerAddEditDialogState extends State<RandomCallerAddEditDialog> {
     super.initState();
     _selectedStudentClassId = widget.randomCaller.classId;
     _isDuplicate = widget.randomCaller.isDuplicate == 1;
-    _isAdd = widget.title == '新增点名器';
+    _isAdd = widget.title == KString.addCaller; // '新增点名器'
     _randomCallerNameController.text = widget.randomCaller.randomCallerName;
     _notesController.text = widget.randomCaller.notes;
   }

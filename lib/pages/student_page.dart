@@ -11,6 +11,7 @@ import 'package:permission_handler/permission_handler.dart'
     show Permission, PermissionActions, PermissionStatusGetters;
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
+import '../configs/strings.dart';
 import '../models/student_class_group.dart';
 import '../models/student_class_model.dart';
 import '../models/student_model.dart';
@@ -202,7 +203,7 @@ class _StudentPageState extends State<StudentPage> {
                 studentNumber: '',
                 created: DateTime.now(),
               ),
-              title: '添加学生',
+              title: KString.addStudent, // '添加学生'
             ),
           ).then((value) {
             if (value == true) {
@@ -262,7 +263,7 @@ class _StudentPageState extends State<StudentPage> {
     );
 
     var studentClass = StudentClassModel(
-      className: '无班级学生',
+      className: KString.noClassStudent, // '无班级学生'
       studentQuantity: allStudents.length,
       teacherName: '',
       notes: '',
@@ -304,7 +305,7 @@ class _StudentPageState extends State<StudentPage> {
         controller: _searchController,
         decoration: InputDecoration(
           prefixIcon: const Icon(Icons.search),
-          hintText: '搜索学号或姓名...',
+          hintText: KString.searchStudentNumberOrName, // '搜索学号或姓名...'
           hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: Theme.of(context).colorScheme.onSurface,
           ),
@@ -349,7 +350,7 @@ class _StudentPageState extends State<StudentPage> {
               ),
             ),
             Text(
-              '${group.students.length}人',
+              '${group.students.length}${KString.peopleountSuffix}', // '人'
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
                 color: Theme.of(context).colorScheme.onSurface.withAlpha(110),
               ),
@@ -421,7 +422,7 @@ class _StudentPageState extends State<StudentPage> {
                 ),
                 SizedBox(height: 4.h),
                 Text(
-                  '创建时间: ${'${student.created.year}-${student.created.month.toString().padLeft(2, '0')}-${student.created.day.toString().padLeft(2, '0')}'}',
+                  '${KString.createTimePrefix}${'${student.created.year}-${student.created.month.toString().padLeft(2, '0')}-${student.created.day.toString().padLeft(2, '0')}'}',
                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     color: Theme.of(
                       context,
@@ -458,7 +459,7 @@ class _StudentPageState extends State<StudentPage> {
                     builder: (BuildContext context) {
                       return StudentAddEditDialog(
                         student: student,
-                        title: '编辑学生',
+                        title: KString.editStudent,
                       );
                     },
                   ).then((value) {
@@ -478,12 +479,12 @@ class _StudentPageState extends State<StudentPage> {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: const Text('确认删除'),
-                      content: const Text('确定删除该学生吗？'),
+                      title: const Text(KString.confirmDeleteCallerTitle), // '确认删除'
+                      content: const Text(KString.confirmDeleteStudentContent), // '确定要删除该学生吗？此操作不可恢复。'
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('取消'),
+                          child: const Text(KString.cancel), // '取消'
                         ),
                         TextButton(
                           onPressed: () async {
@@ -509,7 +510,7 @@ class _StudentPageState extends State<StudentPage> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                      '该学生下有随机点名记录或签到点名记录，无法删除。请先删除该学生下的所有随机点名记录或签到点名记录。',
+                                      KString.confirmDeleteStudentWarnningDetail, // '该学生下有随机点名记录或签到点名记录，无法删除。请先删除该学生下的所有随机点名记录或签到点名记录。'
                                       style: TextStyle(
                                         color: Theme.of(context).colorScheme.onInverseSurface,
                                       ),
@@ -528,7 +529,7 @@ class _StudentPageState extends State<StudentPage> {
                               Navigator.of(context).pop();
                             }
                           },
-                          child: const Text('删除'),
+                          child: const Text(KString.delete), // '删除'
                         ),
                       ],
                     ),
@@ -563,11 +564,11 @@ class _StudentPageState extends State<StudentPage> {
         int nameIndex = -1;
         int classNameIndex = -1;
         for (var i = 0; i < firstColumn.length; i++) {
-          if (firstColumn[i]?.value?.toString() == '学号') {
+          if (firstColumn[i]?.value?.toString() == KString.studentNumber) {
             studentNumberIndex = i;
-          } else if (firstColumn[i]?.value?.toString() == '姓名') {
+          } else if (firstColumn[i]?.value?.toString() == KString.name) {
             nameIndex = i;
-          } else if (firstColumn[i]?.value?.toString() == '班级') {
+          } else if (firstColumn[i]?.value?.toString() == KString.className) {
             classNameIndex = i;
           }
         }
@@ -640,7 +641,9 @@ class _StudentPageState extends State<StudentPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '成功导入 $totalCount 个学生',
+              KString.importSuccessPrefix +
+                  totalCount.toString() +
+                  KString.importSuccessSuffix, // '成功导入 $totalCount 个学生'
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onInverseSurface,
               ),
@@ -657,7 +660,7 @@ class _StudentPageState extends State<StudentPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '导入学生错误：${e.toString()}',
+              KString.importStudentsError, // '导入学生错误'
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onInverseSurface,
               ),
@@ -680,7 +683,7 @@ class _StudentPageState extends State<StudentPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                '请授予存储权限',
+                KString.pleaseGrantStoragePermission, // '请授予存储权限'
                 style: TextStyle(
                   color: Theme.of(context).colorScheme.onInverseSurface,
                 ),
@@ -708,7 +711,7 @@ class _StudentPageState extends State<StudentPage> {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        '模板文件已复制到：$value',
+                        KString.templateFilePathPrefix + value, // '模板文件已复制到：$value'
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onInverseSurface,
                         ),

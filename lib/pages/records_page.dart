@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 
+import '../configs/strings.dart';
 import 'attendance_call_records_page.dart';
 import 'random_call_records_page.dart';
 
@@ -26,7 +27,7 @@ class _RecordState extends State<RecordPage> {
             Container(
               padding: EdgeInsets.all(12.w),
               child: Text(
-                '点名记录管理',
+                KString.recordAppBarTitle, // '点名记录管理'
                 style: Theme.of(context).textTheme.headlineLarge,
               ),
             ),
@@ -80,7 +81,7 @@ class _RecordState extends State<RecordPage> {
               ),
               SizedBox(width: 8.0.w),
               Text(
-                '随机点名记录',
+                KString.randomCallRecord, // '随机点名记录'
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: _selectedIndex == 0 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
                 ),
@@ -124,7 +125,7 @@ class _RecordState extends State<RecordPage> {
               ),
               SizedBox(width: 8.0.w),
               Text(
-                '签到点名记录',
+                KString.attendanceCallRecord, // '签到点名记录'
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   color: _selectedIndex == 1 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
                 ),

@@ -61,7 +61,7 @@ class _StudentClassState extends State<StudentClassPage> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
+                      return Text('${KString.errorPrefix}${snapshot.error}'); // 加载班级失败
                     } else {
                       _studentClassMap = snapshot.data!;
                       return SmartRefresher(
@@ -87,7 +87,7 @@ class _StudentClassState extends State<StudentClassPage> {
                             if (_studentClassMap.isEmpty) {
                               return Center(
                                 child: Text(
-                                  '暂无班级',
+                                  KString.noStudentClass, // 暂无班级
                                   style: Theme.of(context).textTheme.bodyLarge
                                       ?.copyWith(fontStyle: FontStyle.italic),
                                 ),
@@ -160,7 +160,7 @@ class _StudentClassState extends State<StudentClassPage> {
                       );
                     }
                   } else {
-                    return Center(child: Text('没有数据...'));
+                    return Center(child: Text(KString.noData)); // 暂无数据...
                   }
                 },
               ),
@@ -182,7 +182,7 @@ class _StudentClassState extends State<StudentClassPage> {
                   notes: '',
                   created: DateTime.now(),
                 ),
-                title: '添加班级',
+                title: KString.addStudentClass, // 添加班级
               );
             },
           ).then((onValue) {
@@ -191,7 +191,7 @@ class _StudentClassState extends State<StudentClassPage> {
             }
           });
         },
-        tooltip: '添加班级',
+        tooltip: KString.addStudentClass, // 添加班级
         child: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary),
       ),
     );
@@ -287,7 +287,7 @@ class _StudentClassState extends State<StudentClassPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '班级现有人数',
+            KString.studentClassCount, // 班级现有人数
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurface.withAlpha(150),
             ),
@@ -301,7 +301,7 @@ class _StudentClassState extends State<StudentClassPage> {
           ),
           SizedBox(height: 12.0.h),
           Text(
-            '学生现有人数',
+            KString.studentCount, // 学生现有人数
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurface.withAlpha(150),
             ),
@@ -319,7 +319,7 @@ class _StudentClassState extends State<StudentClassPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '教师',
+            KString.teacher, // 教师
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurface.withAlpha(150),
             ),
@@ -333,7 +333,7 @@ class _StudentClassState extends State<StudentClassPage> {
           ),
           SizedBox(height: 12.0.h),
           Text(
-            '创建时间',
+            KString.createTime, // 创建时间
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: Theme.of(context).colorScheme.onSurface.withAlpha(150),
             ),
@@ -375,7 +375,7 @@ class _StudentClassState extends State<StudentClassPage> {
         },
         icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.secondary),
         label: Text(
-          '编辑',
+          KString.edit, // 编辑
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
             color: Theme.of(context).colorScheme.secondary,
           ),
@@ -390,12 +390,12 @@ class _StudentClassState extends State<StudentClassPage> {
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text('确认删除'),
-                content: Text('确定要删除班级“${studentClass.className}”吗？此操作不可恢复。'),
+                title: Text(KString.confirmDeleteCallerTitle), // 确认删除
+                content: Text(KString.deleteClassWarnning), // '确定要删除班级吗？此操作不可恢复。'
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    child: Text('取消'),
+                    child: Text(KString.cancel), // 取消
                   ),
                   TextButton(
                     onPressed: () async {
@@ -437,7 +437,7 @@ class _StudentClassState extends State<StudentClassPage> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                '该班级下还有学生、随机点名器、签到点名器，无法删除。请先删除班级下的所有学生、随机点名器、签到点名器。',
+                                KString.forbitDeleteClassWarnningDetail, // '该班级下还有学生、随机点名器、签到点名器，无法删除。请先删除班级下的所有学生、随机点名器、签到点名器。'
                                 style: TextStyle(
                                   color: Theme.of(
                                     context,
@@ -455,7 +455,7 @@ class _StudentClassState extends State<StudentClassPage> {
                       }
                     },
                     child: Text(
-                      '删除',
+                      KString.delete, // 删除
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         color: Theme.of(context).colorScheme.error,
                       ),
@@ -468,7 +468,7 @@ class _StudentClassState extends State<StudentClassPage> {
         },
         icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
         label: Text(
-          '删除',
+          KString.delete, // 删除
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
             color: Theme.of(context).colorScheme.error,
           ),
@@ -502,10 +502,10 @@ class _StudentClassState extends State<StudentClassPage> {
   String _getQuantityStatusInfo(StudentClassModel studentClass) {
     int classQuantity = studentClass.classQuantity;
     return classQuantity == studentClass.studentQuantity
-        ? '人数已满'
+        ? KString.classFull // '班级人数已满'
         : classQuantity < studentClass.studentQuantity
-        ? '人数未满'
-        : '人数超员';
+        ? KString.classNotFull // '班级人数未满'
+        : KString.classOverQuantity; // '班级人数超员'
   }
 
   Color _getQuantityStatusDecorationColor(StudentClassModel studentClass) {
