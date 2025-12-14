@@ -7,7 +7,6 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart'
     show MaterialPicker;
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart' show getTemporaryDirectory;
 import 'package:provider/provider.dart';

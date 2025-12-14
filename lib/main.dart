@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart'
     show FlutterSecureStorage;
-import 'package:fluttertoast/fluttertoast.dart' show FToastBuilder;
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart' show getTemporaryDirectory;
 import 'package:provider/provider.dart';
@@ -63,7 +62,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       splitScreenMode: true,
       builder: (_, child) {
         return MaterialApp(
-          builder: FToastBuilder(),
           debugShowCheckedModeBanner: false,
           themeMode: context.watch<ThemeSwitcherProvider>().themeMode,
           // 定制主题
