@@ -1,37 +1,49 @@
 // 主题风格枚举
-import 'package:flutter/material.dart'
-    show Colors, ThemeMode, ThemeData, MaterialColor, TextTheme, FontWeight, TextStyle, Brightness;
-import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
+import 'dart:ui' show Color;
 
-enum ThemeStyleOption { blue, purple, green, orange, diy }
+import 'package:flutter/material.dart' show Colors, ThemeMode;
+
+enum ThemeStyleOption { red, orange, yellow, green, blue, indigo, purple, diy }
 
 extension ThemeStyleOptionExtension on ThemeStyleOption {
-  static MaterialColor pickedColor = Colors.blue;
+  static Color pickedColor = Colors.white;
   String get name {
     switch (this) {
-      case ThemeStyleOption.blue:
-        return '蓝色';
-      case ThemeStyleOption.purple:
-        return '紫色';
-      case ThemeStyleOption.green:
-        return '绿色';
+      case ThemeStyleOption.red:
+        return '红色';
       case ThemeStyleOption.orange:
         return '橙色';
+      case ThemeStyleOption.yellow:
+        return '黄色';
+      case ThemeStyleOption.green:
+        return '绿色';
+      case ThemeStyleOption.blue:
+        return '蓝色';
+      case ThemeStyleOption.indigo:
+        return '青色';
+      case ThemeStyleOption.purple:
+        return '紫色';
       case ThemeStyleOption.diy:
         return '自定义';
     }
   }
 
-  MaterialColor get color {
+  Color get color {
     switch (this) {
-      case ThemeStyleOption.blue:
-        return Colors.blue;
-      case ThemeStyleOption.purple:
-        return Colors.purple;
-      case ThemeStyleOption.green:
-        return Colors.green;
+      case ThemeStyleOption.red:
+        return Colors.red;
       case ThemeStyleOption.orange:
         return Colors.orange;
+      case ThemeStyleOption.yellow:
+        return Colors.yellow;
+      case ThemeStyleOption.green:
+        return Colors.green;
+      case ThemeStyleOption.blue:
+        return Colors.blue;
+      case ThemeStyleOption.indigo:
+        return Colors.indigo;
+      case ThemeStyleOption.purple:
+        return Colors.purple;
       case ThemeStyleOption.diy:
         return pickedColor;
     }
@@ -39,14 +51,20 @@ extension ThemeStyleOptionExtension on ThemeStyleOption {
 
   static ThemeStyleOption fromString(String? value) {
     switch (value) {
-      case 'blue':
-        return ThemeStyleOption.blue;
-      case 'purple':
-        return ThemeStyleOption.purple;
-      case 'green':
-        return ThemeStyleOption.green;
+      case 'red':
+        return ThemeStyleOption.red;
       case 'orange':
         return ThemeStyleOption.orange;
+      case 'yellow':
+        return ThemeStyleOption.yellow;
+      case 'green':
+        return ThemeStyleOption.green;
+      case 'blue':
+        return ThemeStyleOption.blue;
+      case 'indigo':
+        return ThemeStyleOption.indigo;
+      case 'purple':
+        return ThemeStyleOption.purple;
       case 'diy':
         return ThemeStyleOption.diy;
       default:
@@ -67,31 +85,10 @@ extension ThemeStyleOptionExtension on ThemeStyleOption {
     }
   }
 
-  static ThemeData getDarkThemeData(ThemeStyleOption themeStyleOption) => ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: themeStyleOption.color,
-        textTheme: textTheme,
-      );
+  
+static Color getContrastColor(Color color) {
+  double brightness = 0.299 * (color.r * 255.0).round().clamp(0, 255) + 0.587 * (color.g * 255.0).round().clamp(0, 255) + 0.114 * (color.b * 255.0).round().clamp(0, 255); 
+  return brightness > 128 ? Colors.black : Colors.white;
+}
 
-  static ThemeData getLightThemeData(ThemeStyleOption themeStyleOption) => ThemeData(
-        brightness: Brightness.light,
-        primarySwatch: themeStyleOption.color,
-        textTheme: textTheme,
-      );
-
-
-  static TextTheme get textTheme => TextTheme(
-    headlineLarge: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold),
-    headlineMedium: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
-    headlineSmall: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
-    titleLarge: TextStyle(fontSize: 26.sp, fontWeight: FontWeight.bold),
-    titleMedium: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
-    titleSmall: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
-    bodyLarge: TextStyle(fontSize: 24.sp),
-    bodyMedium: TextStyle(fontSize: 22.sp),
-    bodySmall: TextStyle(fontSize: 20.sp),
-    labelLarge: TextStyle(fontSize: 22.sp),
-    labelMedium: TextStyle(fontSize: 18.sp),
-    labelSmall: TextStyle(fontSize: 16.sp),
-  );
 }

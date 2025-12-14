@@ -625,11 +625,15 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                             initialValue: _selectedCallerId,
                             hint: const Text('全部'),
                             items: [
-                              const DropdownMenuItem(
+                              DropdownMenuItem(
                                 value: null,
                                 child: Text(
                                   '全部',
-                                  style: TextStyle(color: Colors.black),
+                                  style: TextStyle(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
                                 ),
                               ),
                               ..._allCallers.values.toList().map(
@@ -676,7 +680,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                         Expanded(
                           child: DropdownButtonFormField<int>(
                             initialValue: _selectedClassId,
-                            hint: const Text('全部', ),
+                            hint: const Text('全部'),
                             items: [
                               DropdownMenuItem(
                                 value: null,

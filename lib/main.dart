@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:rollcall/configs/back_up_type.dart'
     show BackUpType, BackUpTypeExtension;
 import 'package:rollcall/configs/strings.dart' show KString;
+import 'package:rollcall/configs/theme_style_option_enum.dart';
 import 'package:rollcall/utils/attendance_call_record_dao.dart'
     show AttendanceCallRecordDao;
 import 'package:rollcall/utils/attendance_caller_dao.dart'
@@ -56,8 +57,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   // 安全存储
   final _storage = const FlutterSecureStorage();
 
-
-
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
@@ -70,7 +69,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           themeMode: context.watch<ThemeSwitcherProvider>().themeMode,
           // 定制主题
           theme: context.watch<ThemeSwitcherProvider>().theme,
-
           darkTheme: context.watch<ThemeSwitcherProvider>().darkTheme,
           home: IndexPage(),
         );
@@ -120,18 +118,29 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     // 获取主题模式
-    // _storage.read(key: KString.themeModeStyleOptionKey).then((onValue)=>{
-    //   if(onValue==null){}else{
-    //     _themeMode=ThemeStyleOptionExtension.fromStringToThemeMode(onValue),
-    //     _themeStyleOption=ThemeStyleOptionExtension.fromString(onValue),
-    //   }
-    //   String mode='',
-    //   String
-    //   onValue.split(',').forEach((element) {
-    //     ThemeStyleOption.fromStringToThemeMode(element);
-    //   }),
-    //   ThemeMode themeMode=ThemeStyleOption.fromStringToThemeMode(onValue),
-    // });
+    _storage.read(key: KString.themeModeStyleOptionKey).then((onValue) {
+      if (onValue != null) {
+        List<String> themeData = onValue.trim().split(',');
+        ThemeMode mode = ThemeStyleOptionExtension.fromStringToThemeMode(
+          themeData[0],
+        );
+        ThemeStyleOption style = ThemeStyleOptionExtension.fromString(
+          themeData[1],
+        );
+        if (style == ThemeStyleOption.diy) {
+          int argb = int.parse(themeData[2]);
+          ThemeStyleOptionExtension.pickedColor = Color.fromARGB(
+            (argb >> 24) & 0xFF,
+            (argb >> 16) & 0xFF,
+            (argb >> 8) & 0xFF,
+            argb & 0xFF,
+          );
+          if (mounted) {
+            context.read<ThemeSwitcherProvider>().setModelAndStyle(mode, style);
+          }
+        }
+      }
+    });
   }
 
   @override
