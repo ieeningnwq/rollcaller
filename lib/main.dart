@@ -14,7 +14,8 @@ import 'package:webdav_client/webdav_client.dart' show Client, newClient;
 
 import 'configs/back_up_type.dart' show BackUpType, BackUpTypeExtension;
 import 'configs/strings.dart';
-import 'configs/theme_style_option_enum.dart' show ThemeStyleOptionExtension, ThemeStyleOption;
+import 'configs/theme_style_option_enum.dart'
+    show ThemeStyleOptionExtension, ThemeStyleOption;
 import 'pages/index_page.dart';
 import './providers/current_index_provider.dart';
 import 'providers/them_switcher_provider.dart';
@@ -52,7 +53,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   // 安全存储
   final _storage = const FlutterSecureStorage();
-
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +103,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           // 开始备份
           await _backupData(client: client, backUpType: BackUpType.auto);
         } catch (e) {
-          log('WebDav连接失败：$e');
+          // ! 8、自动备份失败
+          log('WebDav连接失败');
           return;
         }
       }
@@ -179,6 +180,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       // ! 6、自动备份成功
       log('备份成功：$fileName');
     } catch (e) {
+      // ! 7、自动备份失败
       log('备份失败：$e');
     }
   }

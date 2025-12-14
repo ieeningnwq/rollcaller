@@ -1259,7 +1259,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
         return AlertDialog(
           title: const Text('选择时间范围'),
           content: SizedBox(
-            height: 300.h,
+            height: 400.h,
             width: MediaQuery.of(context).size.width * 0.8,
             child: SfDateRangePicker(
               confirmText: '确定',

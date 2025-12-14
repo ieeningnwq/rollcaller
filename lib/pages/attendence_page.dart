@@ -691,7 +691,7 @@ class _AttendencePageState extends State<AttendencePage> {
           Fluttertoast.showToast(msg: '请先选择点名器');
         }
       },
-      icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.secondary),
+      icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.tertiary),
     );
   }
 
