@@ -11,10 +11,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart' show getTemporaryDirectory;
 import 'package:provider/provider.dart';
-import 'package:rollcall/configs/back_up_type.dart';
-import 'package:rollcall/utils/student_class_dao.dart';
 import 'package:webdav_client/webdav_client.dart' show Client, newClient;
 
+import '../configs/back_up_type.dart';
 import '../configs/strings.dart';
 import '../configs/theme_style_option_enum.dart';
 import '../models/back_up_model.dart';
@@ -23,6 +22,7 @@ import '../utils/attendance_call_record_dao.dart';
 import '../utils/attendance_caller_dao.dart';
 import '../utils/random_call_record_dao.dart';
 import '../utils/random_caller_dao.dart';
+import '../utils/student_class_dao.dart';
 import '../utils/student_class_relation_dao.dart';
 import '../utils/student_dao.dart';
 

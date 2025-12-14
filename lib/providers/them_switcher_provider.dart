@@ -9,7 +9,8 @@ import 'package:flutter/material.dart'
         ThemeData,
         ThemeMode;
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
-import 'package:rollcall/configs/theme_style_option_enum.dart';
+
+import '../configs/theme_style_option_enum.dart';
 
 class ThemeSwitcherProvider extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;

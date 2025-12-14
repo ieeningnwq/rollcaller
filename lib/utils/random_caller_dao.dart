@@ -1,6 +1,6 @@
-import 'package:rollcall/configs/strings.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../configs/strings.dart';
 import '../models/random_caller_model.dart';
 import 'database_helper.dart';
 

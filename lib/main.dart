@@ -10,25 +10,21 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart'
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart' show getTemporaryDirectory;
 import 'package:provider/provider.dart';
-import 'package:rollcall/configs/back_up_type.dart'
-    show BackUpType, BackUpTypeExtension;
-import 'package:rollcall/configs/strings.dart' show KString;
-import 'package:rollcall/configs/theme_style_option_enum.dart';
-import 'package:rollcall/utils/attendance_call_record_dao.dart'
-    show AttendanceCallRecordDao;
-import 'package:rollcall/utils/attendance_caller_dao.dart'
-    show AttendanceCallerDao;
-import 'package:rollcall/utils/random_call_record_dao.dart'
-    show RandomCallRecordDao;
-import 'package:rollcall/utils/random_caller_dao.dart' show RandomCallerDao;
-import 'package:rollcall/utils/student_class_dao.dart' show StudentClassDao;
-import 'package:rollcall/utils/student_class_relation_dao.dart'
-    show StudentClassRelationDao;
-import 'package:rollcall/utils/student_dao.dart' show StudentDao;
 import 'package:webdav_client/webdav_client.dart' show Client, newClient;
+
+import 'configs/back_up_type.dart' show BackUpType, BackUpTypeExtension;
+import 'configs/strings.dart';
+import 'configs/theme_style_option_enum.dart' show ThemeStyleOptionExtension, ThemeStyleOption;
 import 'pages/index_page.dart';
 import './providers/current_index_provider.dart';
 import 'providers/them_switcher_provider.dart';
+import 'utils/attendance_call_record_dao.dart';
+import 'utils/attendance_caller_dao.dart';
+import 'utils/random_call_record_dao.dart';
+import 'utils/random_caller_dao.dart';
+import 'utils/student_class_dao.dart';
+import 'utils/student_class_relation_dao.dart';
+import 'utils/student_dao.dart';
 
 void main() {
   runApp(
@@ -56,6 +52,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   // 安全存储
   final _storage = const FlutterSecureStorage();
+
 
   @override
   Widget build(BuildContext context) {

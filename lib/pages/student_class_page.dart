@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:rollcall/models/student_model.dart';
-import 'package:rollcall/utils/attendance_caller_dao.dart';
-import 'package:rollcall/utils/random_caller_dao.dart';
 
 import '../configs/strings.dart';
 import '../models/student_class_model.dart';
+import '../models/student_model.dart';
+import '../utils/attendance_caller_dao.dart';
+import '../utils/random_caller_dao.dart';
 import '../utils/student_class_dao.dart';
 import '../utils/student_class_relation_dao.dart';
 import '../utils/student_dao.dart';

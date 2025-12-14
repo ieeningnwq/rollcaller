@@ -20,14 +20,16 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: [
               // 顶部标题栏
               Container(
-                padding:  EdgeInsets.all(12.w),
+                padding: EdgeInsets.all(12.w),
                 child: Text(
                   KString.homeAppBarTitle,
                   style: Theme.of(context).textTheme.headlineLarge,
@@ -62,11 +64,13 @@ class _HomePageState extends State<HomePage> {
             // 随机点名功能
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: _selectedIndex == 0 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onPrimary,
-            foregroundColor: _selectedIndex == 0 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
-            side: BorderSide(
-              color:  Theme.of(context).colorScheme.onPrimary,
-            ),
+            backgroundColor: _selectedIndex == 0
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.onPrimary,
+            foregroundColor: _selectedIndex == 0
+                ? Theme.of(context).colorScheme.onPrimary
+                : Theme.of(context).colorScheme.primary,
+            side: BorderSide(color: Theme.of(context).colorScheme.onPrimary),
             padding: EdgeInsets.symmetric(vertical: 12.h),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0.r),
@@ -78,13 +82,17 @@ class _HomePageState extends State<HomePage> {
               Icon(
                 Icons.shuffle,
                 size: Theme.of(context).textTheme.titleLarge?.fontSize,
-                color: _selectedIndex == 0 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
+                color: _selectedIndex == 0
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).colorScheme.primary,
               ),
               SizedBox(width: 8.w),
               Text(
                 '随机点名',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: _selectedIndex == 0 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
+                  color: _selectedIndex == 0
+                      ? Theme.of(context).colorScheme.onPrimary
+                      : Theme.of(context).colorScheme.primary,
                 ),
               ),
             ],
@@ -107,10 +115,16 @@ class _HomePageState extends State<HomePage> {
             // 签到点名功能
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: _selectedIndex == 1 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onPrimary,
-            foregroundColor: _selectedIndex == 1 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
+            backgroundColor: _selectedIndex == 1
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.onPrimary,
+            foregroundColor: _selectedIndex == 1
+                ? Theme.of(context).colorScheme.onPrimary
+                : Theme.of(context).colorScheme.primary,
             side: BorderSide(
-              color: _selectedIndex == 1 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onPrimary,
+              color: _selectedIndex == 1
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onPrimary,
             ),
             padding: EdgeInsets.symmetric(vertical: 12.h),
             shape: RoundedRectangleBorder(
@@ -123,13 +137,17 @@ class _HomePageState extends State<HomePage> {
               Icon(
                 Icons.check_circle,
                 size: Theme.of(context).textTheme.titleLarge?.fontSize,
-                color: _selectedIndex == 1 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
+                color: _selectedIndex == 1
+                    ? Theme.of(context).colorScheme.onPrimary
+                    : Theme.of(context).colorScheme.primary,
               ),
               SizedBox(width: 8.w),
               Text(
                 '签到点名',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: _selectedIndex == 1 ? Theme.of(context).colorScheme.onPrimary : Theme.of(context).colorScheme.primary,
+                  color: _selectedIndex == 1
+                      ? Theme.of(context).colorScheme.onPrimary
+                      : Theme.of(context).colorScheme.primary,
                 ),
               ),
             ],

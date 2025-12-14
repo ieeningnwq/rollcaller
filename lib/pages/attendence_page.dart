@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:fluttertoast/fluttertoast.dart' show Fluttertoast;
 
 import '../configs/attendance_status.dart';
 import '../models/attendance_call_record.dart';
@@ -658,7 +658,9 @@ class _AttendencePageState extends State<AttendencePage> {
             ),
           );
         } else {
-          Fluttertoast.showToast(msg: '请先选择点名器');
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('请先选择点名器')));
         }
       },
       icon: Icon(
@@ -717,16 +719,18 @@ class _AttendencePageState extends State<AttendencePage> {
   IconButton _buildDeleteIconButton() {
     return IconButton(
       onPressed: () async {
-        // 校验是否有关联的签到点名记录
-        final attendanceCallRecords = await AttendanceCallRecordDao()
-            .getAttendanceCallRecordsByCallerId(_selectedCallerId!);
-        if (attendanceCallRecords.isNotEmpty) {
-          // 有签到点名记录，提示用户先删除签到点名记录
-          Fluttertoast.showToast(msg: '该点名器下有签到点名记录，无法删除。请先删除该点名器下的所有签到点名记录。');
-          return;
-        }
         // 删除点名器功能
         if (_selectedCallerId != null) {
+          // 校验是否有关联的签到点名记录
+          final attendanceCallRecords = await AttendanceCallRecordDao()
+              .getAttendanceCallRecordsByCallerId(_selectedCallerId!);
+          if (attendanceCallRecords.isNotEmpty) {
+            // 有签到点名记录，提示用户先删除签到点名记录
+            Fluttertoast.showToast(
+              msg: '该点名器下有签到点名记录，无法删除。请先删除该点名器下的所有签到点名记录。',
+            );
+            return;
+          }
           if (context.mounted) {
             showDialog(
               context: context,
@@ -819,7 +823,10 @@ class _AttendencePageState extends State<AttendencePage> {
         color: Theme.of(context).colorScheme.onSurface,
       ),
       dropdownColor: Theme.of(context).colorScheme.surface,
-      icon: Icon(Icons.arrow_drop_down,color: Theme.of(context).colorScheme.onSurface,),
+      icon: Icon(
+        Icons.arrow_drop_down,
+        color: Theme.of(context).colorScheme.onSurface,
+      ),
       iconSize: Theme.of(context).textTheme.bodyMedium?.fontSize ?? 24.0,
       iconEnabledColor: Theme.of(context).colorScheme.secondary,
     );

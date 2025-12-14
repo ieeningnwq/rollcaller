@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:rollcall/utils/student_class_relation_dao.dart';
 import '../models/student_class_model.dart';
 import '../models/student_model.dart';
 import '../utils/student_class_dao.dart';
+import '../utils/student_class_relation_dao.dart';
 
 class StudentViewDialog extends StatefulWidget {
   final StudentModel student;

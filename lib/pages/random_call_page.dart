@@ -3,13 +3,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:rollcall/utils/random_caller_dao.dart';
 
 import '../models/random_call_record.dart';
 import '../models/random_caller_group.dart';
 import '../models/random_caller_model.dart';
 import '../models/student_model.dart';
 import '../utils/random_call_record_dao.dart';
+import '../utils/random_caller_dao.dart';
 import '../utils/student_class_dao.dart';
 import '../utils/student_class_relation_dao.dart';
 import '../utils/student_dao.dart';
@@ -469,7 +469,10 @@ class _RandomCallPageState extends State<RandomCallPage>
   IconButton _buildDeleteIconButton() {
     return IconButton(
       onPressed: () async {
-        // 校验是否有关联的随机点名记录
+        
+        // 删除点名器功能
+        if (_selectedCallerId != null) {
+          // 校验是否有关联的随机点名记录
         final randomCallRecords = await RandomCallRecordDao()
             .getRandomCallRecordsByCallerId(_selectedCallerId!);
         if (randomCallRecords.isNotEmpty) {
@@ -477,8 +480,6 @@ class _RandomCallPageState extends State<RandomCallPage>
           Fluttertoast.showToast(msg: '该点名器下有随机点名记录，无法删除。请先删除该点名器下的所有随机点名记录。');
           return;
         }
-        // 删除点名器功能
-        if (_selectedCallerId != null) {
           if (mounted) {
             showDialog(
               context: context,
