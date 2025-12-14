@@ -4,7 +4,6 @@ import 'package:flutter/material.dart'
         ChangeNotifier,
         ColorScheme,
         FontWeight,
-        Material,
         TextStyle,
         TextTheme,
         ThemeData,

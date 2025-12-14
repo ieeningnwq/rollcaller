@@ -61,9 +61,11 @@ class _SettingsState extends State<SettingsPage> {
   // 备份进度
   double _procedureProgress = 0;
 
-  ThemeMode ? _selectedThemeMode;
+  ThemeMode? _selectedThemeMode;
 
-  ThemeStyleOption ? _selectedThemeStyle;
+  ThemeStyleOption? _selectedThemeStyle;
+
+  bool _isThemeSettingsExpanded = false;
 
   @override
   dispose() {
@@ -77,7 +79,7 @@ class _SettingsState extends State<SettingsPage> {
   initState() {
     super.initState();
     _getWebDavConfigFuture = _getWebDavConfig();
-    }
+  }
 
   Future<void> _getWebDavConfig() async {
     // 获取WebDav配置服务器
@@ -171,7 +173,7 @@ class _SettingsState extends State<SettingsPage> {
 
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(8.0.w),
                 child: FutureBuilder(
                   future: _getWebDavConfigFuture,
                   builder: (context, snapshot) {
@@ -182,11 +184,11 @@ class _SettingsState extends State<SettingsPage> {
                       return Column(
                         children: [
                           _buildLastBackUpStatus(),
-                          const SizedBox(height: 24),
+                          SizedBox(height: 8.h),
                           _buildWebDavInfo(),
-                          const SizedBox(height: 24),
+                          SizedBox(height: 8.h),
                           _buildBackUpSetting(),
-                          const SizedBox(height: 24),
+                          SizedBox(height: 8.h),
                           _buildBackUpHistory(),
                         ],
                       );
@@ -208,12 +210,13 @@ class _SettingsState extends State<SettingsPage> {
     return Visibility(
       visible: _lastBackUpModel != null,
       child: Container(
-        padding: const EdgeInsets.all(12.0),
+        margin: EdgeInsets.only(top: 8.h),
+        padding: EdgeInsets.all(16.0.w),
         decoration: BoxDecoration(
           color: _lastBackUpModel?.result == true
               ? Colors.green[100]
               : Colors.red[100],
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(8.0.r),
         ),
         child: Row(
           children: [
@@ -224,7 +227,7 @@ class _SettingsState extends State<SettingsPage> {
                   : Colors.red,
               size: 20,
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8.0.w),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -239,11 +242,10 @@ class _SettingsState extends State<SettingsPage> {
                 ),
                 Text(
                   '${_lastBackUpModel?.dateTimeText.substring(0, 4)}-${_lastBackUpModel?.dateTimeText.substring(4, 6)}-${_lastBackUpModel?.dateTimeText.substring(6, 8)} ${_lastBackUpModel?.dateTimeText.substring(8, 10)}:${_lastBackUpModel?.dateTimeText.substring(10, 12)}:${_lastBackUpModel?.dateTimeText.substring(12, 14)}',
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: _lastBackUpModel?.result == true
                         ? Colors.green
                         : Colors.red,
-                    fontSize: 12,
                   ),
                 ),
               ],
@@ -258,31 +260,28 @@ class _SettingsState extends State<SettingsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        SizedBox(height: 8.h),
         // WebDAV配置标题
-        const Text(
-          'WebDAV配置',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 20),
-
+        Text('WebDAV配置', style: Theme.of(context).textTheme.headlineMedium),
+        SizedBox(height: 4.h),
         // 输入框容器
         Container(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.only(top: 20.0.h, left: 8.0.w),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8.0),
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(8.0.r),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withAlpha(10),
-                spreadRadius: 1,
-                blurRadius: 2,
+                color: Colors.grey.withAlpha(100),
+                spreadRadius: 1.r,
+                blurRadius: 2.r,
                 offset: const Offset(0, 1),
               ),
             ],
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline,
+              width: 1.0,
+            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -872,457 +871,607 @@ class _SettingsState extends State<SettingsPage> {
   // 主题设置
   // 主题控制组件
   Widget _buildThemeSelectWidget() {
-    return Container(
-      padding: EdgeInsets.all(8.w),
-      margin: EdgeInsets.symmetric(horizontal: 8.w),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(6.w),
-        boxShadow: [
-          BoxShadow(
-            color: Theme.of(context).shadowColor.withAlpha(100),
-            spreadRadius: 1.w,
-            blurRadius: 2.w,
-            offset: Offset(0, 1),
+    return GestureDetector(
+      onTap: () =>
+          setState(() => _isThemeSettingsExpanded = !_isThemeSettingsExpanded),
+      child: Container(
+        padding: EdgeInsets.all(8.w),
+        margin: EdgeInsets.symmetric(horizontal: 8.w),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(6.w),
+          boxShadow: [
+            BoxShadow(
+              color: Theme.of(context).shadowColor.withAlpha(100),
+              spreadRadius: 1.w,
+              blurRadius: 2.w,
+              offset: Offset(0, 2),
+            ),
+          ],
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outline,
+            width: 2.w,
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // 主题控制标题
-          Text('主题控制', style: Theme.of(context).textTheme.titleLarge),
-          SizedBox(height: 12.h),
-          // 主题模式
-          Text('主题模式:', style: Theme.of(context).textTheme.titleMedium),
-          SizedBox(height: 8.h),
-          Row(
-            children: [
-              // 跟随系统
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _changeThemeMode(ThemeMode.system),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 8.h,
-                      horizontal: 12.w,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _selectedThemeMode == ThemeMode.system
-                          ? _selectedThemeStyle?.color ?? Colors.blue
-                          : Theme.of(context).colorScheme.surface,
-                      borderRadius: BorderRadius.circular(6.r),
-                      border: Border.all(
-                        color: _selectedThemeMode == ThemeMode.system
-                            ? Colors.transparent
-                            : Theme.of(context).colorScheme.outline,
-                        width: 1.w,
-                      ),
-                    ),
-                    child: Text(
-                      '跟随系统',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: _selectedThemeMode == ThemeMode.system
-                            ? ThemeStyleOptionExtension.getContrastColor(
-                                _selectedThemeStyle?.color ?? Colors.blue,
-                              )
-                            : Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(width: 8.w),
-
-              // 浅色
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _changeThemeMode(ThemeMode.light),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 8.h,
-                      horizontal: 12.w,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _selectedThemeMode == ThemeMode.light
-                          ? _selectedThemeStyle?.color ?? Colors.blue
-                          : Theme.of(context).colorScheme.surface,
-                      borderRadius: BorderRadius.circular(6.w),
-                      border: Border.all(
-                        color: _selectedThemeMode == ThemeMode.light
-                            ? Colors.transparent
-                            : Theme.of(context).colorScheme.outline,
-                        width: 1.w,
-                      ),
-                    ),
-                    child: Text(
-                      '浅色',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: _selectedThemeMode == ThemeMode.light
-                            ? ThemeStyleOptionExtension.getContrastColor(
-                                _selectedThemeStyle?.color ?? Colors.blue,
-                              )
-                            : Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(width: 8.w),
-
-              // 深色
-              Expanded(
-                child: GestureDetector(
-                  onTap: () => _changeThemeMode(ThemeMode.dark),
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      vertical: 8.h,
-                      horizontal: 12.w,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _selectedThemeMode == ThemeMode.dark
-                          ? _selectedThemeStyle?.color ?? Colors.blue
-                          : Theme.of(context).colorScheme.surface,
-                      borderRadius: BorderRadius.circular(6.w),
-                      border: Border.all(
-                        color: _selectedThemeMode == ThemeMode.dark
-                            ? Colors.transparent
-                            : Theme.of(context).colorScheme.outline,
-                        width: 1.w,
-                      ),
-                    ),
-                    child: Text(
-                      '深色',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: _selectedThemeMode == ThemeMode.dark
-                            ? ThemeStyleOptionExtension.getContrastColor(
-                                _selectedThemeStyle?.color ?? Colors.blue,
-                              )
-                            : Theme.of(context).colorScheme.onSurface,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 16.h),
-
-          // 主题风格
-          Text('主题风格:', style: Theme.of(context).textTheme.titleMedium),
-          SizedBox(height: 8.h),
-          Column(
-            children: [
-              Row(
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 8.0.h),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // 红色
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => _changeThemeStyle(ThemeStyleOption.red),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 8.h,
-                          horizontal: 12.w,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _selectedThemeStyle == ThemeStyleOption.red
-                              ? _selectedThemeStyle!.color
-                              : Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(6.w),
-                          border: Border.all(
-                            color: _selectedThemeStyle == ThemeStyleOption.red
-                                ? Colors.transparent
-                                : Theme.of(context).colorScheme.outline,
-                            width: 1.w,
-                          ),
-                        ),
-                        child: Text(
-                          '红色',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: _selectedThemeStyle == ThemeStyleOption.red
-                                ? ThemeStyleOptionExtension.getContrastColor(
-                                    _selectedThemeStyle!.color,
-                                  )
-                                : Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  SizedBox(width: 8.w),
-
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => _changeThemeStyle(ThemeStyleOption.orange),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 8.h,
-                          horizontal: 12.w,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _selectedThemeStyle == ThemeStyleOption.orange
-                              ? _selectedThemeStyle!.color
-                              : Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(6.w),
-                          border: Border.all(
-                            color:
-                                _selectedThemeStyle == ThemeStyleOption.orange
-                                ? Colors.transparent
-                                : Theme.of(context).colorScheme.outline,
-                            width: 1.w,
-                          ),
-                        ),
-                        child: Text(
-                          '橙色',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color:
-                                _selectedThemeStyle == ThemeStyleOption.orange
-                                ? ThemeStyleOptionExtension.getContrastColor(
-                                    _selectedThemeStyle!.color,
-                                  )
-                                : Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-
-                  Expanded(
-                    child: // 黄色
-                    GestureDetector(
-                      onTap: () => _changeThemeStyle(ThemeStyleOption.yellow),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 8.h,
-                          horizontal: 12.w,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _selectedThemeStyle == ThemeStyleOption.yellow
-                              ? _selectedThemeStyle!.color
-                              : Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(6.w),
-                          border: Border.all(
-                            color:
-                                _selectedThemeStyle == ThemeStyleOption.yellow
-                                ? Colors.transparent
-                                : Theme.of(context).colorScheme.outline,
-                            width: 1.w,
-                          ),
-                        ),
-                        child: Text(
-                          '黄色',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color:
-                                _selectedThemeStyle == ThemeStyleOption.yellow
-                                ? ThemeStyleOptionExtension.getContrastColor(
-                                    _selectedThemeStyle!.color,
-                                  )
-                                : Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
-
-                  // 绿色
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => _changeThemeStyle(ThemeStyleOption.green),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 8.h,
-                          horizontal: 12.w,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _selectedThemeStyle == ThemeStyleOption.green
-                              ? _selectedThemeStyle!.color
-                              : Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(6.w),
-                          border: Border.all(
-                            color: _selectedThemeStyle == ThemeStyleOption.green
-                                ? Colors.transparent
-                                : Theme.of(context).colorScheme.outline,
-                            width: 1.w,
-                          ),
-                        ),
-                        child: Text(
-                          '绿色',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: _selectedThemeStyle == ThemeStyleOption.green
-                                ? ThemeStyleOptionExtension.getContrastColor(
-                                    _selectedThemeStyle!.color,
-                                  )
-                                : Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                      ),
-                    ),
+                  // 顶部标题和管理链接
+                  Text('主题设置', style: Theme.of(context).textTheme.titleLarge),
+                  Icon(
+                    _isThemeSettingsExpanded
+                        ? Icons.expand_less
+                        : Icons.expand_more,
+                    size: Theme.of(context).textTheme.titleLarge?.fontSize,
                   ),
                 ],
               ),
-              SizedBox(height: 8.h),
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => _changeThemeStyle(ThemeStyleOption.blue),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 8.h,
-                          horizontal: 12.w,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _selectedThemeStyle == ThemeStyleOption.blue
-                              ? _selectedThemeStyle!.color
-                              : Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(6.w),
-                          border: Border.all(
-                            color: _selectedThemeStyle == ThemeStyleOption.blue
-                                ? Colors.transparent
-                                : Theme.of(context).colorScheme.outline,
-                            width: 1.w,
-                          ),
-                        ),
-                        child: Text(
-                          '蓝色',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: _selectedThemeStyle == ThemeStyleOption.blue
-                                ? ThemeStyleOptionExtension.getContrastColor(
-                                    _selectedThemeStyle!.color,
-                                  )
-                                : Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                      ),
+            ),
+            // 主题控制标题
+            SizedBox(height: 8.h),
+            AnimatedCrossFade(
+              firstChild: const SizedBox(height: 0, width: 0),
+              secondChild: Padding(
+                padding: EdgeInsets.symmetric(vertical: 8.0.h),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '主题模式:',
+                      textAlign: TextAlign.left,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
-                  ),
-                  SizedBox(width: 8.w),
+                    SizedBox(height: 8.h),
+                    Row(
+                      children: [
+                        // 跟随系统
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => _changeThemeMode(ThemeMode.system),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                vertical: 8.h,
+                                horizontal: 12.w,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _selectedThemeMode == ThemeMode.system
+                                    ? _selectedThemeStyle?.color ?? Colors.blue
+                                    : Theme.of(context).colorScheme.surface,
+                                borderRadius: BorderRadius.circular(6.r),
+                                border: Border.all(
+                                  color: _selectedThemeMode == ThemeMode.system
+                                      ? Colors.transparent
+                                      : Theme.of(context).colorScheme.outline,
+                                  width: 1.w,
+                                ),
+                              ),
+                              child: Text(
+                                '跟随系统',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      color:
+                                          _selectedThemeMode == ThemeMode.system
+                                          ? ThemeStyleOptionExtension.getContrastColor(
+                                              _selectedThemeStyle?.color ??
+                                                  Colors.blue,
+                                            )
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                    ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 8.w),
 
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => _changeThemeStyle(ThemeStyleOption.indigo),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 8.h,
-                          horizontal: 12.w,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _selectedThemeStyle == ThemeStyleOption.indigo
-                              ? _selectedThemeStyle!.color
-                              : Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(6.w),
-                          border: Border.all(
-                            color:
-                                _selectedThemeStyle == ThemeStyleOption.indigo
-                                ? Colors.transparent
-                                : Theme.of(context).colorScheme.outline,
-                            width: 1.w,
+                        // 浅色
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => _changeThemeMode(ThemeMode.light),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                vertical: 8.h,
+                                horizontal: 12.w,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _selectedThemeMode == ThemeMode.light
+                                    ? _selectedThemeStyle?.color ?? Colors.blue
+                                    : Theme.of(context).colorScheme.surface,
+                                borderRadius: BorderRadius.circular(6.w),
+                                border: Border.all(
+                                  color: _selectedThemeMode == ThemeMode.light
+                                      ? Colors.transparent
+                                      : Theme.of(context).colorScheme.outline,
+                                  width: 1.w,
+                                ),
+                              ),
+                              child: Text(
+                                '浅色',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      color:
+                                          _selectedThemeMode == ThemeMode.light
+                                          ? ThemeStyleOptionExtension.getContrastColor(
+                                              _selectedThemeStyle?.color ??
+                                                  Colors.blue,
+                                            )
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                    ),
+                              ),
+                            ),
                           ),
                         ),
-                        child: Text(
-                          '青色',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color:
-                                _selectedThemeStyle == ThemeStyleOption.indigo
-                                ? ThemeStyleOptionExtension.getContrastColor(
-                                    _selectedThemeStyle!.color,
-                                  )
-                                : Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 8.w),
+                        SizedBox(width: 8.w),
 
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => _changeThemeStyle(ThemeStyleOption.purple),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 8.h,
-                          horizontal: 12.w,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _selectedThemeStyle == ThemeStyleOption.purple
-                              ? _selectedThemeStyle!.color
-                              : Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(6.w),
-                          border: Border.all(
-                            color:
-                                _selectedThemeStyle == ThemeStyleOption.purple
-                                ? Colors.transparent
-                                : Theme.of(context).colorScheme.outline,
-                            width: 1.w,
+                        // 深色
+                        Expanded(
+                          child: GestureDetector(
+                            onTap: () => _changeThemeMode(ThemeMode.dark),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                vertical: 8.h,
+                                horizontal: 12.w,
+                              ),
+                              decoration: BoxDecoration(
+                                color: _selectedThemeMode == ThemeMode.dark
+                                    ? _selectedThemeStyle?.color ?? Colors.blue
+                                    : Theme.of(context).colorScheme.surface,
+                                borderRadius: BorderRadius.circular(6.w),
+                                border: Border.all(
+                                  color: _selectedThemeMode == ThemeMode.dark
+                                      ? Colors.transparent
+                                      : Theme.of(context).colorScheme.outline,
+                                  width: 1.w,
+                                ),
+                              ),
+                              child: Text(
+                                '深色',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                      color:
+                                          _selectedThemeMode == ThemeMode.dark
+                                          ? ThemeStyleOptionExtension.getContrastColor(
+                                              _selectedThemeStyle?.color ??
+                                                  Colors.blue,
+                                            )
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.onSurface,
+                                    ),
+                              ),
+                            ),
                           ),
                         ),
-                        child: Text(
-                          '紫色',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color:
-                                _selectedThemeStyle == ThemeStyleOption.purple
-                                ? ThemeStyleOptionExtension.getContrastColor(
-                                    _selectedThemeStyle!.color,
-                                  )
-                                : Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                      ),
+                      ],
                     ),
-                  ),
-                  SizedBox(width: 8.w),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () => _changeThemeStyle(ThemeStyleOption.diy),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          vertical: 8.h,
-                          horizontal: 12.w,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _selectedThemeStyle == ThemeStyleOption.diy
-                              ? _selectedThemeStyle!.color
-                              : Theme.of(context).colorScheme.surface,
-                          borderRadius: BorderRadius.circular(6.w),
-                          border: Border.all(
-                            color: _selectedThemeStyle == ThemeStyleOption.diy
-                                ? Colors.transparent
-                                : Theme.of(context).colorScheme.outline,
-                            width: 1.w,
-                          ),
-                        ),
-                        child: Text(
-                          '自定义',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: _selectedThemeStyle == ThemeStyleOption.diy
-                                ? ThemeStyleOptionExtension.getContrastColor(
-                                    _selectedThemeStyle!.color,
-                                  )
-                                : Theme.of(context).colorScheme.onSurface,
-                          ),
-                        ),
-                      ),
+                    SizedBox(height: 16.h),
+
+                    // 主题风格
+                    Text(
+                      '主题风格:',
+                      textAlign: TextAlign.left,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
-                  ),
-                ],
+                    SizedBox(height: 8.h),
+                    Column(
+                      children: [
+                        Row(
+                          children: [
+                            // 红色
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () =>
+                                    _changeThemeStyle(ThemeStyleOption.red),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 8.h,
+                                    horizontal: 12.w,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        _selectedThemeStyle ==
+                                            ThemeStyleOption.red
+                                        ? _selectedThemeStyle!.color
+                                        : Theme.of(context).colorScheme.surface,
+                                    borderRadius: BorderRadius.circular(6.w),
+                                    border: Border.all(
+                                      color:
+                                          _selectedThemeStyle ==
+                                              ThemeStyleOption.red
+                                          ? Colors.transparent
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.outline,
+                                      width: 1.w,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '红色',
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color:
+                                              _selectedThemeStyle ==
+                                                  ThemeStyleOption.red
+                                              ? ThemeStyleOptionExtension.getContrastColor(
+                                                  _selectedThemeStyle!.color,
+                                                )
+                                              : Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(width: 8.w),
+
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () =>
+                                    _changeThemeStyle(ThemeStyleOption.orange),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 8.h,
+                                    horizontal: 12.w,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        _selectedThemeStyle ==
+                                            ThemeStyleOption.orange
+                                        ? _selectedThemeStyle!.color
+                                        : Theme.of(context).colorScheme.surface,
+                                    borderRadius: BorderRadius.circular(6.w),
+                                    border: Border.all(
+                                      color:
+                                          _selectedThemeStyle ==
+                                              ThemeStyleOption.orange
+                                          ? Colors.transparent
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.outline,
+                                      width: 1.w,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '橙色',
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color:
+                                              _selectedThemeStyle ==
+                                                  ThemeStyleOption.orange
+                                              ? ThemeStyleOptionExtension.getContrastColor(
+                                                  _selectedThemeStyle!.color,
+                                                )
+                                              : Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 8.w),
+
+                            Expanded(
+                              child: // 黄色
+                              GestureDetector(
+                                onTap: () =>
+                                    _changeThemeStyle(ThemeStyleOption.yellow),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 8.h,
+                                    horizontal: 12.w,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        _selectedThemeStyle ==
+                                            ThemeStyleOption.yellow
+                                        ? _selectedThemeStyle!.color
+                                        : Theme.of(context).colorScheme.surface,
+                                    borderRadius: BorderRadius.circular(6.w),
+                                    border: Border.all(
+                                      color:
+                                          _selectedThemeStyle ==
+                                              ThemeStyleOption.yellow
+                                          ? Colors.transparent
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.outline,
+                                      width: 1.w,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '黄色',
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color:
+                                              _selectedThemeStyle ==
+                                                  ThemeStyleOption.yellow
+                                              ? ThemeStyleOptionExtension.getContrastColor(
+                                                  _selectedThemeStyle!.color,
+                                                )
+                                              : Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 8.w),
+
+                            // 绿色
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () =>
+                                    _changeThemeStyle(ThemeStyleOption.green),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 8.h,
+                                    horizontal: 12.w,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        _selectedThemeStyle ==
+                                            ThemeStyleOption.green
+                                        ? _selectedThemeStyle!.color
+                                        : Theme.of(context).colorScheme.surface,
+                                    borderRadius: BorderRadius.circular(6.w),
+                                    border: Border.all(
+                                      color:
+                                          _selectedThemeStyle ==
+                                              ThemeStyleOption.green
+                                          ? Colors.transparent
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.outline,
+                                      width: 1.w,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '绿色',
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color:
+                                              _selectedThemeStyle ==
+                                                  ThemeStyleOption.green
+                                              ? ThemeStyleOptionExtension.getContrastColor(
+                                                  _selectedThemeStyle!.color,
+                                                )
+                                              : Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8.h),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () =>
+                                    _changeThemeStyle(ThemeStyleOption.blue),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 8.h,
+                                    horizontal: 12.w,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        _selectedThemeStyle ==
+                                            ThemeStyleOption.blue
+                                        ? _selectedThemeStyle!.color
+                                        : Theme.of(context).colorScheme.surface,
+                                    borderRadius: BorderRadius.circular(6.w),
+                                    border: Border.all(
+                                      color:
+                                          _selectedThemeStyle ==
+                                              ThemeStyleOption.blue
+                                          ? Colors.transparent
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.outline,
+                                      width: 1.w,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '蓝色',
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color:
+                                              _selectedThemeStyle ==
+                                                  ThemeStyleOption.blue
+                                              ? ThemeStyleOptionExtension.getContrastColor(
+                                                  _selectedThemeStyle!.color,
+                                                )
+                                              : Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 8.w),
+
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () =>
+                                    _changeThemeStyle(ThemeStyleOption.indigo),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 8.h,
+                                    horizontal: 12.w,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        _selectedThemeStyle ==
+                                            ThemeStyleOption.indigo
+                                        ? _selectedThemeStyle!.color
+                                        : Theme.of(context).colorScheme.surface,
+                                    borderRadius: BorderRadius.circular(6.w),
+                                    border: Border.all(
+                                      color:
+                                          _selectedThemeStyle ==
+                                              ThemeStyleOption.indigo
+                                          ? Colors.transparent
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.outline,
+                                      width: 1.w,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '青色',
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color:
+                                              _selectedThemeStyle ==
+                                                  ThemeStyleOption.indigo
+                                              ? ThemeStyleOptionExtension.getContrastColor(
+                                                  _selectedThemeStyle!.color,
+                                                )
+                                              : Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 8.w),
+
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () =>
+                                    _changeThemeStyle(ThemeStyleOption.purple),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 8.h,
+                                    horizontal: 12.w,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        _selectedThemeStyle ==
+                                            ThemeStyleOption.purple
+                                        ? _selectedThemeStyle!.color
+                                        : Theme.of(context).colorScheme.surface,
+                                    borderRadius: BorderRadius.circular(6.w),
+                                    border: Border.all(
+                                      color:
+                                          _selectedThemeStyle ==
+                                              ThemeStyleOption.purple
+                                          ? Colors.transparent
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.outline,
+                                      width: 1.w,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '紫色',
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color:
+                                              _selectedThemeStyle ==
+                                                  ThemeStyleOption.purple
+                                              ? ThemeStyleOptionExtension.getContrastColor(
+                                                  _selectedThemeStyle!.color,
+                                                )
+                                              : Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 8.w),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () =>
+                                    _changeThemeStyle(ThemeStyleOption.diy),
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: 8.h,
+                                    horizontal: 12.w,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        _selectedThemeStyle ==
+                                            ThemeStyleOption.diy
+                                        ? _selectedThemeStyle!.color
+                                        : Theme.of(context).colorScheme.surface,
+                                    borderRadius: BorderRadius.circular(6.w),
+                                    border: Border.all(
+                                      color:
+                                          _selectedThemeStyle ==
+                                              ThemeStyleOption.diy
+                                          ? Colors.transparent
+                                          : Theme.of(
+                                              context,
+                                            ).colorScheme.outline,
+                                      width: 1.w,
+                                    ),
+                                  ),
+                                  child: Text(
+                                    '自定义',
+                                    textAlign: TextAlign.center,
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color:
+                                              _selectedThemeStyle ==
+                                                  ThemeStyleOption.diy
+                                              ? ThemeStyleOptionExtension.getContrastColor(
+                                                  _selectedThemeStyle!.color,
+                                                )
+                                              : Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurface,
+                                        ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ],
+              crossFadeState: _isThemeSettingsExpanded
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              duration: const Duration(milliseconds: 300),
+            ),
+
+            // 主题模式
+          ],
+        ),
       ),
     );
   }
