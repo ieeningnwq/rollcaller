@@ -3,7 +3,8 @@ import 'dart:io' show File;
 
 import 'package:dio/dio.dart' show CancelToken;
 import 'package:flutter/material.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart' show MaterialPicker;
+import 'package:flutter_colorpicker/flutter_colorpicker.dart'
+    show MaterialPicker;
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -60,9 +61,9 @@ class _SettingsState extends State<SettingsPage> {
   // 备份进度
   double _procedureProgress = 0;
 
-  ThemeMode _selectedThemeMode = ThemeMode.system;
+  ThemeMode ? _selectedThemeMode;
 
-  ThemeStyleOption _selectedThemeStyle = ThemeStyleOption.values.first;
+  ThemeStyleOption ? _selectedThemeStyle;
 
   @override
   dispose() {
@@ -76,31 +77,7 @@ class _SettingsState extends State<SettingsPage> {
   initState() {
     super.initState();
     _getWebDavConfigFuture = _getWebDavConfig();
-    // 获取主题模式
-    _storage.read(key: KString.themeModeStyleOptionKey).then((onValue) {
-      if (onValue != null) {
-        List<String> themeData = onValue.trim().split(',');
-        ThemeMode mode = ThemeStyleOptionExtension.fromStringToThemeMode(
-          themeData[0],
-        );
-        ThemeStyleOption style = ThemeStyleOptionExtension.fromString(
-          themeData[1],
-        );
-        if (style == ThemeStyleOption.diy) {
-          int argb = int.parse(themeData[2]);
-          ThemeStyleOptionExtension.pickedColor = Color.fromARGB(
-            (argb >> 24) & 0xFF,
-            (argb >> 16) & 0xFF,
-            (argb >> 8) & 0xFF,
-            argb & 0xFF,
-          );
-          if (mounted) {
-            context.read<ThemeSwitcherProvider>().setModelAndStyle(mode, style);
-          }
-        }
-      }
-    });
-  }
+    }
 
   Future<void> _getWebDavConfig() async {
     // 获取WebDav配置服务器
@@ -123,55 +100,59 @@ class _SettingsState extends State<SettingsPage> {
     _autoBackupEnabled =
         ((await _storage.read(key: KString.autoBackUpKey)) ?? 'false') ==
         'true';
-    try {
-      await _client.ping();
-      // 获取历史备份数据，从服务器获取数据
-      var list = await _client.readDir('/${KString.webDavServerFolder}');
-      // 过滤出备份文件，并排序
-      list = list
-          .where(
-            (f) =>
-                f.isDir == false &&
-                f.name!.startsWith(KString.backupFileName) &&
-                f.name!.endsWith('.json'),
-          )
-          .toList();
-      list.sort((a, b) => a.name!.compareTo(b.name!));
-      // 转换为备份模型
-      var backUpModels = list
-          .map(
-            (f) => BackUpModel.fromMap({
-              'type': BackUpTypeExtension.fromString(f.name!.split('_')[2]),
-              'dateTimeKey': f.name!.split('_')[3].replaceAll('.json', ''),
-              'result': true,
-              'fileName': f.name!,
-            }),
-          )
-          .toList();
-      // 转换为Map
-      _allBackUpModels = backUpModels.fold(
-        {},
-        (map, e) => map..addAll({e.dateTimeKey: e}),
-      );
-      // 获取上次备份数据
-      if (list.isNotEmpty) {
-        _lastBackUpModel =
-            _allBackUpModels[list.last.name!
-                .split('_')[3]
-                .replaceAll('.json', '')];
-        // 获取选中待回退的备份数据
-        _selectedBackUpModel = _lastBackUpModel;
-      } else {
-        _selectedBackUpModel = null;
-        _lastBackUpModel = null;
+    if (_allBackUpModels.isEmpty) {
+      try {
+        await _client.ping();
+        // 获取历史备份数据，从服务器获取数据
+        var list = await _client.readDir('/${KString.webDavServerFolder}');
+        // 过滤出备份文件，并排序
+        list = list
+            .where(
+              (f) =>
+                  f.isDir == false &&
+                  f.name!.startsWith(KString.backupFileName) &&
+                  f.name!.endsWith('.json'),
+            )
+            .toList();
+        list.sort((a, b) => a.name!.compareTo(b.name!));
+        // 转换为备份模型
+        var backUpModels = list
+            .map(
+              (f) => BackUpModel.fromMap({
+                'type': BackUpTypeExtension.fromString(f.name!.split('_')[2]),
+                'dateTimeKey': f.name!.split('_')[3].replaceAll('.json', ''),
+                'result': true,
+                'fileName': f.name!,
+              }),
+            )
+            .toList();
+        // 转换为Map
+        _allBackUpModels = backUpModels.fold(
+          {},
+          (map, e) => map..addAll({e.dateTimeKey: e}),
+        );
+        // 获取上次备份数据
+        if (list.isNotEmpty) {
+          _lastBackUpModel =
+              _allBackUpModels[list.last.name!
+                  .split('_')[3]
+                  .replaceAll('.json', '')];
+          // 获取选中待回退的备份数据
+          _selectedBackUpModel = _lastBackUpModel;
+        } else {
+          _selectedBackUpModel = null;
+          _lastBackUpModel = null;
+        }
+      } catch (e) {
+        Fluttertoast.showToast(msg: '获取WebDav配置失败：$e');
       }
-    } catch (e) {
-      ;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    _selectedThemeStyle ??= context.read<ThemeSwitcherProvider>().themeStyle;
+    _selectedThemeMode ??= context.read<ThemeSwitcherProvider>().themeMode;
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -928,7 +909,7 @@ class _SettingsState extends State<SettingsPage> {
                     ),
                     decoration: BoxDecoration(
                       color: _selectedThemeMode == ThemeMode.system
-                          ? _selectedThemeStyle.color
+                          ? _selectedThemeStyle?.color ?? Colors.blue
                           : Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(6.r),
                       border: Border.all(
@@ -944,7 +925,7 @@ class _SettingsState extends State<SettingsPage> {
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: _selectedThemeMode == ThemeMode.system
                             ? ThemeStyleOptionExtension.getContrastColor(
-                                _selectedThemeStyle.color,
+                                _selectedThemeStyle?.color ?? Colors.blue,
                               )
                             : Theme.of(context).colorScheme.onSurface,
                       ),
@@ -965,7 +946,7 @@ class _SettingsState extends State<SettingsPage> {
                     ),
                     decoration: BoxDecoration(
                       color: _selectedThemeMode == ThemeMode.light
-                          ? _selectedThemeStyle.color
+                          ? _selectedThemeStyle?.color ?? Colors.blue
                           : Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(6.w),
                       border: Border.all(
@@ -981,7 +962,7 @@ class _SettingsState extends State<SettingsPage> {
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: _selectedThemeMode == ThemeMode.light
                             ? ThemeStyleOptionExtension.getContrastColor(
-                                _selectedThemeStyle.color,
+                                _selectedThemeStyle?.color ?? Colors.blue,
                               )
                             : Theme.of(context).colorScheme.onSurface,
                       ),
@@ -1002,7 +983,7 @@ class _SettingsState extends State<SettingsPage> {
                     ),
                     decoration: BoxDecoration(
                       color: _selectedThemeMode == ThemeMode.dark
-                          ? _selectedThemeStyle.color
+                          ? _selectedThemeStyle?.color ?? Colors.blue
                           : Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(6.w),
                       border: Border.all(
@@ -1018,7 +999,7 @@ class _SettingsState extends State<SettingsPage> {
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: _selectedThemeMode == ThemeMode.dark
                             ? ThemeStyleOptionExtension.getContrastColor(
-                                _selectedThemeStyle.color,
+                                _selectedThemeStyle?.color ?? Colors.blue,
                               )
                             : Theme.of(context).colorScheme.onSurface,
                       ),
@@ -1048,7 +1029,7 @@ class _SettingsState extends State<SettingsPage> {
                         ),
                         decoration: BoxDecoration(
                           color: _selectedThemeStyle == ThemeStyleOption.red
-                              ? _selectedThemeStyle.color
+                              ? _selectedThemeStyle!.color
                               : Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(6.w),
                           border: Border.all(
@@ -1061,15 +1042,13 @@ class _SettingsState extends State<SettingsPage> {
                         child: Text(
                           '红色',
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color:
-                                    _selectedThemeStyle == ThemeStyleOption.red
-                                    ? ThemeStyleOptionExtension.getContrastColor(
-                                        _selectedThemeStyle.color,
-                                      )
-                                    : Theme.of(context).colorScheme.onSurface,
-                              ),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: _selectedThemeStyle == ThemeStyleOption.red
+                                ? ThemeStyleOptionExtension.getContrastColor(
+                                    _selectedThemeStyle!.color,
+                                  )
+                                : Theme.of(context).colorScheme.onSurface,
+                          ),
                         ),
                       ),
                     ),
@@ -1087,7 +1066,7 @@ class _SettingsState extends State<SettingsPage> {
                         ),
                         decoration: BoxDecoration(
                           color: _selectedThemeStyle == ThemeStyleOption.orange
-                              ? _selectedThemeStyle.color
+                              ? _selectedThemeStyle!.color
                               : Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(6.w),
                           border: Border.all(
@@ -1101,16 +1080,14 @@ class _SettingsState extends State<SettingsPage> {
                         child: Text(
                           '橙色',
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color:
-                                    _selectedThemeStyle ==
-                                        ThemeStyleOption.orange
-                                    ? ThemeStyleOptionExtension.getContrastColor(
-                                        _selectedThemeStyle.color,
-                                      )
-                                    : Theme.of(context).colorScheme.onSurface,
-                              ),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color:
+                                _selectedThemeStyle == ThemeStyleOption.orange
+                                ? ThemeStyleOptionExtension.getContrastColor(
+                                    _selectedThemeStyle!.color,
+                                  )
+                                : Theme.of(context).colorScheme.onSurface,
+                          ),
                         ),
                       ),
                     ),
@@ -1128,7 +1105,7 @@ class _SettingsState extends State<SettingsPage> {
                         ),
                         decoration: BoxDecoration(
                           color: _selectedThemeStyle == ThemeStyleOption.yellow
-                              ? _selectedThemeStyle.color
+                              ? _selectedThemeStyle!.color
                               : Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(6.w),
                           border: Border.all(
@@ -1142,16 +1119,14 @@ class _SettingsState extends State<SettingsPage> {
                         child: Text(
                           '黄色',
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color:
-                                    _selectedThemeStyle ==
-                                        ThemeStyleOption.yellow
-                                    ? ThemeStyleOptionExtension.getContrastColor(
-                                        _selectedThemeStyle.color,
-                                      )
-                                    : Theme.of(context).colorScheme.onSurface,
-                              ),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color:
+                                _selectedThemeStyle == ThemeStyleOption.yellow
+                                ? ThemeStyleOptionExtension.getContrastColor(
+                                    _selectedThemeStyle!.color,
+                                  )
+                                : Theme.of(context).colorScheme.onSurface,
+                          ),
                         ),
                       ),
                     ),
@@ -1169,7 +1144,7 @@ class _SettingsState extends State<SettingsPage> {
                         ),
                         decoration: BoxDecoration(
                           color: _selectedThemeStyle == ThemeStyleOption.green
-                              ? _selectedThemeStyle.color
+                              ? _selectedThemeStyle!.color
                               : Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(6.w),
                           border: Border.all(
@@ -1182,16 +1157,13 @@ class _SettingsState extends State<SettingsPage> {
                         child: Text(
                           '绿色',
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color:
-                                    _selectedThemeStyle ==
-                                        ThemeStyleOption.green
-                                    ? ThemeStyleOptionExtension.getContrastColor(
-                                        _selectedThemeStyle.color,
-                                      )
-                                    : Theme.of(context).colorScheme.onSurface,
-                              ),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: _selectedThemeStyle == ThemeStyleOption.green
+                                ? ThemeStyleOptionExtension.getContrastColor(
+                                    _selectedThemeStyle!.color,
+                                  )
+                                : Theme.of(context).colorScheme.onSurface,
+                          ),
                         ),
                       ),
                     ),
@@ -1211,7 +1183,7 @@ class _SettingsState extends State<SettingsPage> {
                         ),
                         decoration: BoxDecoration(
                           color: _selectedThemeStyle == ThemeStyleOption.blue
-                              ? _selectedThemeStyle.color
+                              ? _selectedThemeStyle!.color
                               : Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(6.w),
                           border: Border.all(
@@ -1224,15 +1196,13 @@ class _SettingsState extends State<SettingsPage> {
                         child: Text(
                           '蓝色',
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color:
-                                    _selectedThemeStyle == ThemeStyleOption.blue
-                                    ? ThemeStyleOptionExtension.getContrastColor(
-                                        _selectedThemeStyle.color,
-                                      )
-                                    : Theme.of(context).colorScheme.onSurface,
-                              ),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: _selectedThemeStyle == ThemeStyleOption.blue
+                                ? ThemeStyleOptionExtension.getContrastColor(
+                                    _selectedThemeStyle!.color,
+                                  )
+                                : Theme.of(context).colorScheme.onSurface,
+                          ),
                         ),
                       ),
                     ),
@@ -1249,7 +1219,7 @@ class _SettingsState extends State<SettingsPage> {
                         ),
                         decoration: BoxDecoration(
                           color: _selectedThemeStyle == ThemeStyleOption.indigo
-                              ? _selectedThemeStyle.color
+                              ? _selectedThemeStyle!.color
                               : Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(6.w),
                           border: Border.all(
@@ -1263,16 +1233,14 @@ class _SettingsState extends State<SettingsPage> {
                         child: Text(
                           '青色',
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color:
-                                    _selectedThemeStyle ==
-                                        ThemeStyleOption.indigo
-                                    ? ThemeStyleOptionExtension.getContrastColor(
-                                        _selectedThemeStyle.color,
-                                      )
-                                    : Theme.of(context).colorScheme.onSurface,
-                              ),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color:
+                                _selectedThemeStyle == ThemeStyleOption.indigo
+                                ? ThemeStyleOptionExtension.getContrastColor(
+                                    _selectedThemeStyle!.color,
+                                  )
+                                : Theme.of(context).colorScheme.onSurface,
+                          ),
                         ),
                       ),
                     ),
@@ -1289,7 +1257,7 @@ class _SettingsState extends State<SettingsPage> {
                         ),
                         decoration: BoxDecoration(
                           color: _selectedThemeStyle == ThemeStyleOption.purple
-                              ? _selectedThemeStyle.color
+                              ? _selectedThemeStyle!.color
                               : Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(6.w),
                           border: Border.all(
@@ -1303,16 +1271,14 @@ class _SettingsState extends State<SettingsPage> {
                         child: Text(
                           '紫色',
                           textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color:
-                                    _selectedThemeStyle ==
-                                        ThemeStyleOption.purple
-                                    ? ThemeStyleOptionExtension.getContrastColor(
-                                        _selectedThemeStyle.color,
-                                      )
-                                    : Theme.of(context).colorScheme.onSurface,
-                              ),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color:
+                                _selectedThemeStyle == ThemeStyleOption.purple
+                                ? ThemeStyleOptionExtension.getContrastColor(
+                                    _selectedThemeStyle!.color,
+                                  )
+                                : Theme.of(context).colorScheme.onSurface,
+                          ),
                         ),
                       ),
                     ),
@@ -1328,7 +1294,7 @@ class _SettingsState extends State<SettingsPage> {
                         ),
                         decoration: BoxDecoration(
                           color: _selectedThemeStyle == ThemeStyleOption.diy
-                              ? _selectedThemeStyle.color
+                              ? _selectedThemeStyle!.color
                               : Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(6.w),
                           border: Border.all(
@@ -1344,7 +1310,7 @@ class _SettingsState extends State<SettingsPage> {
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: _selectedThemeStyle == ThemeStyleOption.diy
                                 ? ThemeStyleOptionExtension.getContrastColor(
-                                    _selectedThemeStyle.color,
+                                    _selectedThemeStyle!.color,
                                   )
                                 : Theme.of(context).colorScheme.onSurface,
                           ),
@@ -1362,27 +1328,41 @@ class _SettingsState extends State<SettingsPage> {
   }
 
   // 切换主题模式
-  void _changeThemeMode(ThemeMode mode) {
-    setState(() {
-      _selectedThemeMode = mode;
-    });
+  Future<void> _changeThemeMode(ThemeMode mode) async {
+    _selectedThemeMode = mode;
     if (mounted) {
       context.read<ThemeSwitcherProvider>().setThemeMode(mode);
+      // 将主题风格数据写入安全存储
+      if (_selectedThemeStyle != ThemeStyleOption.diy) {
+        await _storage.write(
+          key: KString.themeModeStyleOptionKey,
+          value:
+              '${context.read<ThemeSwitcherProvider>().themeMode.toString()},${context.read<ThemeSwitcherProvider>().themeStyle.toString()}',
+        );
+      } else {
+        await _storage.write(
+          key: KString.themeModeStyleOptionKey,
+          value:
+              '${context.read<ThemeSwitcherProvider>().themeMode.toString()},${context.read<ThemeSwitcherProvider>().themeStyle.toString()},${ThemeStyleOptionExtension.pickedColor.toARGB32()}',
+        );
+      }
     }
   }
 
   // 切换主题风格
   Future<void> _changeThemeStyle(ThemeStyleOption style) async {
-    if(style==ThemeStyleOption.diy){
+    if (style == ThemeStyleOption.diy) {
       await showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: Text('自定义主题'),
           content: SingleChildScrollView(
             child: MaterialPicker(
-              pickerColor: _selectedThemeStyle.color,
-              onColorChanged: (color) => ThemeStyleOptionExtension.pickedColor = color),
+              pickerColor: _selectedThemeStyle!.color,
+              onColorChanged: (color) =>
+                  ThemeStyleOptionExtension.pickedColor = color,
             ),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -1396,11 +1376,24 @@ class _SettingsState extends State<SettingsPage> {
         ),
       );
     }
-    setState(() {
-      _selectedThemeStyle = style;
-    });
+
+    _selectedThemeStyle = style;
     if (mounted) {
       context.read<ThemeSwitcherProvider>().setThemeStyle(style);
+      // 将主题风格数据写入安全存储
+      if (style != ThemeStyleOption.diy) {
+        await _storage.write(
+          key: KString.themeModeStyleOptionKey,
+          value:
+              '${context.read<ThemeSwitcherProvider>().themeMode.toString()},${context.read<ThemeSwitcherProvider>().themeStyle.toString()}',
+        );
+      } else {
+        await _storage.write(
+          key: KString.themeModeStyleOptionKey,
+          value:
+              '${context.read<ThemeSwitcherProvider>().themeMode.toString()},${context.read<ThemeSwitcherProvider>().themeStyle.toString()},${ThemeStyleOptionExtension.pickedColor.toARGB32()}',
+        );
+      }
     }
   }
 }

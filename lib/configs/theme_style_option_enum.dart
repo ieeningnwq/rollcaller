@@ -6,6 +6,7 @@ import 'package:flutter/material.dart' show Colors, ThemeMode;
 enum ThemeStyleOption { red, orange, yellow, green, blue, indigo, purple, diy }
 
 extension ThemeStyleOptionExtension on ThemeStyleOption {
+
   static Color pickedColor = Colors.white;
   String get name {
     switch (this) {
@@ -51,21 +52,21 @@ extension ThemeStyleOptionExtension on ThemeStyleOption {
 
   static ThemeStyleOption fromString(String? value) {
     switch (value) {
-      case 'red':
+      case 'ThemeStyleOption.red':
         return ThemeStyleOption.red;
-      case 'orange':
+      case 'ThemeStyleOption.orange':
         return ThemeStyleOption.orange;
-      case 'yellow':
+      case 'ThemeStyleOption.yellow':
         return ThemeStyleOption.yellow;
-      case 'green':
+      case 'ThemeStyleOption.green':
         return ThemeStyleOption.green;
-      case 'blue':
+      case 'ThemeStyleOption.blue':
         return ThemeStyleOption.blue;
-      case 'indigo':
+      case 'ThemeStyleOption.indigo':
         return ThemeStyleOption.indigo;
-      case 'purple':
+      case 'ThemeStyleOption.purple':
         return ThemeStyleOption.purple;
-      case 'diy':
+      case 'ThemeStyleOption.diy':
         return ThemeStyleOption.diy;
       default:
         return ThemeStyleOption.blue;
@@ -74,21 +75,22 @@ extension ThemeStyleOptionExtension on ThemeStyleOption {
 
   static ThemeMode fromStringToThemeMode(String value) {
     switch (value) {
-      case 'system':
+      case 'ThemeMode.system':
         return ThemeMode.system;
-      case 'light':
+      case 'ThemeMode.light':
         return ThemeMode.light;
-      case 'dark':
+      case 'ThemeMode.dark':
         return ThemeMode.dark;
       default:
         return ThemeMode.system;
     }
   }
 
-  
-static Color getContrastColor(Color color) {
-  double brightness = 0.299 * (color.r * 255.0).round().clamp(0, 255) + 0.587 * (color.g * 255.0).round().clamp(0, 255) + 0.114 * (color.b * 255.0).round().clamp(0, 255); 
-  return brightness > 128 ? Colors.black : Colors.white;
-}
-
+  static Color getContrastColor(Color color) {
+    double brightness =
+        0.299 * (color.r * 255.0).round().clamp(0, 255) +
+        0.587 * (color.g * 255.0).round().clamp(0, 255) +
+        0.114 * (color.b * 255.0).round().clamp(0, 255);
+    return brightness > 128 ? Colors.black : Colors.white;
+  }
 }
