@@ -403,7 +403,20 @@ class _RandomCallPageState extends State<RandomCallPage>
             ),
           );
         } else {
-          Fluttertoast.showToast(msg: '请先选择点名器');
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '请先选择点名器',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onInverseSurface,
+                  ),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
         }
       },
       icon: Icon(
@@ -431,7 +444,20 @@ class _RandomCallPageState extends State<RandomCallPage>
             }
           });
         } else {
-          Fluttertoast.showToast(msg: '请先选择点名器');
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '请先选择点名器',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onInverseSurface,
+                  ),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
         }
       },
       icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.tertiary),
@@ -469,18 +495,30 @@ class _RandomCallPageState extends State<RandomCallPage>
   IconButton _buildDeleteIconButton() {
     return IconButton(
       onPressed: () async {
-        
-        // 删除点名器功能
+        // 校验是否有关联的随机点名记录
         if (_selectedCallerId != null) {
           // 校验是否有关联的随机点名记录
         final randomCallRecords = await RandomCallRecordDao()
             .getRandomCallRecordsByCallerId(_selectedCallerId!);
         if (randomCallRecords.isNotEmpty) {
           // 有随机点名记录，提示用户先删除随机点名记录
-          Fluttertoast.showToast(msg: '该点名器下有随机点名记录，无法删除。请先删除该点名器下的所有随机点名记录。');
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '该点名器下有随机点名记录，无法删除。请先删除该点名器下的所有随机点名记录。',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onInverseSurface,
+                  ),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
           return;
         }
-          if (mounted) {
+          if (context.mounted) {
             showDialog(
               context: context,
               builder: (BuildContext context) {
@@ -542,7 +580,20 @@ class _RandomCallPageState extends State<RandomCallPage>
             );
           }
         } else {
-          Fluttertoast.showToast(msg: '请先选择点名器');
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '请先选择点名器',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onInverseSurface,
+                  ),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
         }
       },
       icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
@@ -784,10 +835,23 @@ class _RandomCallPageState extends State<RandomCallPage>
               // 设置当前学生为被点击的学生
               if (_randomCallerGroup!.randomCallerModel.isDuplicate == 0 &&
                   isPickedGroup) {
-                Fluttertoast.showToast(
-                  msg:
-                      '${_randomCallerGroup!.randomCallerModel.randomCallerName}不可重复选择，已抽取学生无法重复选择',
-                );
+                // 不可重复选择，已抽取学生无法重复选择
+                if (studentRecord.values.first.isNotEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '${studentRecord.keys.first.studentName}已抽取，不可重复选择',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onInverseSurface,
+                        ),
+                      ),
+                      backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+                } else {
+                  _currentStudent = studentRecord.keys.first;
+                }
               } else {
                 _currentStudent = studentRecord.keys.first;
               }

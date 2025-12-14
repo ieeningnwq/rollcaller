@@ -504,10 +504,22 @@ class _StudentPageState extends State<StudentPage> {
                             if (randomCallRecords.isNotEmpty ||
                                 attendanceCallRecords.isNotEmpty) {
                               // 有随机点名记录，提示用户先删除随机点名记录
-                              Fluttertoast.showToast(
-                                msg:
-                                    '该学生下有随机点名记录或签到点名记录，无法删除。请先删除该学生下的所有随机点名记录或签到点名记录。',
-                              );
+                              // 显示SnackBar
+                              if (context.mounted) {
+                                Navigator.of(context).pop(); // 关闭确认弹窗
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      '该学生下有随机点名记录或签到点名记录，无法删除。请先删除该学生下的所有随机点名记录或签到点名记录。',
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onInverseSurface,
+                                      ),
+                                    ),
+                                    backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                                    duration: const Duration(seconds: 3),
+                                  ),
+                                );
+                              }
                               return;
                             }
                             await StudentDao().deleteStudentById(student.id);
@@ -624,10 +636,38 @@ class _StudentPageState extends State<StudentPage> {
           totalCount++;
         }
       }
-      Fluttertoast.showToast(msg: '成功导入 $totalCount 个学生');
+      // 显示SnackBar
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '成功导入 $totalCount 个学生',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onInverseSurface,
+              ),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
       _refreshClassGroupData();
     } catch (e) {
-      Fluttertoast.showToast(msg: '导入学生错误：${e.toString()}');
+      // 显示SnackBar
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '导入学生错误：${e.toString()}',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onInverseSurface,
+              ),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
     }
   }
 
@@ -637,7 +677,20 @@ class _StudentPageState extends State<StudentPage> {
     Permission.storage.request().then((status) {
       if (!status.isGranted) {
         // 处理权限拒绝
-        Fluttertoast.showToast(msg: '请授予存储权限');
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '请授予存储权限',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onInverseSurface,
+                ),
+              ),
+              backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
       } else {
         // 权限已授予，执行文件保存操作
         rootBundle.load('assets/templates/student_import_template.xlsx').then((
@@ -652,24 +705,19 @@ class _StudentPageState extends State<StudentPage> {
               )
               .then((value) {
                 if(context.mounted) {
-                  showDialog(
-                  context: context,
-                  builder: (context) => SimpleDialog(
-                    title: const Text('提示'),
-                    children: [
-                      Container(
-                        padding:  EdgeInsets.only(left: 24.0.w,right: 8.0.w),
-                        child: Text('模板文件已复制到：$value'),
+                  // 显示SnackBar
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        '模板文件已复制到：$value',
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.onInverseSurface,
+                        ),
                       ),
-                      SimpleDialogOption(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('确定'),
-                      ),
-                    ],
-                  ),
-                );
+                      backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
                 }
               });
         });

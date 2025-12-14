@@ -146,7 +146,21 @@ class _SettingsState extends State<SettingsPage> {
           _lastBackUpModel = null;
         }
       } catch (e) {
-        Fluttertoast.showToast(msg: '获取WebDav配置失败：$e');
+        // 显示SnackBar
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '获取WebDav配置失败：$e',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onInverseSurface,
+                ),
+              ),
+              backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
       }
     }
   }
@@ -422,11 +436,39 @@ class _SettingsState extends State<SettingsPage> {
                         );
                         try {
                           await _client.ping();
-                          Fluttertoast.showToast(msg: '连接成功');
+                          // 连接成功处理逻辑
+                          // 可以显示成功提示、更新UI状态等
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  '连接成功',
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onInverseSurface,
+                                  ),
+                                ),
+                                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                                duration: const Duration(seconds: 3),
+                              ),
+                            );
+                          }
                         } catch (e) {
                           // 连接失败处理逻辑
                           // 可以显示错误提示、更新UI状态等
-                          Fluttertoast.showToast(msg: '连接失败');
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  '连接失败：$e',
+                                  style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onInverseSurface,
+                                  ),
+                                ),
+                                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                                duration: const Duration(seconds: 3),
+                              ),
+                            );
+                          }
                         }
                       },
                       style: OutlinedButton.styleFrom(
@@ -805,7 +847,22 @@ class _SettingsState extends State<SettingsPage> {
       }
     } catch (e) {
       result = false;
-      Fluttertoast.showToast(msg: '备份失败：$e');
+      // 显示SnackBar
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '备份失败：$e',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onInverseSurface,
+              ),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+      return;
     }
     // ! 5、删除临时文件
     await tempFile.delete();
@@ -821,9 +878,37 @@ class _SettingsState extends State<SettingsPage> {
     });
     // ! 7、反馈结果
     if (result) {
-      Fluttertoast.showToast(msg: '备份成功');
+      // 显示SnackBar
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '备份成功',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onInverseSurface,
+              ),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
     } else {
-      Fluttertoast.showToast(msg: '备份失败');
+      // 显示SnackBar
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '备份失败',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onInverseSurface,
+              ),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
     }
   }
 
@@ -909,10 +994,38 @@ class _SettingsState extends State<SettingsPage> {
       // 11、刷新数据
       setState(() {
         _procedureProgress = 1.0;
-        Fluttertoast.showToast(msg: '恢复成功');
+        // 显示SnackBar
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '恢复成功',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onInverseSurface,
+                ),
+              ),
+              backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
       });
     } catch (e) {
-      Fluttertoast.showToast(msg: '恢复失败：$e');
+      // 显示SnackBar
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '恢复失败：$e',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onInverseSurface,
+              ),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
     }
   }
 

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart' show Fluttertoast;
 
 import '../configs/attendance_status.dart';
 import '../models/attendance_call_record.dart';
@@ -658,9 +657,7 @@ class _AttendencePageState extends State<AttendencePage> {
             ),
           );
         } else {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(
+          ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
                 '请先选择点名器',
@@ -699,7 +696,18 @@ class _AttendencePageState extends State<AttendencePage> {
             }
           });
         } else {
-          Fluttertoast.showToast(msg: '请先选择点名器');
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                '请先选择点名器',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onInverseSurface,
+                ),
+              ),
+              backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+              duration: const Duration(seconds: 3),
+            ),
+          );
         }
       },
       icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.tertiary),
@@ -737,9 +745,21 @@ class _AttendencePageState extends State<AttendencePage> {
               .getAttendanceCallRecordsByCallerId(_selectedCallerId!);
           if (attendanceCallRecords.isNotEmpty) {
             // 有签到点名记录，提示用户先删除签到点名记录
-            Fluttertoast.showToast(
-              msg: '该点名器下有签到点名记录，无法删除。请先删除该点名器下的所有签到点名记录。',
-            );
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                    '该点名器下有签到点名记录，无法删除。请先删除该点名器下的所有签到点名记录。',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onInverseSurface,
+                    ),
+                  ),
+                  backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+            }
+
             return;
           }
           if (context.mounted) {
@@ -770,10 +790,14 @@ class _AttendencePageState extends State<AttendencePage> {
                                       content: Text(
                                         '删除成功',
                                         style: TextStyle(
-                                          color: Theme.of(context).colorScheme.onInverseSurface,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onInverseSurface,
                                         ),
                                       ),
-                                      backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                                      backgroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.inverseSurface,
                                       duration: const Duration(seconds: 3),
                                     ),
                                   );
@@ -785,12 +809,16 @@ class _AttendencePageState extends State<AttendencePage> {
                                       content: Text(
                                         '删除失败',
                                         style: TextStyle(
-                                          color: Theme.of(context).colorScheme.onInverseSurface,
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onInverseSurface,
                                         ),
                                       ),
-                                      backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                                      backgroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.inverseSurface,
                                       duration: const Duration(seconds: 3),
-                                    ),  
+                                    ),
                                   );
                                 }
                               }
@@ -804,7 +832,20 @@ class _AttendencePageState extends State<AttendencePage> {
             );
           }
         } else {
-          Fluttertoast.showToast(msg: '请先选择点名器');
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '请先选择点名器',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onInverseSurface,
+                  ),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                duration: const Duration(seconds: 3),
+              ),
+            );
+          }
         }
       },
       icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),

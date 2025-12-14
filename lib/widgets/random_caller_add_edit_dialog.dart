@@ -100,12 +100,22 @@ class _RandomCallerAddEditDialogState extends State<RandomCallerAddEditDialog> {
                 TextButton(
                   onPressed: () {
                     if (_allStudentClassesMap!.isEmpty) {
-                      Fluttertoast.showToast(
-                        msg: '暂无班级，无法添加点名器，请先添加班级',
-                        toastLength: Toast.LENGTH_SHORT,
-                        gravity: ToastGravity.BOTTOM,
-                        timeInSecForIosWeb: 1,
-                      );
+                      // 显示SnackBar
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              '暂无班级，无法添加点名器，请先添加班级',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onInverseSurface,
+                              ),
+                            ),
+                            backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                            duration: const Duration(seconds: 3),
+                          ),
+                        );
+                      }
+                      Navigator.of(context).pop(false);
                       return;
                     }
                     _saveRandomCaller(context);

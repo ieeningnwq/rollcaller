@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../configs/strings.dart';
@@ -50,7 +49,7 @@ class _StudentClassState extends State<StudentClassPage> {
           children: [
             // 顶部标题栏
             Container(
-              padding:  EdgeInsets.all(12.w),
+              padding: EdgeInsets.all(12.w),
               child: Text(
                 KString.studentClassAppBarTitle,
                 style: Theme.of(context).textTheme.headlineLarge,
@@ -89,9 +88,8 @@ class _StudentClassState extends State<StudentClassPage> {
                               return Center(
                                 child: Text(
                                   '暂无班级',
-                                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                    fontStyle: FontStyle.italic,
-                                  ),
+                                  style: Theme.of(context).textTheme.bodyLarge
+                                      ?.copyWith(fontStyle: FontStyle.italic),
                                 ),
                               );
                             }
@@ -99,7 +97,9 @@ class _StudentClassState extends State<StudentClassPage> {
                                 .values
                                 .elementAt(index);
                             return Card(
-                              color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHigh,
                               elevation: 10.0.w,
                               margin: EdgeInsets.symmetric(
                                 horizontal: 16.0.h,
@@ -108,11 +108,12 @@ class _StudentClassState extends State<StudentClassPage> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0.r),
                                 side: BorderSide(
-                                  color: Theme.of(context).colorScheme.outline.withAlpha(150),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.outline.withAlpha(150),
                                   width: 1.0.w,
                                 ),
                               ),
-                              
 
                               child: Padding(
                                 padding: EdgeInsets.all(8.0.w),
@@ -137,9 +138,15 @@ class _StudentClassState extends State<StudentClassPage> {
                                     // 班级备注
                                     Text(
                                       studentClass.notes,
-                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                        color: Theme.of(context).colorScheme.onSurface.withAlpha(150),
-                                      ),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .bodySmall
+                                          ?.copyWith(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withAlpha(150),
+                                          ),
                                     ),
                                     SizedBox(height: 12.0.h),
                                     // 底部操作按钮
@@ -179,7 +186,7 @@ class _StudentClassState extends State<StudentClassPage> {
               );
             },
           ).then((onValue) {
-            if (onValue!=null && onValue) {
+            if (onValue != null && onValue) {
               _refreshClassData();
             }
           });
@@ -367,9 +374,12 @@ class _StudentClassState extends State<StudentClassPage> {
           });
         },
         icon: Icon(Icons.edit, color: Theme.of(context).colorScheme.secondary),
-        label: Text('编辑', style: Theme.of(context).textTheme.labelLarge?.copyWith(
-          color: Theme.of(context).colorScheme.secondary,
-        )),
+        label: Text(
+          '编辑',
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            color: Theme.of(context).colorScheme.secondary,
+          ),
+        ),
       ),
       SizedBox(width: 8.0),
       TextButton.icon(
@@ -420,16 +430,36 @@ class _StudentClassState extends State<StudentClassPage> {
                             });
                       } else {
                         // 班级下还有学生，提示用户先删除学生
-                        Fluttertoast.showToast(
-                          msg:
-                              '该班级下还有学生、随机点名器、签到点名器，无法删除。请先删除班级下的所有学生、随机点名器、签到点名器。',
-                        );
+                        // 显示SnackBar
+                        if (context.mounted) {
+                          Navigator.of(context).pop(); // 关闭确认弹窗
+
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                '该班级下还有学生、随机点名器、签到点名器，无法删除。请先删除班级下的所有学生、随机点名器、签到点名器。',
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onInverseSurface,
+                                ),
+                              ),
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.inverseSurface,
+                              duration: const Duration(seconds: 3),
+                            ),
+                          );
+                        }
                         // 关闭确认弹窗
                       }
                     },
-                    child: Text('删除', style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.error,
-                    )),
+                    child: Text(
+                      '删除',
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
                   ),
                 ],
               );
@@ -437,9 +467,12 @@ class _StudentClassState extends State<StudentClassPage> {
           );
         },
         icon: Icon(Icons.delete, color: Theme.of(context).colorScheme.error),
-        label: Text('删除', style: Theme.of(context).textTheme.labelLarge?.copyWith(
-          color: Theme.of(context).colorScheme.error,
-        )),
+        label: Text(
+          '删除',
+          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+            color: Theme.of(context).colorScheme.error,
+          ),
+        ),
       ),
     ],
   );
@@ -449,7 +482,11 @@ class _StudentClassState extends State<StudentClassPage> {
     return classQuantity == studentClass.studentQuantity
         ? Icon(Icons.check_circle, size: 16, color: Colors.green)
         : classQuantity < studentClass.studentQuantity
-        ? Icon(Icons.warning_amber, size: 16, color: Color.fromARGB(170, 146, 64, 14))
+        ? Icon(
+            Icons.warning_amber,
+            size: 16,
+            color: Color.fromARGB(170, 146, 64, 14),
+          )
         : Icon(Icons.error, size: 16, color: Colors.red);
   }
 
