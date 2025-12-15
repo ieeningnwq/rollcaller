@@ -5,8 +5,8 @@ import 'dart:io' show File;
 import 'package:dio/dio.dart' show CancelToken;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart'
-    show FlutterSecureStorage;
+import 'package:shared_preferences/shared_preferences.dart'
+    show SharedPreferences;
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart' show getTemporaryDirectory;
 import 'package:provider/provider.dart';
@@ -52,7 +52,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   // 安全存储
-  final _storage = const FlutterSecureStorage();
+  final _storage = SharedPreferences.getInstance();
 
   @override
   Widget build(BuildContext context) {
@@ -79,18 +79,29 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     if (state == AppLifecycleState.paused) {
       // 获取是否自动备份
       bool autoBackupEnabled =
-          ((await _storage.read(key: KString.autoBackUpKey)) ?? 'false') ==
-          'true';
+          ((await _storage.then(
+            (storage) => storage.getBool(KString.autoBackUpKey),
+          )) ??
+          false);
       if (autoBackupEnabled) {
         // 获取WebDav配置服务器
         final webDavServer =
-            (await _storage.read(key: KString.webDavServerKey)) ?? '';
+            (await _storage.then(
+              (storage) => storage.getString(KString.webDavServerKey),
+            )) ??
+            '';
         // 获取WebDav配置用户名
         final webDavUsername =
-            (await _storage.read(key: KString.webDavUsernameKey)) ?? '';
+            (await _storage.then(
+              (storage) => storage.getString(KString.webDavUsernameKey),
+            )) ??
+            '';
         // 获取WebDav配置密码
         final webDavPassword =
-            (await _storage.read(key: KString.webDavPasswordKey)) ?? '';
+            (await _storage.then(
+              (storage) => storage.getString(KString.webDavPasswordKey),
+            )) ??
+            '';
         // 设置WebDav连接客户端
         Client client = newClient(
           webDavServer,
@@ -116,29 +127,34 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     // 获取主题模式
-    _storage.read(key: KString.themeModeStyleOptionKey).then((onValue) {
-      if (onValue != null) {
-        List<String> themeData = onValue.trim().split(',');
-        ThemeMode mode = ThemeStyleOptionExtension.fromStringToThemeMode(
-          themeData[0],
-        );
-        ThemeStyleOption style = ThemeStyleOptionExtension.fromString(
-          themeData[1],
-        );
-        if (style == ThemeStyleOption.diy) {
-          int argb = int.parse(themeData[2]);
-          ThemeStyleOptionExtension.pickedColor = Color.fromARGB(
-            (argb >> 24) & 0xFF,
-            (argb >> 16) & 0xFF,
-            (argb >> 8) & 0xFF,
-            argb & 0xFF,
-          );
-          if (mounted) {
-            context.read<ThemeSwitcherProvider>().setModelAndStyle(mode, style);
+    _storage
+        .then((storage) => storage.getString(KString.themeModeStyleOptionKey))
+        .then((onValue) {
+          if (onValue != null) {
+            List<String> themeData = onValue.trim().split(',');
+            ThemeMode mode = ThemeStyleOptionExtension.fromStringToThemeMode(
+              themeData[0],
+            );
+            ThemeStyleOption style = ThemeStyleOptionExtension.fromString(
+              themeData[1],
+            );
+            if (style == ThemeStyleOption.diy) {
+              int argb = int.parse(themeData[2]);
+              ThemeStyleOptionExtension.pickedColor = Color.fromARGB(
+                (argb >> 24) & 0xFF,
+                (argb >> 16) & 0xFF,
+                (argb >> 8) & 0xFF,
+                argb & 0xFF,
+              );
+              if (mounted) {
+                context.read<ThemeSwitcherProvider>().setModelAndStyle(
+                  mode,
+                  style,
+                );
+              }
+            }
           }
-        }
-      }
-    });
+        });
   }
 
   @override

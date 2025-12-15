@@ -12,7 +12,6 @@
     <!-- 允许访问网络状态 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <application
-        android:allowBackup="false"
         android:label="点名器"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">

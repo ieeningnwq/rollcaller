@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart'
     show MaterialPicker;
 import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart' show getTemporaryDirectory;
 import 'package:provider/provider.dart';
@@ -53,7 +53,7 @@ class _SettingsState extends State<SettingsPage> {
   // WebDav连接客户端
   late Client _client;
   // 安全存储
-  final _storage = const FlutterSecureStorage();
+  final _storage = SharedPreferences.getInstance();
 
   // 获取WebDav配置
   late Future<void> _getWebDavConfigFuture;
@@ -83,13 +83,22 @@ class _SettingsState extends State<SettingsPage> {
   Future<void> _getWebDavConfig() async {
     // 获取WebDav配置服务器
     _webDavServerController.text =
-        (await _storage.read(key: KString.webDavServerKey)) ?? '';
+        (await _storage.then(
+          (storage) => storage.getString(KString.webDavServerKey),
+        )) ??
+        '';
     // 获取WebDav配置用户名
     _webDavUsernameController.text =
-        (await _storage.read(key: KString.webDavUsernameKey)) ?? '';
+        (await _storage.then(
+          (storage) => storage.getString(KString.webDavUsernameKey),
+        )) ??
+        '';
     // 获取WebDav配置密码
     _webDavPasswordController.text =
-        (await _storage.read(key: KString.webDavPasswordKey)) ?? '';
+        (await _storage.then(
+          (storage) => storage.getString(KString.webDavPasswordKey),
+        )) ??
+        '';
     // 设置WebDav连接客户端
     _client = newClient(
       _webDavServerController.text,
@@ -99,8 +108,10 @@ class _SettingsState extends State<SettingsPage> {
     );
     // 获取是否自动备份
     _autoBackupEnabled =
-        ((await _storage.read(key: KString.autoBackUpKey)) ?? 'false') ==
-        'true';
+        ((await _storage.then(
+          (storage) => storage.getBool(KString.autoBackUpKey),
+        )) ??
+        false);
     if (_allBackUpModels.isEmpty) {
       try {
         await _client.ping();
@@ -414,17 +425,23 @@ class _SettingsState extends State<SettingsPage> {
                     child: OutlinedButton(
                       onPressed: () async {
                         // 将信息保存到_storage
-                        _storage.write(
-                          key: KString.webDavServerKey,
-                          value: _webDavServerController.text,
+                        await _storage.then(
+                          (value) => value.setString(
+                            KString.webDavServerKey,
+                            _webDavServerController.text,
+                          ),
                         );
-                        _storage.write(
-                          key: KString.webDavUsernameKey,
-                          value: _webDavUsernameController.text,
+                        await _storage.then(
+                          (value) => value.setString(
+                            KString.webDavUsernameKey,
+                            _webDavUsernameController.text,
+                          ),
                         );
-                        _storage.write(
-                          key: KString.webDavPasswordKey,
-                          value: _webDavPasswordController.text,
+                        await _storage.then(
+                          (value) => value.setString(
+                            KString.webDavPasswordKey,
+                            _webDavPasswordController.text,
+                          ),
                         );
                         // 更新_client
                         _client = newClient(
@@ -443,10 +460,14 @@ class _SettingsState extends State<SettingsPage> {
                                 content: Text(
                                   '连接成功',
                                   style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onInverseSurface,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onInverseSurface,
                                   ),
                                 ),
-                                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.inverseSurface,
                                 duration: const Duration(seconds: 3),
                               ),
                             );
@@ -460,10 +481,14 @@ class _SettingsState extends State<SettingsPage> {
                                 content: Text(
                                   '连接失败：$e',
                                   style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onInverseSurface,
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onInverseSurface,
                                   ),
                                 ),
-                                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                                backgroundColor: Theme.of(
+                                  context,
+                                ).colorScheme.inverseSurface,
                                 duration: const Duration(seconds: 3),
                               ),
                             );
@@ -514,17 +539,23 @@ class _SettingsState extends State<SettingsPage> {
                     child: ElevatedButton(
                       onPressed: () {
                         // 保存配置的逻辑
-                        _storage.write(
-                          key: KString.webDavServerKey,
-                          value: _webDavServerController.text,
+                        _storage.then(
+                          (value) => value.setString(
+                            KString.webDavServerKey,
+                            _webDavServerController.text,
+                          ),
                         );
-                        _storage.write(
-                          key: KString.webDavUsernameKey,
-                          value: _webDavUsernameController.text,
+                        _storage.then(
+                          (value) => value.setString(
+                            KString.webDavUsernameKey,
+                            _webDavUsernameController.text,
+                          ),
                         );
-                        _storage.write(
-                          key: KString.webDavPasswordKey,
-                          value: _webDavPasswordController.text,
+                        _storage.then(
+                          (value) => value.setString(
+                            KString.webDavPasswordKey,
+                            _webDavPasswordController.text,
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -615,9 +646,9 @@ class _SettingsState extends State<SettingsPage> {
                 onChanged: (value) {
                   setState(() {
                     _autoBackupEnabled = value;
-                    _storage.write(
-                      key: KString.autoBackUpKey,
-                      value: value.toString(),
+                    _storage.then(
+                      (storage) =>
+                          storage.setBool(KString.autoBackUpKey, value),
                     );
                   });
                 },
@@ -693,10 +724,14 @@ class _SettingsState extends State<SettingsPage> {
                         content: Text(
                           '请先选择要恢复的备份',
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.onInverseSurface,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onInverseSurface,
                           ),
                         ),
-                        backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.inverseSurface,
                       ),
                     );
                   }
@@ -1645,16 +1680,18 @@ class _SettingsState extends State<SettingsPage> {
       context.read<ThemeSwitcherProvider>().setThemeMode(mode);
       // 将主题风格数据写入安全存储
       if (_selectedThemeStyle != ThemeStyleOption.diy) {
-        await _storage.write(
-          key: KString.themeModeStyleOptionKey,
-          value:
-              '${context.read<ThemeSwitcherProvider>().themeMode.toString()},${context.read<ThemeSwitcherProvider>().themeStyle.toString()}',
+        await _storage.then(
+          (value) => value.setString(
+            KString.themeModeStyleOptionKey,
+            '${context.read<ThemeSwitcherProvider>().themeMode.toString()},${context.read<ThemeSwitcherProvider>().themeStyle.toString()}',
+          ),
         );
       } else {
-        await _storage.write(
-          key: KString.themeModeStyleOptionKey,
-          value:
-              '${context.read<ThemeSwitcherProvider>().themeMode.toString()},${context.read<ThemeSwitcherProvider>().themeStyle.toString()},${ThemeStyleOptionExtension.pickedColor.toARGB32()}',
+        await _storage.then(
+          (value) => value.setString(
+            KString.themeModeStyleOptionKey,
+            '${context.read<ThemeSwitcherProvider>().themeMode.toString()},${context.read<ThemeSwitcherProvider>().themeStyle.toString()},${ThemeStyleOptionExtension.pickedColor.toARGB32()}',
+          ),
         );
       }
     }
@@ -1694,16 +1731,18 @@ class _SettingsState extends State<SettingsPage> {
       context.read<ThemeSwitcherProvider>().setThemeStyle(style);
       // 将主题风格数据写入安全存储
       if (style != ThemeStyleOption.diy) {
-        await _storage.write(
-          key: KString.themeModeStyleOptionKey,
-          value:
-              '${context.read<ThemeSwitcherProvider>().themeMode.toString()},${context.read<ThemeSwitcherProvider>().themeStyle.toString()}',
+        _storage.then(
+          (value) => value.setString(
+            KString.themeModeStyleOptionKey,
+            '${context.read<ThemeSwitcherProvider>().themeMode.toString()},${context.read<ThemeSwitcherProvider>().themeStyle.toString()}',
+          ),
         );
       } else {
-        await _storage.write(
-          key: KString.themeModeStyleOptionKey,
-          value:
-              '${context.read<ThemeSwitcherProvider>().themeMode.toString()},${context.read<ThemeSwitcherProvider>().themeStyle.toString()},${ThemeStyleOptionExtension.pickedColor.toARGB32()}',
+        _storage.then(
+          (value) => value.setString(
+            KString.themeModeStyleOptionKey,
+            '${context.read<ThemeSwitcherProvider>().themeMode.toString()},${context.read<ThemeSwitcherProvider>().themeStyle.toString()},${ThemeStyleOptionExtension.pickedColor.toARGB32()}',
+          ),
         );
       }
     }
