@@ -679,7 +679,7 @@ class _StudentPageState extends State<StudentPage> {
   void _copyStudentImportTemplateExcel() {
     // 读取模板文件 Saves as: student_import_template.xlsx
     // 请求权限
-    Permission.storage.request().then((status) {
+    Permission.manageExternalStorage.request().then((status) {
       if (!status.isGranted) {
         // 处理权限拒绝
         if (context.mounted) {
