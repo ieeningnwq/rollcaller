@@ -51,7 +51,7 @@ class _SettingsState extends State<SettingsPage> {
   // 选中待回退的备份数据
   BackUpModel? _selectedBackUpModel;
   // WebDav连接客户端
-   Client ?_client;
+  Client? _client;
   // 安全存储
   final _storage = SharedPreferences.getInstance();
 
@@ -1736,6 +1736,7 @@ class _SettingsState extends State<SettingsPage> {
 
   // 切换主题风格
   Future<void> _changeThemeStyle(ThemeStyleOption style) async {
+    Color materialPickerColor = _selectedThemeStyle!.color;
     if (style == ThemeStyleOption.diy) {
       await showDialog(
         context: context,
@@ -1744,17 +1745,16 @@ class _SettingsState extends State<SettingsPage> {
           content: SingleChildScrollView(
             child: MaterialPicker(
               pickerColor: _selectedThemeStyle!.color,
-              onColorChanged: (color) =>
-                  ThemeStyleOptionExtension.pickedColor = color,
+              onColorChanged: (color) => materialPickerColor = color,
+              onPrimaryChanged: (color) => materialPickerColor = color,
             ),
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('取消'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () {
+                Navigator.of(context).pop();
+                ThemeStyleOptionExtension.pickedColor = materialPickerColor;
+              },
               child: Text('确定'),
             ),
           ],

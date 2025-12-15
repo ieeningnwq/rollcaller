@@ -37,7 +37,7 @@ class KString {
   static const String callSuffix = '次'; // '次'
   static const String averageScorePrefix = '平均分: '; // '平均分：'
   static const String studentList = '学生列表';
-    static const String pickedStudent = '已抽取学生';
+  static const String pickedStudent = '已抽取学生';
   static const String notPickedStudent = '未抽取学生';
   // ! 4、签到点名功能页面 attendance_page.dart
   static const String searchStudent = '搜索学生'; // '搜索学生'
@@ -100,7 +100,7 @@ class KString {
   static const String filterCondition = '筛选条件'; // '筛选条件'
   static const String resetFilter = '重置'; // '重置筛选条件'
   static const String export = '导出'; // '导出'
-  static const String randomCallerPrefix= '点名器: '; // '点名器: '
+  static const String randomCallerPrefix = '点名器: '; // '点名器: '
   static const String all = '全部'; // '全部'
   static const String timeRangePrefix = '时间范围: '; // '时间范围'
   static const String startTime = '开始时间'; // '开始时间'
@@ -111,14 +111,18 @@ class KString {
   static const String editScore = '编辑分数'; // '编辑分数'
   static const String score = '分数'; // '分数'
   static const String pleaseInputScore = '请输入分数'; // '请输入分数'
-  static const String pleaseInputValidScore = '请输入有效的整数（1-10）'; // '请输入有效的整数（1-10）'
+  static const String pleaseInputValidScore =
+      '请输入有效的整数（1-10）'; // '请输入有效的整数（1-10）'
   static const String confirmDeleteCallerRecordContent =
       '确定要删除这条点名记录吗？此操作不可恢复。'; // '确定要删除这条点名记录吗？此操作不可恢复。'
-      static const String confirmArchive = '确认归档'; // '确认归档'
-  static const String confirmArchiveContent = '归档后该点名器及记录将不可修改且无法撤销，是否继续？'; // '归档后该点名器及记录将不可修改且无法撤销，是否继续？'
+  static const String confirmArchive = '确认归档'; // '确认归档'
+  static const String confirmArchiveContent =
+      '归档后该点名器及记录将不可修改且无法撤销，是否继续？'; // '归档后该点名器及记录将不可修改且无法撤销，是否继续？'
   static const String selectRandomCallerToExport = '选择需要导出的点名器'; // '选择需要导出的点名器'
-  static const String pleaseSelectRandomCallerToExportPrefix = '请选择需要导出的点名器: '; // '请选择需要导出的点名器: '
-  static const String pleaseSelectAtLeastOneRandomCaller = '请至少选择一个点名器'; // '请至少选择一个点名器'
+  static const String pleaseSelectRandomCallerToExportPrefix =
+      '请选择需要导出的点名器: '; // '请选择需要导出的点名器: '
+  static const String pleaseSelectAtLeastOneRandomCaller =
+      '请至少选择一个点名器'; // '请至少选择一个点名器'
   static const String exportColumnOrder = '序号'; // '序号'
   static const String exportColumnName = '点名器名称'; // '点名器名称'
   static const String exportColumnClassName = '班级名称'; // '班级名称'
@@ -128,7 +132,8 @@ class KString {
   static const String exportColumnTime = '点名时间'; // '时间'
   static const String exportColumnRemark = '备注'; // '备注'
   static const String noExportableRecords = '没有找到可导出的记录'; // '没有找到可导出的记录'
-  static const String pleaseGrantStoragePermissionToExport = '请授予存储权限才能导出文件'; // '请授予存储权限才能导出文件'
+  static const String pleaseGrantStoragePermissionToExport =
+      '请授予存储权限才能导出文件'; // '请授予存储权限才能导出文件'
   static const String exportFileNamePrefix = '点名记录_'; // '点名记录_'
   static const String exportSuccessPrefix = '导出成功！共导出 '; // '导出成功！共导出 '
   static const String exportSuccessSuffix = '条记录到文件: '; // '条记录'
@@ -137,17 +142,6 @@ class KString {
   static const String noAttendanceCallRecord = '暂无签到点名记录'; // '暂无签到点名记录'
   static const String exportColumnAttendanceStatus = '出席情况'; // '出席情况'
   // ! 10、设置页面 settings_page.dart
-
-
-
-
-
-
-
-
-
-
-
   // ! 数据库相关配置
   static const String databaseName = 'rollcall.db';
   static const String studentClassTableName = 'student_class';
@@ -188,7 +182,4 @@ class KString {
   static const String edit = '编辑';
   static const String confirm = '确定'; // '确定'
   static const String save = '保存';
-
-
-
 }

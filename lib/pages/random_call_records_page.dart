@@ -909,6 +909,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
           title: const Text(KString.dateRangePickerTitle), // '选择时间范围'
           content: SizedBox(
             height: 400.h,
+            width: MediaQuery.of(context).size.width * 0.8,
             child: SfDateRangePicker(
               confirmText: KString.confirm, // '确定'
               cancelText: KString.cancel, // '取消'

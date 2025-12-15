@@ -153,6 +153,13 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                 );
               }
             }
+          }else{
+            if (mounted) {
+              context.read<ThemeSwitcherProvider>().setModelAndStyle(
+                ThemeMode.system,
+                ThemeStyleOption.blue,
+              );
+            }
           }
         });
   }
