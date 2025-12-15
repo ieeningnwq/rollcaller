@@ -414,11 +414,13 @@ class _StudentClassState extends State<StudentClassPage> {
                           randomCallers.isEmpty &&
                           attendanceCallers.isEmpty) {
                         classDao
-                            .deleteStudentClassByClassName(
-                              studentClass.className,
+                            .deleteStudentClassById(
+                              studentClass.id!,
                             )
                             .then((value) {
                               if (value != 0) {
+                                // 删除学生班级关系表中的数据
+                                StudentClassRelationDao().deleteAllByClassId(studentClass.id!);
                                 // 删除成功
                                 setState(() {
                                   _studentClassMap.remove(studentClass.id!);

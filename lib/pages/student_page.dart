@@ -522,7 +522,10 @@ class _StudentPageState extends State<StudentPage> {
                               }
                               return;
                             }
+                            // 删除学生
                             await StudentDao().deleteStudentById(student.id);
+                            // 删除学生班级关系表中相关的数据
+                            await StudentClassRelationDao().deleteStudentClasses(student.id!);
                             if (context.mounted) {
                               // 刷新学生列表
                               _refreshClassGroupData();

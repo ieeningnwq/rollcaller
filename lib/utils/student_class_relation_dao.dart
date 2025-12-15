@@ -54,6 +54,15 @@ class StudentClassRelationDao {
     );
   }
 
+  Future<int> deleteAllByClassId(int classId) async {
+    final db = await dbHelper.database;
+    return await db.delete(
+      tableName,
+      where: 'class_id = ?',
+      whereArgs: [classId],
+    );
+  }
+
   Future<bool> isStudentClassRelationExist(int? studentId, int classId) async {
     final db = await dbHelper.database;
     final List<Map<String, dynamic>> maps = await db.query(
