@@ -1,6 +1,6 @@
-import 'package:sqflite/sqflite.dart';
+import 'dart:io' show Platform, Directory;
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart';
-
 import '../configs/strings.dart';
 
 class DatabaseHelper {
@@ -19,11 +19,28 @@ class DatabaseHelper {
   }
 
   Future<Database> initDb() async {
-    final String databasesPath = join(
-      await getDatabasesPath(),
-      KString.databaseName,
-    );
-    return await openDatabase(databasesPath, version: 1, onCreate: _createDb);
+    String databasesPath;
+
+    // 根据平台类型选择不同的数据库路径和初始化方式
+    if (Platform.isWindows) {
+      // Windows平台使用sqflite_common_ffi
+      sqfliteFfiInit();
+      // 使用getDatabasesPath可能在Windows上返回空路径，需要处理
+      databasesPath = await databaseFactoryFfi.getDatabasesPath();
+      if (databasesPath.isEmpty) {
+        // 如果路径为空，使用当前目录或文档目录
+        databasesPath = Directory.current.path;
+      }
+      databasesPath = join(databasesPath, KString.databaseName);
+      return await databaseFactoryFfi.openDatabase(
+        databasesPath,
+        options: OpenDatabaseOptions(version: 1, onCreate: _createDb),
+      );
+    } else {
+      // 移动端使用原生sqflite
+      databasesPath = join(await getDatabasesPath(), KString.databaseName);
+      return await openDatabase(databasesPath, version: 1, onCreate: _createDb);
+    }
   }
 
   void _createDb(Database db, int version) async {

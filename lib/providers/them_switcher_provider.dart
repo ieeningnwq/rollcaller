@@ -17,7 +17,16 @@ class ThemeSwitcherProvider extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
   ThemeStyleOption _themeStyle = ThemeStyleOption.blue;
 
-  static final TextTheme _textTheme = TextTheme(
+  ThemeMode get themeMode => _themeMode;
+  ThemeStyleOption get themeStyle => _themeStyle;
+
+  ThemeData? get theme =>
+      _themeDataMap[_themeStyle]![Brightness.light];
+  ThemeData? get darkTheme =>
+      _themeDataMap[_themeStyle]![Brightness.dark];
+
+  // 主题数据
+  static final TextTheme textTheme = TextTheme(
     headlineLarge: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold),
     headlineMedium: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
     headlineSmall: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
@@ -31,8 +40,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
     labelMedium: TextStyle(fontSize: 18.sp),
     labelSmall: TextStyle(fontSize: 16.sp),
   );
-
-  final _themeDataMap = {
+  static final _themeDataMap = {
     ThemeStyleOption.blue: {
       Brightness.light: ThemeData(
         brightness: Brightness.light,
@@ -40,7 +48,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
           seedColor: Colors.blue,
           brightness: Brightness.light,
         ),
-        textTheme: _textTheme,
+        textTheme: textTheme,
       ),
       Brightness.dark: ThemeData(
         brightness: Brightness.dark,
@@ -48,7 +56,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
           seedColor: Colors.blue,
           brightness: Brightness.dark,
         ),
-        textTheme: _textTheme,
+        textTheme: textTheme,   
       ),
     },
     ThemeStyleOption.red: {
@@ -58,7 +66,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
           seedColor: Colors.red,
           brightness: Brightness.light,
         ),
-        textTheme: _textTheme,
+        textTheme: textTheme,
       ),
       Brightness.dark: ThemeData(
         brightness: Brightness.dark,
@@ -66,7 +74,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
           seedColor: Colors.red,
           brightness: Brightness.dark,
         ),
-        textTheme: _textTheme,
+        textTheme: textTheme,
       ),
     },
     ThemeStyleOption.green: {
@@ -76,7 +84,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
           seedColor: Colors.green,
           brightness: Brightness.light,
         ),
-        textTheme: _textTheme,
+        textTheme: textTheme,
       ),
       Brightness.dark: ThemeData(
         brightness: Brightness.dark,
@@ -84,7 +92,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
           seedColor: Colors.green,
           brightness: Brightness.dark,
         ),
-        textTheme: _textTheme,
+        textTheme: textTheme,
       ),
     },
     ThemeStyleOption.yellow: {
@@ -94,7 +102,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
           seedColor: Colors.yellow,
           brightness: Brightness.light,
         ),
-        textTheme: _textTheme,
+        textTheme: textTheme,
       ),
       Brightness.dark: ThemeData(
         brightness: Brightness.dark,
@@ -102,7 +110,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
           seedColor: Colors.yellow,
           brightness: Brightness.dark,
         ),
-        textTheme: _textTheme,
+        textTheme: textTheme,
       ),
     },
     ThemeStyleOption.purple: {
@@ -112,7 +120,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
           seedColor: Colors.purple,
           brightness: Brightness.light,
         ),
-        textTheme: _textTheme,
+        textTheme: textTheme,
       ),
       Brightness.dark: ThemeData(
         brightness: Brightness.dark,
@@ -120,7 +128,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
           seedColor: Colors.purple,
           brightness: Brightness.dark,
         ),
-        textTheme: _textTheme,
+        textTheme: textTheme,
       ),
     },
     ThemeStyleOption.orange: {
@@ -130,7 +138,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
           seedColor: Colors.orange,
           brightness: Brightness.light,
         ),
-        textTheme: _textTheme,
+        textTheme: textTheme,
       ),
       Brightness.dark: ThemeData(
         brightness: Brightness.dark,
@@ -138,7 +146,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
           seedColor: Colors.orange,
           brightness: Brightness.dark,
         ),
-        textTheme: _textTheme,
+        textTheme: textTheme,
       ),
     },
     ThemeStyleOption.indigo: {
@@ -148,7 +156,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
           seedColor: Colors.indigo,
           brightness: Brightness.light,
         ),
-        textTheme: _textTheme,
+        textTheme: textTheme,
       ),
       Brightness.dark: ThemeData(
         brightness: Brightness.dark,
@@ -156,7 +164,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
           seedColor: Colors.indigo,
           brightness: Brightness.dark,
         ),
-        textTheme: _textTheme,
+        textTheme: textTheme,
       ),
     },
     ThemeStyleOption.diy: {
@@ -166,7 +174,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
           seedColor: ThemeStyleOption.diy.color,
           brightness: Brightness.light,
         ),
-        textTheme: _textTheme,
+        textTheme: textTheme,
       ),
       Brightness.dark: ThemeData(
         brightness: Brightness.dark,
@@ -174,16 +182,10 @@ class ThemeSwitcherProvider extends ChangeNotifier {
           seedColor: ThemeStyleOption.diy.color,
           brightness: Brightness.dark,
         ),
-        textTheme: _textTheme,
+        textTheme: textTheme,
       ),
     },
   };
-
-  ThemeMode get themeMode => _themeMode;
-  ThemeStyleOption get themeStyle => _themeStyle;
-
-  ThemeData get theme => _themeDataMap[themeStyle]![Brightness.light]!;
-  ThemeData get darkTheme => _themeDataMap[themeStyle]![Brightness.dark]!;
 
   void setThemeMode(ThemeMode themeMode) {
     _themeMode = themeMode;
@@ -191,22 +193,21 @@ class ThemeSwitcherProvider extends ChangeNotifier {
   }
 
   void setThemeStyle(ThemeStyleOption themeStyle) {
+    _themeStyle = themeStyle;
     if (themeStyle == ThemeStyleOption.diy) {
       _updateDiyThemeData();
     }
-    _themeStyle = themeStyle;
     notifyListeners();
   }
 
   void _updateDiyThemeData() {
-    if (_themeStyle != ThemeStyleOption.diy) return;
     _themeDataMap[ThemeStyleOption.diy]![Brightness.light] = ThemeData(
       brightness: Brightness.light,
       colorScheme: ColorScheme.fromSeed(
         seedColor: ThemeStyleOption.diy.color,
         brightness: Brightness.light,
       ),
-      textTheme: _textTheme,
+      textTheme: textTheme,
     );
     _themeDataMap[ThemeStyleOption.diy]![Brightness.dark] = ThemeData(
       brightness: Brightness.dark,
@@ -214,7 +215,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
         seedColor: ThemeStyleOption.diy.color,
         brightness: Brightness.dark,
       ),
-      textTheme: _textTheme,
+      textTheme: textTheme, 
     );
   }
 
@@ -226,5 +227,13 @@ class ThemeSwitcherProvider extends ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  void setModelAndStyleWithoutNotify(ThemeMode themeMode, ThemeStyleOption themeStyle) {
+    _themeMode = themeMode;
+    _themeStyle = themeStyle;
+    if (themeStyle == ThemeStyleOption.diy) {
+      _updateDiyThemeData();
+    }
   }
 }

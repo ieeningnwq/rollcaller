@@ -54,21 +54,78 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   // 安全存储
   final _storage = SharedPreferences.getInstance();
 
+  late Future<void> _getThemeInfoFuture;
+
+  Future<void> _getThemeInfo() async {
+    // 获取主题模式
+    final storage = await _storage;
+    final themeModeStyleOption = storage.getString(
+      KString.themeModeStyleOptionKey,
+    );
+    if (themeModeStyleOption != null) {
+      List<String> themeData = themeModeStyleOption.trim().split(',');
+      ThemeMode mode = ThemeStyleOptionExtension.fromStringToThemeMode(
+        themeData[0],
+      );
+      ThemeStyleOption style = ThemeStyleOptionExtension.fromString(
+        themeData[1],
+      );
+      if (style == ThemeStyleOption.diy) {
+        int argb = int.parse(themeData[2]);
+        ThemeStyleOptionExtension.pickedColor = Color.fromARGB(
+          (argb >> 24) & 0xFF,
+          (argb >> 16) & 0xFF,
+          (argb >> 8) & 0xFF,
+          argb & 0xFF,
+        );
+      }
+      if (mounted) {
+        Provider.of<ThemeSwitcherProvider>(
+          context,
+          listen: false,
+        ).setModelAndStyleWithoutNotify(mode, style);
+      }
+    } else {
+      if (mounted) {
+        Provider.of<ThemeSwitcherProvider>(
+          context,
+          listen: false,
+        ).setModelAndStyleWithoutNotify(
+          ThemeMode.system,
+          ThemeStyleOption.blue,
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      // designSize: const Size(480, 954),
-      designSize: const Size(960, 1908),
+      designSize: const Size(480, 954),
+      // designSize: const Size(1908, 960),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (_, child) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          themeMode: context.watch<ThemeSwitcherProvider>().themeMode,
-          // 定制主题
-          theme: context.watch<ThemeSwitcherProvider>().theme,
-          darkTheme: context.watch<ThemeSwitcherProvider>().darkTheme,
-          home: IndexPage(),
+        return Consumer<ThemeSwitcherProvider>(
+          builder: (context, themeSwitcherProvider, child) {
+            return FutureBuilder(
+              future: _getThemeInfoFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return MaterialApp(
+                    debugShowCheckedModeBanner: false,
+                    // 定制主题
+                    theme: themeSwitcherProvider.theme,
+                    darkTheme: themeSwitcherProvider.darkTheme,
+                    themeMode: themeSwitcherProvider.themeMode,
+                    home: IndexPage(),
+                  );
+                } else {
+                  return CircularProgressIndicator();
+                }
+              },
+            );
+          },
         );
       },
     );
@@ -127,42 +184,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // 获取主题模式
-    _storage
-        .then((storage) => storage.getString(KString.themeModeStyleOptionKey))
-        .then((onValue) {
-          if (onValue != null) {
-            List<String> themeData = onValue.trim().split(',');
-            ThemeMode mode = ThemeStyleOptionExtension.fromStringToThemeMode(
-              themeData[0],
-            );
-            ThemeStyleOption style = ThemeStyleOptionExtension.fromString(
-              themeData[1],
-            );
-            if (style == ThemeStyleOption.diy) {
-              int argb = int.parse(themeData[2]);
-              ThemeStyleOptionExtension.pickedColor = Color.fromARGB(
-                (argb >> 24) & 0xFF,
-                (argb >> 16) & 0xFF,
-                (argb >> 8) & 0xFF,
-                argb & 0xFF,
-              );
-              if (mounted) {
-                context.read<ThemeSwitcherProvider>().setModelAndStyle(
-                  mode,
-                  style,
-                );
-              }
-            }
-          }else{
-            if (mounted) {
-              context.read<ThemeSwitcherProvider>().setModelAndStyle(
-                ThemeMode.system,
-                ThemeStyleOption.blue,
-              );
-            }
-          }
-        });
+    _getThemeInfoFuture = _getThemeInfo();
   }
 
   @override
