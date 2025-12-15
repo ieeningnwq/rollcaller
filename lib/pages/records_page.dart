@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../configs/strings.dart';
 import 'attendance_call_records_page.dart';

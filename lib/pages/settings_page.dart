@@ -5,7 +5,7 @@ import 'package:dio/dio.dart' show CancelToken;
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart'
     show MaterialPicker;
-import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart' show getTemporaryDirectory;
@@ -51,12 +51,14 @@ class _SettingsState extends State<SettingsPage> {
   // 选中待回退的备份数据
   BackUpModel? _selectedBackUpModel;
   // WebDav连接客户端
-  late Client _client;
+   Client ?_client;
   // 安全存储
   final _storage = SharedPreferences.getInstance();
 
   // 获取WebDav配置
-  late Future<void> _getWebDavConfigFuture;
+
+  // 获取WebDav配置
+  late Future<void> _getBackUpDataFuture;
   // 备份进度
   double _procedureProgress = 0;
 
@@ -77,10 +79,16 @@ class _SettingsState extends State<SettingsPage> {
   @override
   initState() {
     super.initState();
-    _getWebDavConfigFuture = _getWebDavConfig();
+    // 读取webdav设置
+    _getWebDavConfig().then((onValue) {
+      setState(() {
+        _autoBackupEnabled = onValue;
+      });
+    });
+    _getBackUpDataFuture = _getBackUpData();
   }
 
-  Future<void> _getWebDavConfig() async {
+  Future<bool> _getWebDavConfig() async {
     // 获取WebDav配置服务器
     _webDavServerController.text =
         (await _storage.then(
@@ -107,16 +115,23 @@ class _SettingsState extends State<SettingsPage> {
       debug: false,
     );
     // 获取是否自动备份
-    _autoBackupEnabled =
+    bool autoBackupEnabled =
         ((await _storage.then(
           (storage) => storage.getBool(KString.autoBackUpKey),
         )) ??
         false);
+    return autoBackupEnabled;
+  }
+
+  Future<void> _getBackUpData() async {
+    while (_client == null) {
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
     if (_allBackUpModels.isEmpty) {
       try {
-        await _client.ping();
+        await _client!.ping();
         // 获取历史备份数据，从服务器获取数据
-        var list = await _client.readDir('/${KString.webDavServerFolder}');
+        var list = await _client!.readDir('/${KString.webDavServerFolder}');
         // 过滤出备份文件，并排序
         list = list
             .where(
@@ -198,28 +213,32 @@ class _SettingsState extends State<SettingsPage> {
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(8.0.w),
-                child: FutureBuilder(
-                  future: _getWebDavConfigFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      }
-                      return Column(
-                        children: [
-                          _buildLastBackUpStatus(),
-                          SizedBox(height: 8.h),
-                          _buildWebDavInfo(),
-                          SizedBox(height: 8.h),
-                          _buildBackUpSetting(),
-                          SizedBox(height: 8.h),
-                          _buildBackUpHistory(),
-                        ],
-                      );
-                    } else {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                  },
+                child: Column(
+                  children: [
+                    _buildLastBackUpStatus(),
+                    SizedBox(height: 8.h),
+                    _buildWebDavInfo(),
+                    SizedBox(height: 8.h),
+                    _buildBackUpSetting(),
+                    SizedBox(height: 8.h),
+                    FutureBuilder(
+                      future: _getBackUpDataFuture,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.done) {
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text('Error: ${snapshot.error}'),
+                            );
+                          }
+                          return _buildBackUpHistory();
+                        } else {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -451,7 +470,7 @@ class _SettingsState extends State<SettingsPage> {
                           debug: false,
                         );
                         try {
-                          await _client.ping();
+                          await _client!.ping();
                           // 连接成功处理逻辑
                           // 可以显示成功提示、更新UI状态等
                           if (context.mounted) {
@@ -557,6 +576,24 @@ class _SettingsState extends State<SettingsPage> {
                             _webDavPasswordController.text,
                           ),
                         );
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(
+                                '配置已保存',
+                                style: TextStyle(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onInverseSurface,
+                                ),
+                              ),
+                              backgroundColor: Theme.of(
+                                context,
+                              ).colorScheme.inverseSurface,
+                              duration: const Duration(seconds: 3),
+                            ),
+                          );
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -864,7 +901,7 @@ class _SettingsState extends State<SettingsPage> {
     bool result = false;
     try {
       CancelToken c = CancelToken();
-      await _client.writeFromFile(
+      await _client!.writeFromFile(
         tempFilePath,
         '/${KString.webDavServerFolder}/$fileName',
         onProgress: (c, t) {
@@ -979,7 +1016,7 @@ class _SettingsState extends State<SettingsPage> {
       // 2、从WebDAV下载文件
       final tempDir = await getTemporaryDirectory();
       final tempFilePath = join(tempDir.path, backUpModel.fileName);
-      await _client.read2File(
+      await _client!.read2File(
         filePath,
         tempFilePath,
         onProgress: (c, t) {

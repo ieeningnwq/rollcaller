@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:excel/excel.dart' hide Border;
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart'
     show getExternalStorageDirectory;
@@ -1271,7 +1271,6 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
           title: Text(KString.dateRangePickerTitle), // '选择时间范围'  
           content: SizedBox(
             height: 400.h,
-            width: MediaQuery.of(context).size.width * 0.8,
             child: SfDateRangePicker(
               confirmText: KString.confirm, // '确定'
               cancelText: KString.cancel, // '取消' 

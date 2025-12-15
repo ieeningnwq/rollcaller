@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../models/student_class_model.dart';
 import '../models/student_model.dart';

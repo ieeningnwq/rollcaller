@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../models/student_class_model.dart';
 import '../utils/student_class_dao.dart';

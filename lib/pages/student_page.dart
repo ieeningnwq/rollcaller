@@ -6,7 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:file_saver/file_saver.dart' show FileSaver, MimeType;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:permission_handler/permission_handler.dart'
     show Permission, PermissionActions, PermissionStatusGetters;
 import 'package:pull_to_refresh/pull_to_refresh.dart';

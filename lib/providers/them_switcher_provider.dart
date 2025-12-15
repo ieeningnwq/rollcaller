@@ -9,7 +9,7 @@ import 'package:flutter/material.dart'
         ThemeData,
         ThemeMode,
         Colors;
-import 'package:flutter_screenutil/flutter_screenutil.dart' show SizeExtension;
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../configs/theme_style_option_enum.dart';
 

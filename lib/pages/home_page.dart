@@ -21,7 +21,7 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
+            top: 4.h,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
