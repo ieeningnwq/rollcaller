@@ -49,7 +49,7 @@ class _SettingsState extends State<SettingsPage> {
   // 所有备份信息
   static Map<String, BackUpModel> _allBackUpModels = {};
   // 选中待回退的备份数据
-  BackUpModel? _selectedBackUpModel;
+  static BackUpModel? _selectedBackUpModel;
   // WebDav连接客户端
   Client? _client;
   // 安全存储
@@ -230,6 +230,9 @@ class _SettingsState extends State<SettingsPage> {
                               child: Text('Error: ${snapshot.error}'),
                             );
                           }
+                          _selectedBackUpModel = _allBackUpModels.isNotEmpty
+                              ? _allBackUpModels[_allBackUpModels.keys.last]
+                              : null;
                           return _buildBackUpHistory();
                         } else {
                           return const Center(
