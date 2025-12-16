@@ -720,7 +720,7 @@ class _SettingsState extends State<SettingsPage> {
                   });
                   _backupData();
                 },
-                style: ElevatedButton.styleFrom(
+                style: OutlinedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   padding: EdgeInsets.symmetric(vertical: 14.0.h),
                   shape: RoundedRectangleBorder(
@@ -738,7 +738,7 @@ class _SettingsState extends State<SettingsPage> {
                     SizedBox(width: 8.w),
                     Text(
                       '手动备份',
-                      style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
                         color: Theme.of(context).colorScheme.onPrimary,
                       ),
                     ),
@@ -794,7 +794,7 @@ class _SettingsState extends State<SettingsPage> {
                     SizedBox(width: 8.w),
                     Text(
                       '恢复数据',
-                      style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                      style: Theme.of(context).textTheme.titleMedium!.copyWith(
                         color: Theme.of(context).colorScheme.onPrimary,
                       ),
                     ),

@@ -115,7 +115,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                     KString.tryAdjustFilter, // '请尝试调整筛选条件'
                                     style: Theme.of(context)
                                         .textTheme
-                                        .bodyMedium!
+                                        .headlineMedium!
                                         .copyWith(
                                           color: Theme.of(context)
                                               .colorScheme

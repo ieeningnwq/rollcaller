@@ -28,7 +28,7 @@ class ThemeSwitcherProvider extends ChangeNotifier {
   // 主题数据
   static final TextTheme textTheme = TextTheme(
     headlineLarge: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold),
-    headlineMedium: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
+    headlineMedium: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold),
     headlineSmall: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
     titleLarge: TextStyle(fontSize: 26.sp, fontWeight: FontWeight.bold),
     titleMedium: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),

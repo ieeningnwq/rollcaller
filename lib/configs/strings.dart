@@ -51,8 +51,8 @@ class KString {
   static const String studentClassAppBarTitle = '教学班级';
   static const String noStudentClass = '暂无班级'; // '暂无班级'
   static const String addStudentClass = '添加班级'; // '添加班级'
-  static const String studentClassCount = '班级现有人数'; // '班级现有人数'
-  static const String studentCount = '学生现有人数'; // '学生现有人数'
+  static const String studentClassCount = '班级已有人数'; // '班级现有人数'
+  static const String studentCount = '学生应有人数'; // '学生现有人数'
   static const String teacher = '教师'; // '教师现有人数'
   static const String editStudentClass = '编辑班级'; // '编辑班级'
   static const String deleteClassWarnning =

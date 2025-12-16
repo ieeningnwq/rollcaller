@@ -902,12 +902,12 @@ class _RandomCallPageState extends State<RandomCallPage>
                   children: [
                     Text(
                       studentRecord.keys.first.studentName,
-                      style: Theme.of(context).textTheme.titleMedium,
+                      style: Theme.of(context).textTheme.titleSmall,
                     ),
                     SizedBox(height: 4.0.h),
                     Text(
                       studentRecord.keys.first.studentNumber,
-                      style: Theme.of(context).textTheme.labelMedium,
+                      style: Theme.of(context).textTheme.labelSmall,
                     ),
                   ],
                 ),
@@ -970,7 +970,7 @@ class _RandomCallPageState extends State<RandomCallPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(KString.studentList, style: Theme.of(context).textTheme.headlineMedium),
+              Text(KString.studentList, style: Theme.of(context).textTheme.headlineMedium), //  '学生列表'
               SizedBox(height: 8.0.h),
 
               // 已抽取学生组
@@ -985,7 +985,7 @@ class _RandomCallPageState extends State<RandomCallPage>
                   children: [
                     Text(
                       KString.pickedStudent, // '已抽取学生'
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: Theme.of(context).colorScheme.tertiary,
                       ),
                     ),
@@ -1023,7 +1023,7 @@ class _RandomCallPageState extends State<RandomCallPage>
                   children: [
                     Text(
                       KString.notPickedStudent, // '未抽取学生'
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: Theme.of(context).colorScheme.tertiary,
                       ),
                     ),
