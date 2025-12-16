@@ -703,7 +703,7 @@ class _SettingsState extends State<SettingsPage> {
           SizedBox(height: 4.r),
           // 提示语句
           Text(
-            '若打开自动备份则每次退出app时自动备份',
+            '若打开自动备份则每次应用置于后台时自动备份',
             style: Theme.of(context).textTheme.labelSmall,
           ),
         ],
