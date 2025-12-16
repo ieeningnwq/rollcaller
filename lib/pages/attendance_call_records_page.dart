@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart'
-    show getDownloadsDirectory, getExternalStorageDirectory;
+    show getDownloadsDirectory;
 import 'package:permission_handler/permission_handler.dart'
     show Permission, PermissionActions, PermissionStatusGetters;
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
