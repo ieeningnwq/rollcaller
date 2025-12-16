@@ -47,7 +47,7 @@ class _SettingsState extends State<SettingsPage> {
   // 备份设置状态
   bool _autoBackupEnabled = false;
   // 所有备份信息
-  Map<String, BackUpModel> _allBackUpModels = {};
+  static Map<String, BackUpModel> _allBackUpModels = {};
   // 选中待回退的备份数据
   BackUpModel? _selectedBackUpModel;
   // WebDav连接客户端
@@ -490,6 +490,10 @@ class _SettingsState extends State<SettingsPage> {
                                 duration: const Duration(seconds: 3),
                               ),
                             );
+                            // 刷新备份数据
+                            setState(() {
+                              _getBackUpDataFuture = _getBackUpData();
+                            });
                           }
                         } catch (e) {
                           // 连接失败处理逻辑

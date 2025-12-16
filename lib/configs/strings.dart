@@ -134,6 +134,7 @@ class KString {
   static const String noExportableRecords = '没有找到可导出的记录'; // '没有找到可导出的记录'
   static const String pleaseGrantStoragePermissionToExport =
       '请授予存储权限才能导出文件'; // '请授予存储权限才能导出文件'
+  static const String exportRandomCallerFileNamePrefix = '随机点名记录_'; // 'xlsx'
   static const String exportFileNamePrefix = '点名记录_'; // '点名记录_'
   static const String exportSuccessPrefix = '导出成功！共导出 '; // '导出成功！共导出 '
   static const String exportSuccessSuffix = '条记录到文件: '; // '条记录'
@@ -141,6 +142,9 @@ class KString {
   // ! 9、签到点名记录详情页面 attendance_call_records_page.dart
   static const String noAttendanceCallRecord = '暂无签到点名记录'; // '暂无签到点名记录'
   static const String exportColumnAttendanceStatus = '出席情况'; // '出席情况'
+  static const String exportAttendanceCallerFileNamePrefix =
+      '签到点名记录_'; // 'xlsx'
+
   // ! 10、设置页面 settings_page.dart
   // ! 数据库相关配置
   static const String databaseName = 'rollcall.db';

@@ -100,9 +100,9 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
                       _buildStudentNumberField(),
                       // 学生姓名
                       _buildStudengNameField(),
-                       SizedBox(height: 4.h),
+                      SizedBox(height: 4.h),
                       // 班级选择
-                      const Text('所在班级', ),
+                      const Text('所在班级'),
                       _buildClassSelectField(),
                     ],
                   ),
@@ -234,9 +234,7 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
             classIds,
           );
           if (context.mounted) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
                   '新增成功',
@@ -244,17 +242,13 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
                     color: Theme.of(context).colorScheme.onInverseSurface,
                   ),
                 ),
-                backgroundColor: Theme.of(
-                  context,
-                ).colorScheme.inverseSurface,
+                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
               ),
             );
           }
         } else {
           if (context.mounted) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text(
                   '新增失败',
@@ -262,72 +256,56 @@ class _StudentAddEditDialogState extends State<StudentAddEditDialog> {
                     color: Theme.of(context).colorScheme.onInverseSurface,
                   ),
                 ),
-                backgroundColor: Theme.of(
-                  context,
-                ).colorScheme.inverseSurface,
+                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
               ),
             );
           }
         }
       } else {
         // 修改学生
-        studentDao
-            .updateStudentById(widget.student)
-            .then(
-              (value) async => {
-                if (value != 0)
-                  {
-                    // 删除该学生所有的班级关系
-                    await StudentClassRelationDao().deleteStudentClasses(
-                      widget.student.id!,
-                    ),
-                    // 添加该学生的班级关系
-                    await StudentClassRelationDao().insertStudentClasses(
-                      widget.student.id!,
-                      classIds,
-                    ),
-                    if (context.mounted)
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            '修改成功',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onInverseSurface,
-                            ),
-                          ),
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.inverseSurface,
-                        ),
-                      ),
-                  }
-                else
-                  {
-                    if (context.mounted)
-                      ScaffoldMessenger.of(
-                        context,
-                      ).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            '修改失败',
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onInverseSurface,
-                            ),
-                          ),
-                          backgroundColor: Theme.of(
-                            context,
-                          ).colorScheme.inverseSurface,
-                        ),
-                      ),
-                  },
-              },
+        int status = await studentDao.updateStudentById(widget.student);
+        if (status != 0) {
+          // 删除该学生所有的班级关系
+          await StudentClassRelationDao().deleteStudentClasses(
+            widget.student.id!,
+          );
+          // 添加该学生的班级关系
+          await StudentClassRelationDao().insertStudentClasses(
+            widget.student.id!,
+            classIds,
+          );
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '修改成功',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onInverseSurface,
+                  ),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+              ),
             );
+          }
+        } else {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '修改失败',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onInverseSurface,
+                  ),
+                ),
+                backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+              ),
+            );
+          }
+        }
       }
-      if (context.mounted) {
-        Navigator.of(context).pop(true); // 关闭弹窗
-      }
+    }
+    if (context.mounted) {
+      Navigator.of(context).pop(true); // 关闭弹窗
     }
   }
 }

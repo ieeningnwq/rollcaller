@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart'
-    show getExternalStorageDirectory;
+    show getDownloadsDirectory, getExternalStorageDirectory;
 import 'package:permission_handler/permission_handler.dart'
     show Permission, PermissionActions, PermissionStatusGetters;
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
@@ -638,25 +638,13 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                             alignment: Alignment.center,
                             height: 60.h,
                             child: DropdownButtonFormField<int>(
-                            initialValue: _selectedCallerId,
-                            hint: Text(KString.all), // '全部'
-                            items: [
-                              DropdownMenuItem(
-                                value: null,
-                                child: Text(
-                                  KString.all, // '全部'
-                                  style: TextStyle(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ),
-                                ),
-                              ),
-                              ..._allCallers.values.toList().map(
-                                (caller) => DropdownMenuItem(
-                                  value: caller.id,
+                              initialValue: _selectedCallerId,
+                              hint: Text(KString.all), // '全部'
+                              items: [
+                                DropdownMenuItem(
+                                  value: null,
                                   child: Text(
-                                    caller.attendanceCallerName,
+                                    KString.all, // '全部'
                                     style: TextStyle(
                                       color: Theme.of(
                                         context,
@@ -664,25 +652,37 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                     ),
                                   ),
                                 ),
+                                ..._allCallers.values.toList().map(
+                                  (caller) => DropdownMenuItem(
+                                    value: caller.id,
+                                    child: Text(
+                                      caller.attendanceCallerName,
+                                      style: TextStyle(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedCallerId = value;
+                                  // 执行筛选
+                                  _applyFilters();
+                                });
+                              },
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 8.0.h,
+                                ),
                               ),
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedCallerId = value;
-                                // 执行筛选
-                                _applyFilters();
-                              });
-                            },
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 8.0.h,
-                              ),
+                              style: Theme.of(context).textTheme.labelMedium,
                             ),
-                            style: Theme.of(context).textTheme.labelMedium,
                           ),
-                        
-                          )),
+                        ),
                       ],
                     ),
                     SizedBox(height: 10.h),
@@ -702,25 +702,13 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                             alignment: Alignment.center,
                             height: 60.h,
                             child: DropdownButtonFormField<int>(
-                            initialValue: _selectedClassId,
-                            hint: Text(KString.all), // '全部'
-                            items: [
-                              DropdownMenuItem(
-                                value: null,
-                                child: Text(
-                                  KString.all, // '全部'
-                                  style: TextStyle(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ),
-                                ),
-                              ),
-                              ..._allClasses.values.toList().map(
-                                (cls) => DropdownMenuItem(
-                                  value: cls.id,
+                              initialValue: _selectedClassId,
+                              hint: Text(KString.all), // '全部'
+                              items: [
+                                DropdownMenuItem(
+                                  value: null,
                                   child: Text(
-                                    cls.className,
+                                    KString.all, // '全部'
                                     style: TextStyle(
                                       color: Theme.of(
                                         context,
@@ -728,24 +716,37 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                     ),
                                   ),
                                 ),
+                                ..._allClasses.values.toList().map(
+                                  (cls) => DropdownMenuItem(
+                                    value: cls.id,
+                                    child: Text(
+                                      cls.className,
+                                      style: TextStyle(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedClassId = value;
+                                  // 执行筛选
+                                  _applyFilters();
+                                });
+                              },
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 8.0.h,
+                                ),
                               ),
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedClassId = value;
-                                // 执行筛选
-                                _applyFilters();
-                              });
-                            },
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 8.0.h,
-                              ),
+                              style: Theme.of(context).textTheme.labelMedium,
                             ),
-                            style: Theme.of(context).textTheme.labelMedium,
                           ),
-                          )),
+                        ),
                       ],
                     ),
                     SizedBox(height: 10.h),
@@ -849,68 +850,75 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                             alignment: Alignment.center,
                             height: 60.h,
                             child: DropdownButtonFormField<bool?>(
-                            initialValue: _isArchiveFilter,
-                            hint: Text(KString.all), // '全部'
-                            items: [
-                              DropdownMenuItem(
-                                value: null,
-                                child: Text(
-                                  KString.all, // '全部'
-                                  style: Theme.of(context).textTheme.labelMedium
-                                      ?.copyWith(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurface,
-                                      ),
+                              initialValue: _isArchiveFilter,
+                              hint: Text(KString.all), // '全部'
+                              items: [
+                                DropdownMenuItem(
+                                  value: null,
+                                  child: Text(
+                                    KString.all, // '全部'
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium
+                                        ?.copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                        ),
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: false,
+                                  child: Text(
+                                    KString.unarchived, // '未归档'
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium
+                                        ?.copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                        ),
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: true,
+                                  child: Text(
+                                    KString.archived, // '已归档'
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium
+                                        ?.copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                        ),
+                                  ),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  _isArchiveFilter = value;
+                                  // 执行筛选
+                                  _applyFilters();
+                                });
+                              },
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 8.0.h,
+                                  vertical: 12.w,
                                 ),
                               ),
-                              DropdownMenuItem(
-                                value: false,
-                                child: Text(
-                                  KString.unarchived, // '未归档'
-                                  style: Theme.of(context).textTheme.labelMedium
-                                      ?.copyWith(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurface,
-                                      ),
-                                ),
-                              ),
-                              DropdownMenuItem(
-                                value: true,
-                                child: Text(
-                                  KString.archived, // '已归档'
-                                  style: Theme.of(context).textTheme.labelMedium
-                                      ?.copyWith(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurface,
-                                      ),
-                                ),
-                              ),
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                _isArchiveFilter = value;
-                                // 执行筛选
-                                _applyFilters();
-                              });
-                            },
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 8.0.h,
-                                vertical: 12.w,
-                              ),
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
                             ),
-                            style: Theme.of(context).textTheme.labelMedium
-                                ?.copyWith(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
-                                ),
                           ),
-                          )),
+                        ),
                       ],
                     ),
                     SizedBox(height: 12.h),
@@ -1249,16 +1257,16 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
       // 保存Excel文件
 
       String fileName =
-          '${KString.exportFileNamePrefix}${DateTime.now().year}${DateTime.now().month.toString().padLeft(2, '0')}${DateTime.now().day.toString().padLeft(2, '0')}_${DateTime.now().hour}${DateTime.now().minute}${DateTime.now().second}.xlsx';
+          '${KString.exportAttendanceCallerFileNamePrefix}${DateTime.now().year}${DateTime.now().month.toString().padLeft(2, '0')}${DateTime.now().day.toString().padLeft(2, '0')}_${DateTime.now().hour}${DateTime.now().minute}${DateTime.now().second}.xlsx';
       String downloadsPath = '';
       // 根据不同平台获取下载路径
       if (Platform.isAndroid || Platform.isIOS) {
-        var directory = await getExternalStorageDirectory();
+        var directory = await getDownloadsDirectory();
         downloadsPath = join(directory!.path, fileName);
       } else if (Platform.isWindows) {
-        downloadsPath = '${Platform.environment['USERPROFILE']}/Downloads/';
+        downloadsPath = join((await getDownloadsDirectory())!.path, fileName);
       } else if (Platform.isMacOS) {
-        downloadsPath = '${Platform.environment['HOME']}/Downloads/';
+        downloadsPath = join((await getDownloadsDirectory())!.path, fileName);
       }
       excelFile.delete('Sheet1');
       var fileBytes = excelFile.save();
@@ -1270,15 +1278,16 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            showCloseIcon: true,
             content: Text(
-              '${KString.exportSuccessPrefix} $totalExportedRecords ${KString.exportSuccessSuffix}$fileName',
+              '${KString.exportSuccessPrefix} $totalExportedRecords ${KString.exportSuccessSuffix}$downloadsPath',
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onInverseSurface,
               ),
             ),
             backgroundColor: Theme.of(context).colorScheme.inverseSurface,
 
-            duration: const Duration(seconds: 3),
+            duration: const Duration(seconds: 10),
           ),
         );
       }

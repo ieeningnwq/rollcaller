@@ -1,23 +1,23 @@
 import 'dart:convert' show json;
 import 'dart:developer';
-import 'dart:io' show File, Platform;
+import 'dart:io' show File;
 
 import 'package:dio/dio.dart' show CancelToken;
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:shared_preferences/shared_preferences.dart'
-    show SharedPreferences;
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart' show getTemporaryDirectory;
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart'
+    show SharedPreferences;
 import 'package:webdav_client/webdav_client.dart' show Client, newClient;
 
+import './providers/current_index_provider.dart';
 import 'configs/back_up_type.dart' show BackUpType, BackUpTypeExtension;
 import 'configs/strings.dart';
 import 'configs/theme_style_option_enum.dart'
     show ThemeStyleOptionExtension, ThemeStyleOption;
 import 'pages/index_page.dart';
-import './providers/current_index_provider.dart';
 import 'providers/them_switcher_provider.dart';
 import 'utils/attendance_call_record_dao.dart';
 import 'utils/attendance_caller_dao.dart';

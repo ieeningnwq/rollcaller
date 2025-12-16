@@ -1466,16 +1466,16 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
       // 保存Excel文件
 
       String fileName =
-          '${KString.exportFileNamePrefix}${DateTime.now().year}${DateTime.now().month.toString().padLeft(2, '0')}${DateTime.now().day.toString().padLeft(2, '0')}_${DateTime.now().hour}${DateTime.now().minute}${DateTime.now().second}.xlsx';
+          '${KString.exportRandomCallerFileNamePrefix}${DateTime.now().year}${DateTime.now().month.toString().padLeft(2, '0')}${DateTime.now().day.toString().padLeft(2, '0')}_${DateTime.now().hour}${DateTime.now().minute}${DateTime.now().second}.xlsx';
       String downloadsPath = '';
       // 根据不同平台获取下载路径
       if (Platform.isAndroid || Platform.isIOS) {
-        var directory = await getExternalStorageDirectory();
+        var directory = await getDownloadsDirectory();
         downloadsPath = join(directory!.path, fileName);
       } else if (Platform.isWindows) {
-        downloadsPath = '${Platform.environment['USERPROFILE']}/Downloads/';
+        downloadsPath = join((await getDownloadsDirectory())!.path, fileName);
       } else if (Platform.isMacOS) {
-        downloadsPath = '${Platform.environment['HOME']}/Downloads/';
+        downloadsPath = join((await getDownloadsDirectory())!.path, fileName);
       }
       excelFile.delete('Sheet1');
       var fileBytes = excelFile.save();
@@ -1487,14 +1487,15 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+            showCloseIcon: true,
             content: Text(
-              '${KString.exportSuccessPrefix}$totalExportedRecords ${KString.exportSuccessSuffix}$fileName', // '导出成功！共导出 '
+              '${KString.exportSuccessPrefix}$totalExportedRecords ${KString.exportSuccessSuffix}$downloadsPath', // '导出成功！共导出 '
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onInverseSurface,
               ),
             ),
             backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-            duration: const Duration(seconds: 3),
+            duration: const Duration(seconds: 10),
           ),
         );
       }
