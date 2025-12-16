@@ -1,6 +1,6 @@
 import 'dart:convert' show json;
 import 'dart:developer';
-import 'dart:io' show File;
+import 'dart:io' show File, Platform;
 
 import 'package:dio/dio.dart' show CancelToken;
 import 'package:flutter/material.dart';
@@ -54,8 +54,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   // 安全存储
   final _storage = SharedPreferences.getInstance();
 
-  late Future<void> _getThemeInfoFuture;
-
   Future<void> _getThemeInfo() async {
     // 获取主题模式
     final storage = await _storage;
@@ -80,17 +78,14 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         );
       }
       if (mounted) {
-        Provider.of<ThemeSwitcherProvider>(
-          context,
-          listen: false,
-        ).setModelAndStyleWithoutNotify(mode, style);
+        context.read<ThemeSwitcherProvider>().setModelAndStyleWithoutNotify(
+          mode,
+          style,
+        );
       }
     } else {
       if (mounted) {
-        Provider.of<ThemeSwitcherProvider>(
-          context,
-          listen: false,
-        ).setModelAndStyleWithoutNotify(
+        context.read<ThemeSwitcherProvider>().setModelAndStyleWithoutNotify(
           ThemeMode.system,
           ThemeStyleOption.blue,
         );
@@ -101,30 +96,25 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-      designSize: const Size(480, 954),
-      // designSize: const Size(1908, 960),
+      designSize: const Size(540, 960),
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (_, child) {
-        return Consumer<ThemeSwitcherProvider>(
-          builder: (context, themeSwitcherProvider, child) {
-            return FutureBuilder(
-              future: _getThemeInfoFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return MaterialApp(
-                    debugShowCheckedModeBanner: false,
-                    // 定制主题
-                    theme: themeSwitcherProvider.theme,
-                    darkTheme: themeSwitcherProvider.darkTheme,
-                    themeMode: themeSwitcherProvider.themeMode,
-                    home: IndexPage(),
-                  );
-                } else {
-                  return CircularProgressIndicator();
-                }
-              },
-            );
+        return FutureBuilder(
+          future: _getThemeInfo(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return MaterialApp(
+                debugShowCheckedModeBanner: false,
+                // 定制主题
+                theme: context.watch<ThemeSwitcherProvider>().theme,
+                darkTheme: context.watch<ThemeSwitcherProvider>().darkTheme,
+                themeMode: context.watch<ThemeSwitcherProvider>().themeMode,
+                home: IndexPage(),
+              );
+            } else {
+              return CircularProgressIndicator();
+            }
           },
         );
       },
@@ -184,7 +174,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _getThemeInfoFuture = _getThemeInfo();
   }
 
   @override

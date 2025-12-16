@@ -22,7 +22,7 @@ class DatabaseHelper {
     String databasesPath;
 
     // 根据平台类型选择不同的数据库路径和初始化方式
-    if (Platform.isWindows) {
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       // Windows平台使用sqflite_common_ffi
       sqfliteFfiInit();
       // 使用getDatabasesPath可能在Windows上返回空路径，需要处理

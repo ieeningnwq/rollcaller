@@ -67,7 +67,9 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasError) {
-            return Text('${KString.exportFailPrefix}${snapshot.error}'); // '失败: '
+            return Text(
+              '${KString.exportFailPrefix}${snapshot.error}',
+            ); // '失败: '
           } else {
             _groupedRecords = snapshot.data!;
             return Expanded(
@@ -96,7 +98,8 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                   ),
                                   SizedBox(height: 16.h),
                                   Text(
-                                    KString.noAttendanceCallRecord, // '暂无签到点名记录'
+                                    KString
+                                        .noAttendanceCallRecord, // '暂无签到点名记录'
                                     style: Theme.of(context)
                                         .textTheme
                                         .headlineLarge!
@@ -109,7 +112,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                   ),
                                   SizedBox(height: 8.h),
                                   Text(
-                                    KString.tryAdjustFilter, // '请尝试调整筛选条件'  
+                                    KString.tryAdjustFilter, // '请尝试调整筛选条件'
                                     style: Theme.of(context)
                                         .textTheme
                                         .bodyMedium!
@@ -206,7 +209,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                                 _showArchiveConfirmationDialog(
                                                   group.attendanceCallerModel,
                                                 ),
-                                            tooltip: KString.archive, // '归档' 
+                                            tooltip: KString.archive, // '归档'
                                           ),
                                         if (group
                                                 .attendanceCallerModel
@@ -257,7 +260,8 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                           horizontal: 16.h,
                                         ),
                                         child: Text(
-                                          KString.noAttendanceCallRecord, // '暂无签到点名记录' 
+                                          KString
+                                              .noAttendanceCallRecord, // '暂无签到点名记录'
                                           textAlign: TextAlign.center,
                                           style: Theme.of(context)
                                               .textTheme
@@ -319,7 +323,8 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                                         children: [
                                                           Text(
                                                             student?.studentName ??
-                                                                KString.unknownStudent, // '未知学生' 
+                                                                KString
+                                                                    .unknownStudent, // '未知学生'
                                                             style: Theme.of(context)
                                                                 .textTheme
                                                                 .titleMedium
@@ -338,7 +343,8 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                                           SizedBox(width: 12.w),
                                                           Text(
                                                             student?.studentNumber ??
-                                                                KString.unknownStudentNumber, // '未知学号'   
+                                                                KString
+                                                                    .unknownStudentNumber, // '未知学号'
                                                             style: Theme.of(context)
                                                                 .textTheme
                                                                 .bodySmall
@@ -423,7 +429,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                                         ),
                                                   ),
                                                   Text(
-                                                    '${KString.timePrefix}${record.created.toString().substring(0, 19)}', // '时间: ' 
+                                                    '${KString.timePrefix}${record.created.toString().substring(0, 19)}', // '时间: '
                                                     style: Theme.of(context)
                                                         .textTheme
                                                         .bodySmall
@@ -476,7 +482,8 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                                                     ?.fontSize,
                                                           ),
                                                           label: Text(
-                                                            KString.edit, // '编辑'
+                                                            KString
+                                                                .edit, // '编辑'
                                                             style: Theme.of(context)
                                                                 .textTheme
                                                                 .bodyMedium
@@ -584,7 +591,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    KString.filterCondition, // '筛选条件'  
+                    KString.filterCondition, // '筛选条件'
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
 
@@ -596,7 +603,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                   TextButton.icon(
                     onPressed: _showExportDialog,
                     icon: const Icon(Icons.file_upload),
-                    label: Text(KString.export), // '导出'  
+                    label: Text(KString.export), // '导出'
                   ),
                   Icon(
                     _isFilterExpanded ? Icons.expand_less : Icons.expand_more,
@@ -619,19 +626,25 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                     // 点名器筛选
                     Row(
                       children: [
-                        const SizedBox(
-                          width: 80,
-                          child: Text(KString.randomCallerPrefix, textAlign: TextAlign.justify), // '点名器: '
+                        SizedBox(
+                          width: 100.w,
+                          child: Text(
+                            KString.randomCallerPrefix,
+                            textAlign: TextAlign.left,
+                          ), // '点名器: '
                         ),
                         Expanded(
-                          child: DropdownButtonFormField<int>(
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 60.h,
+                            child: DropdownButtonFormField<int>(
                             initialValue: _selectedCallerId,
                             hint: Text(KString.all), // '全部'
                             items: [
                               DropdownMenuItem(
                                 value: null,
                                 child: Text(
-                                  KString.all, // '全部'  
+                                  KString.all, // '全部'
                                   style: TextStyle(
                                     color: Theme.of(
                                       context,
@@ -668,7 +681,8 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                             ),
                             style: Theme.of(context).textTheme.labelMedium,
                           ),
-                        ),
+                        
+                          )),
                       ],
                     ),
                     SizedBox(height: 10.h),
@@ -676,19 +690,25 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                     // 班级筛选
                     Row(
                       children: [
-                        const SizedBox(
-                          width: 80,
-                          child: Text(KString.classPrefix, textAlign: TextAlign.justify), // '班级: '
+                        SizedBox(
+                          width: 100.w,
+                          child: Text(
+                            KString.classPrefix,
+                            textAlign: TextAlign.left,
+                          ), // '班级: '
                         ),
                         Expanded(
-                          child: DropdownButtonFormField<int>(
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 60.h,
+                            child: DropdownButtonFormField<int>(
                             initialValue: _selectedClassId,
                             hint: Text(KString.all), // '全部'
                             items: [
                               DropdownMenuItem(
                                 value: null,
                                 child: Text(
-                                  KString.all, // '全部'  
+                                  KString.all, // '全部'
                                   style: TextStyle(
                                     color: Theme.of(
                                       context,
@@ -725,7 +745,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                             ),
                             style: Theme.of(context).textTheme.labelMedium,
                           ),
-                        ),
+                          )),
                       ],
                     ),
                     SizedBox(height: 10.h),
@@ -733,13 +753,16 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                     // 时间范围筛选
                     Row(
                       children: [
-                        const SizedBox(
-                          width: 80,
-                          child: Text(KString.timeRangePrefix, textAlign: TextAlign.justify), // '时间范围: ' 
+                        SizedBox(
+                          width: 100.w,
+                          child: Text(
+                            KString.timeRangePrefix,
+                            textAlign: TextAlign.left,
+                          ), // '时间范围: '
                         ),
                         Expanded(
                           child: SizedBox(
-                            height: 50, // 与DropdownButtonFormField高度一致
+                            height: 60.h, // 与DropdownButtonFormField高度一致
                             child: TextButton(
                               onPressed: () {
                                 _showDateRangePicker();
@@ -778,7 +801,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                           ),
                                     ),
                                     Text(
-                                      KString.to, // '至' 
+                                      KString.to, // '至'
                                       style: Theme.of(context)
                                           .textTheme
                                           .labelMedium
@@ -791,7 +814,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                     Text(
                                       _endDate != null
                                           ? '${_endDate!.subtract(const Duration(days: 1)).year}-${_endDate!.subtract(const Duration(days: 1)).month.toString().padLeft(2, '0')}-${_endDate!.subtract(const Duration(days: 1)).day.toString().padLeft(2, '0')}'
-                                          : KString.endTime, // '结束时间'  
+                                          : KString.endTime, // '结束时间'
                                       style: Theme.of(context)
                                           .textTheme
                                           .labelMedium
@@ -814,12 +837,18 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                     // 归档状态筛选
                     Row(
                       children: [
-                        const SizedBox(
-                          width: 80,
-                          child: Text(KString.isArchivedPrefix, textAlign: TextAlign.justify), // '是否归档: '
+                        SizedBox(
+                          width: 100.w,
+                          child: Text(
+                            KString.isArchivedPrefix,
+                            textAlign: TextAlign.left,
+                          ), // '是否归档: '
                         ),
                         Expanded(
-                          child: DropdownButtonFormField<bool?>(
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 60.h,
+                            child: DropdownButtonFormField<bool?>(
                             initialValue: _isArchiveFilter,
                             hint: Text(KString.all), // '全部'
                             items: [
@@ -850,7 +879,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                               DropdownMenuItem(
                                 value: true,
                                 child: Text(
-                                  KString.archived, // '已归档' 
+                                  KString.archived, // '已归档'
                                   style: Theme.of(context).textTheme.labelMedium
                                       ?.copyWith(
                                         color: Theme.of(
@@ -881,7 +910,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                                   ).colorScheme.onSurface,
                                 ),
                           ),
-                        ),
+                          )),
                       ],
                     ),
                     SizedBox(height: 12.h),
@@ -990,13 +1019,15 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
       builder: (context) {
         return AlertDialog(
           title: Text(KString.confirmArchive), // '确认归档'
-          content: Text(KString.confirmArchiveContent), // '归档后该点名器及记录将不可修改且无法撤销，是否继续？'
+          content: Text(
+            KString.confirmArchiveContent,
+          ), // '归档后该点名器及记录将不可修改且无法撤销，是否继续？'
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text(KString.cancel), // '取消'  
+              child: Text(KString.cancel), // '取消'
             ),
             TextButton(
               onPressed: () {
@@ -1024,7 +1055,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
               style: TextButton.styleFrom(
                 foregroundColor: Theme.of(context).colorScheme.error,
               ),
-              child: Text(KString.confirmArchive), // '确认归档'  
+              child: Text(KString.confirmArchive), // '确认归档'
             ),
           ],
         );
@@ -1049,7 +1080,9 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(KString.pleaseSelectRandomCallerToExportPrefix), // '请选择要导出的点名器：' 
+                    Text(
+                      KString.pleaseSelectRandomCallerToExportPrefix,
+                    ), // '请选择要导出的点名器：'
                     SizedBox(height: 24.h),
                     ..._allCallers.values.toList().map((caller) {
                       return CheckboxListTile(
@@ -1079,7 +1112,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: Text(KString.cancel), // '取消'    
+              child: Text(KString.cancel), // '取消'
             ),
             ElevatedButton(
               onPressed: () {
@@ -1090,7 +1123,8 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                   ScaffoldMessenger.of(this.context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        KString.pleaseSelectAtLeastOneRandomCaller, // '请至少选择一个点名器' 
+                        KString
+                            .pleaseSelectAtLeastOneRandomCaller, // '请至少选择一个点名器'
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onInverseSurface,
                         ),
@@ -1103,7 +1137,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
                   );
                 }
               },
-              child: Text(KString.export), // '导出'      
+              child: Text(KString.export), // '导出'
             ),
           ],
         );
@@ -1181,7 +1215,7 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              KString.noExportableRecords, // '没有找到可导出的记录'  
+              KString.noExportableRecords, // '没有找到可导出的记录'
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onInverseSurface,
               ),
@@ -1200,7 +1234,9 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
             SnackBar(
               content: Text(
                 KString.pleaseGrantStoragePermissionToExport, // '需要存储权限才能导出文件'
-                style: TextStyle(color: Theme.of(context).colorScheme.onInverseSurface),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onInverseSurface,
+                ),
               ),
               backgroundColor: Theme.of(context).colorScheme.inverseSurface,
               duration: const Duration(seconds: 3),
@@ -1236,7 +1272,9 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
           SnackBar(
             content: Text(
               '${KString.exportSuccessPrefix} $totalExportedRecords ${KString.exportSuccessSuffix}$fileName',
-              style: TextStyle(color: Theme.of(context).colorScheme.onInverseSurface),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onInverseSurface,
+              ),
             ),
             backgroundColor: Theme.of(context).colorScheme.inverseSurface,
 
@@ -1251,7 +1289,9 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
           SnackBar(
             content: Text(
               '${KString.exportFailPrefix}${e.toString()}',
-              style: TextStyle(color: Theme.of(context).colorScheme.onInverseSurface),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onInverseSurface,
+              ),
             ),
             backgroundColor: Theme.of(context).colorScheme.inverseSurface,
 
@@ -1268,13 +1308,13 @@ class _AttendanceRecordsState extends State<AttendanceCallRecordsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(KString.dateRangePickerTitle), // '选择时间范围'  
+          title: Text(KString.dateRangePickerTitle), // '选择时间范围'
           content: SizedBox(
             height: 400.h,
             width: MediaQuery.of(context).size.width * 0.8,
             child: SfDateRangePicker(
               confirmText: KString.confirm, // '确定'
-              cancelText: KString.cancel, // '取消' 
+              cancelText: KString.cancel, // '取消'
               view: DateRangePickerView.month,
               selectionMode: DateRangePickerSelectionMode.range,
               initialSelectedRange: _startDate != null && _endDate != null

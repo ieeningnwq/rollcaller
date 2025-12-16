@@ -271,7 +271,8 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                             horizontal: 16.w,
                                           ),
                                           child: Text(
-                                            KString.noRandomCallRecord, // '暂无随机点名记录'
+                                            KString
+                                                .noRandomCallRecord, // '暂无随机点名记录'
                                             textAlign: TextAlign.center,
                                             style: Theme.of(context)
                                                 .textTheme
@@ -337,7 +338,8 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                                             children: [
                                                               Text(
                                                                 student?.studentName ??
-                                                                    KString.unknownStudent, // '未知学生'
+                                                                    KString
+                                                                        .unknownStudent, // '未知学生'
                                                                 style: Theme.of(context)
                                                                     .textTheme
                                                                     .titleMedium
@@ -358,7 +360,8 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                                               ),
                                                               Text(
                                                                 student?.studentNumber ??
-                                                                    KString.unknownStudentNumber, // '未知学号'
+                                                                    KString
+                                                                        .unknownStudentNumber, // '未知学号'
                                                                 style: Theme.of(context)
                                                                     .textTheme
                                                                     .bodySmall
@@ -479,7 +482,8 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                                                     ?.fontSize,
                                                               ),
                                                               label: Text(
-                                                                KString.edit, // '编辑'
+                                                                KString
+                                                                    .edit, // '编辑'
                                                                 style: Theme.of(context)
                                                                     .textTheme
                                                                     .bodyMedium
@@ -510,7 +514,8 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                                                     ?.fontSize,
                                                               ),
                                                               label: Text(
-                                                                KString.delete, // '删除'
+                                                                KString
+                                                                    .delete, // '删除'
                                                                 style: Theme.of(context)
                                                                     .textTheme
                                                                     .bodyMedium
@@ -613,36 +618,27 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                     Row(
                       children: [
                         SizedBox(
-                          width: 80,
+                          width: 100.w,
                           child: Text(
                             KString.randomCallerPrefix, // '点名器: '
-                            textAlign: TextAlign.justify,
+                            textAlign: TextAlign.left,
                             style: Theme.of(context).textTheme.bodyMedium,
                           ),
                         ),
                         Expanded(
-                          child: DropdownButtonFormField<int>(
-                            initialValue: _selectedCallerId,
-                            hint: Text(
-                              KString.all, // '全部'
-                            ),
-                            items: [
-                              DropdownMenuItem(
-                                value: null,
-                                child: Text(
-                                  KString.all, // '全部'
-                                  style: TextStyle(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ),
-                                ),
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 60.h,
+                            child: DropdownButtonFormField<int>(
+                              initialValue: _selectedCallerId,
+                              hint: Text(
+                                KString.all, // '全部'
                               ),
-                              ..._allCallers.values.toList().map(
-                                (caller) => DropdownMenuItem(
-                                  value: caller.id,
+                              items: [
+                                DropdownMenuItem(
+                                  value: null,
                                   child: Text(
-                                    caller.randomCallerName,
+                                    KString.all, // '全部'
                                     style: TextStyle(
                                       color: Theme.of(
                                         context,
@@ -650,22 +646,35 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                     ),
                                   ),
                                 ),
+                                ..._allCallers.values.toList().map(
+                                  (caller) => DropdownMenuItem(
+                                    value: caller.id,
+                                    child: Text(
+                                      caller.randomCallerName,
+                                      style: TextStyle(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedCallerId = value;
+                                  // 执行筛选
+                                  _applyFilters();
+                                });
+                              },
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 8.0.h,
+                                ),
                               ),
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedCallerId = value;
-                                // 执行筛选
-                                _applyFilters();
-                              });
-                            },
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 8.0.h,
-                              ),
+                              style: Theme.of(context).textTheme.labelMedium,
                             ),
-                            style: Theme.of(context).textTheme.labelMedium,
                           ),
                         ),
                       ],
@@ -675,36 +684,27 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                     // 班级筛选
                     Row(
                       children: [
-                        const SizedBox(
-                          width: 80,
+                        SizedBox(
+                          width: 100.w,
                           child: Text(
                             KString.classPrefix, // '班级: '
-                            textAlign: TextAlign.justify,
+                            textAlign: TextAlign.left,
                           ),
                         ),
                         Expanded(
-                          child: DropdownButtonFormField<int>(
-                            initialValue: _selectedClassId,
-                            hint: Text(
-                              KString.all, // '全部'
-                            ),
-                            items: [
-                              DropdownMenuItem(
-                                value: null,
-                                child: Text(
-                                  KString.all, // '全部'
-                                  style: TextStyle(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSurface,
-                                  ),
-                                ),
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 60.h,
+                            child: DropdownButtonFormField<int>(
+                              initialValue: _selectedClassId,
+                              hint: Text(
+                                KString.all, // '全部'
                               ),
-                              ..._allClasses.values.toList().map(
-                                (cls) => DropdownMenuItem(
-                                  value: cls.id,
+                              items: [
+                                DropdownMenuItem(
+                                  value: null,
                                   child: Text(
-                                    cls.className,
+                                    KString.all, // '全部'
                                     style: TextStyle(
                                       color: Theme.of(
                                         context,
@@ -712,22 +712,35 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                                     ),
                                   ),
                                 ),
+                                ..._allClasses.values.toList().map(
+                                  (cls) => DropdownMenuItem(
+                                    value: cls.id,
+                                    child: Text(
+                                      cls.className,
+                                      style: TextStyle(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurface,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedClassId = value;
+                                  // 执行筛选
+                                  _applyFilters();
+                                });
+                              },
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 8.0.h,
+                                ),
                               ),
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                _selectedClassId = value;
-                                // 执行筛选
-                                _applyFilters();
-                              });
-                            },
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 8.0.h,
-                              ),
+                              style: Theme.of(context).textTheme.labelMedium,
                             ),
-                            style: Theme.of(context).textTheme.labelMedium,
                           ),
                         ),
                       ],
@@ -737,16 +750,16 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                     // 时间范围筛选
                     Row(
                       children: [
-                        const SizedBox(
-                          width: 80,
+                        SizedBox(
+                          width: 100.w,
                           child: Text(
                             KString.timeRangePrefix, // '时间范围：'
-                            textAlign: TextAlign.justify,
+                            textAlign: TextAlign.left,
                           ),
                         ),
                         Expanded(
                           child: SizedBox(
-                            height: 50, // 与DropdownButtonFormField高度一致
+                            height: 60.h, // 与DropdownButtonFormField高度一致
                             child: TextButton(
                               onPressed: () {
                                 _showDateRangePicker();
@@ -815,72 +828,85 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                     // 归档状态筛选
                     Row(
                       children: [
-                        const SizedBox(
-                          width: 80,
-                          child: Text(KString.isArchivedPrefix, textAlign: TextAlign.justify),
+                        SizedBox(
+                          width: 100.w,
+                          child: Text(
+                            KString.isArchivedPrefix,
+                            textAlign: TextAlign.left,
+                          ),
                         ),
                         Expanded(
-                          child: DropdownButtonFormField<bool?>(
-                            initialValue: _isArchiveFilter,
-                            hint: const Text(KString.all),
-                            items: [
-                              DropdownMenuItem(
-                                value: null,
-                                child: Text(
-                                  KString.all, // '全部'
-                                  style: Theme.of(context).textTheme.labelMedium
-                                      ?.copyWith(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurface,
-                                      ),
+                          child: Container(
+                            alignment: Alignment.center,
+                            height: 60.h,
+                            child: DropdownButtonFormField<bool?>(
+                              initialValue: _isArchiveFilter,
+                              hint: const Text(KString.all),
+                              items: [
+                                DropdownMenuItem(
+                                  value: null,
+                                  child: Text(
+                                    KString.all, // '全部'
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium
+                                        ?.copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                        ),
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: false,
+                                  child: Text(
+                                    KString.unarchived, // '未归档'
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium
+                                        ?.copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                        ),
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: true,
+                                  child: Text(
+                                    KString.archived, // '已归档'
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelMedium
+                                        ?.copyWith(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
+                                        ),
+                                  ),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  _isArchiveFilter = value;
+                                  // 执行筛选
+                                  _applyFilters();
+                                });
+                              },
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 8.0.h,
+                                  vertical: 12.0.w,
                                 ),
                               ),
-                              DropdownMenuItem(
-                                value: false,
-                                child: Text(
-                                  KString.unarchived, // '未归档'
-                                  style: Theme.of(context).textTheme.labelMedium
-                                      ?.copyWith(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurface,
-                                      ),
-                                ),
-                              ),
-                              DropdownMenuItem(
-                                value: true,
-                                child: Text(
-                                  KString.archived, // '已归档'
-                                  style: Theme.of(context).textTheme.labelMedium
-                                      ?.copyWith(
-                                        color: Theme.of(
-                                          context,
-                                        ).colorScheme.onSurface,
-                                      ),
-                                ),
-                              ),
-                            ],
-                            onChanged: (value) {
-                              setState(() {
-                                _isArchiveFilter = value;
-                                // 执行筛选
-                                _applyFilters();
-                              });
-                            },
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(),
-                              contentPadding: EdgeInsets.symmetric(
-                                horizontal: 8.0.h,
-                                vertical: 12.0.w,
-                              ),
+                              style: Theme.of(context).textTheme.labelMedium
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurface,
+                                  ),
                             ),
-                            style: Theme.of(context).textTheme.labelMedium
-                                ?.copyWith(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.onSurface,
-                                ),
                           ),
                         ),
                       ],
@@ -1166,7 +1192,9 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text(KString.confirmDeleteCallerTitle), // '确认删除'
-          content: const Text(KString.confirmDeleteCallerRecordContent), // '确定要删除这条点名记录吗？此操作不可恢复。'
+          content: const Text(
+            KString.confirmDeleteCallerRecordContent,
+          ), // '确定要删除这条点名记录吗？此操作不可恢复。'
           actions: [
             TextButton(
               onPressed: () {
@@ -1210,7 +1238,9 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
       builder: (context) {
         return AlertDialog(
           title: const Text(KString.confirmArchive), // '确认归档'
-          content: const Text(KString.confirmArchiveContent), // '归档后该点名器及记录将不可修改且无法撤销，是否继续？'
+          content: const Text(
+            KString.confirmArchiveContent,
+          ), // '归档后该点名器及记录将不可修改且无法撤销，是否继续？'
           actions: [
             TextButton(
               onPressed: () {
@@ -1262,14 +1292,16 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text(KString.selectRandomCallerToExport), // '选择需要导出的点名器'  
+          title: const Text(KString.selectRandomCallerToExport), // '选择需要导出的点名器'
           content: StatefulBuilder(
             builder: (BuildContext context, StateSetter setState) {
               return SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(KString.pleaseSelectRandomCallerToExportPrefix), // '请选择需要导出的点名器: ' 
+                    const Text(
+                      KString.pleaseSelectRandomCallerToExportPrefix,
+                    ), // '请选择需要导出的点名器: '
                     SizedBox(height: 12.h),
                     ..._allCallers.values.toList().map((caller) {
                       return CheckboxListTile(
@@ -1310,11 +1342,12 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
                   ScaffoldMessenger.of(this.context).showSnackBar(
                     SnackBar(
                       content: Text(
-                        KString.pleaseSelectAtLeastOneRandomCaller, // '请至少选择一个点名器' 
+                        KString
+                            .pleaseSelectAtLeastOneRandomCaller, // '请至少选择一个点名器'
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onPrimary,
                         ),
-                      ),  
+                      ),
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       duration: Duration(seconds: 2),
                     ),
@@ -1399,7 +1432,7 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              KString.noExportableRecords, // '没有找到可导出的记录'  
+              KString.noExportableRecords, // '没有找到可导出的记录'
               style: TextStyle(
                 color: Theme.of(context).colorScheme.onInverseSurface,
               ),
@@ -1417,8 +1450,10 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                KString.pleaseGrantStoragePermissionToExport, // '请授予存储权限才能导出文件' 
-                style: TextStyle(color: Theme.of(context).colorScheme.onInverseSurface),
+                KString.pleaseGrantStoragePermissionToExport, // '请授予存储权限才能导出文件'
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onInverseSurface,
+                ),
               ),
               backgroundColor: Theme.of(context).colorScheme.inverseSurface,
               duration: const Duration(seconds: 3),
@@ -1454,7 +1489,9 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
           SnackBar(
             content: Text(
               '${KString.exportSuccessPrefix}$totalExportedRecords ${KString.exportSuccessSuffix}$fileName', // '导出成功！共导出 '
-              style: TextStyle(color: Theme.of(context).colorScheme.onInverseSurface),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onInverseSurface,
+              ),
             ),
             backgroundColor: Theme.of(context).colorScheme.inverseSurface,
             duration: const Duration(seconds: 3),
@@ -1468,7 +1505,9 @@ class _RandomRecordsState extends State<RandomCallRecordsPage> {
           SnackBar(
             content: Text(
               '${KString.exportFailPrefix}${e.toString()}', // '导出失败：'
-              style: TextStyle(color: Theme.of(context).colorScheme.onInverseSurface),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onInverseSurface,
+              ),
             ),
             backgroundColor: Theme.of(context).colorScheme.inverseSurface,
             duration: const Duration(seconds: 3),
