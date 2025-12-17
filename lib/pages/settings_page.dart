@@ -230,9 +230,6 @@ class _SettingsState extends State<SettingsPage> {
                               child: Text('Error: ${snapshot.error}'),
                             );
                           }
-                          _selectedBackUpModel = _allBackUpModels.isNotEmpty
-                              ? _allBackUpModels[_allBackUpModels.keys.last]
-                              : null;
                           return _buildBackUpHistory();
                         } else {
                           return const Center(
