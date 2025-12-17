@@ -166,6 +166,9 @@ class _SettingsState extends State<SettingsPage> {
                     SizedBox(height: 8.h),
                     _buildBackUpSetting(),
                     SizedBox(height: 8.h),
+                    _buildBackUpButtons(),
+                    SizedBox(height: 12.h),
+
                     FutureBuilder(
                       future: _getBackUpDataFuture,
                       builder: (context, snapshot) {
@@ -658,11 +661,8 @@ class _SettingsState extends State<SettingsPage> {
     );
   }
 
-  Column _buildBackUpHistory() {
-    var backUpModels = _allBackUpModels.values.toList();
-    backUpModels.sort((a, b) => b.dateTimeKey.compareTo(a.dateTimeKey));
+  Column _buildBackUpButtons() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // 备份和恢复按钮
         Row(
@@ -769,7 +769,6 @@ class _SettingsState extends State<SettingsPage> {
             Theme.of(context).colorScheme.primary,
           ),
         ),
-        SizedBox(height: 12.h),
         // 备份历史标题
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -797,7 +796,16 @@ class _SettingsState extends State<SettingsPage> {
           ],
         ),
         SizedBox(height: 12.h),
+      ],
+    );
+  }
 
+  Column _buildBackUpHistory() {
+    var backUpModels = _allBackUpModels.values.toList();
+    backUpModels.sort((a, b) => b.dateTimeKey.compareTo(a.dateTimeKey));
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         // 备份历史列表容器
         Container(
           padding: EdgeInsets.all(16.0.r),
