@@ -20,7 +20,7 @@ class KString {
   static const String startCallButtonLabel = '开始随机抽取';
   static const String chooseACaller = '选择点名器';
   static const String notChooseACaller = '无选中点名器';
-  static const String notDuplicateSuffix = '：不可重复';
+  static const String notDuplicatePrefix = '不可重复 | ';
   static const String duplicateSuffix = '：可重复';
   static const String pleaseChooseACaller = '请先选择点名器';
   static const String editCaller = '编辑点名器';

@@ -340,7 +340,7 @@ class _RandomCallPageState extends State<RandomCallPage>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   // 顶部标题和管理链接
-                  Row(
+                  Expanded(child: Row(
                     children: [
                       Text(
                         KString.chooseACaller, // '选择点名器'
@@ -348,13 +348,18 @@ class _RandomCallPageState extends State<RandomCallPage>
                           color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
-                      Text(
-                        '    ${_randomCallerGroup == null ? KString.notChooseACaller : (_randomCallerGroup!.randomCallerModel.isDuplicate == 0 ? '${_randomCallerGroup!.randomCallerModel.randomCallerName}${KString.notDuplicateSuffix}' : '${_randomCallerGroup!.randomCallerModel.randomCallerName}${KString.duplicateSuffix}')}',
+                      SizedBox(width: 24.w,),
+                      Expanded(
+                        child:Text(
+                        _randomCallerGroup == null ? KString.notChooseACaller : (_randomCallerGroup!.randomCallerModel.isDuplicate == 0 ? '${KString.notDuplicatePrefix}${_randomCallerGroup!.randomCallerModel.randomCallerName}' : '${_randomCallerGroup!.randomCallerModel.randomCallerName}${KString.duplicateSuffix}'),
                         style: Theme.of(context).textTheme.labelMedium,
+                        overflow: TextOverflow.ellipsis,
+                      )
                       ),
                     ],
                   ),
-                  Icon(
+                  )
+                  ,Icon(
                     _isRandomCallerInfoWidgetExpanded
                         ? Icons.expand_less
                         : Icons.expand_more,
