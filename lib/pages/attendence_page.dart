@@ -173,10 +173,10 @@ class _AttendencePageState extends State<AttendencePage> {
         .attendanceCallRecords[_filteredStudents[index].id!]!
         .present;
     final statuses = [
+      AttendanceStatus.absent,
       AttendanceStatus.present,
       AttendanceStatus.late,
       AttendanceStatus.excused,
-      AttendanceStatus.absent,
     ];
     final currentIndex = statuses.indexOf(currentStatus);
     final nextIndex = (currentIndex + 1) % statuses.length;
