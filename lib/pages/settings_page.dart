@@ -709,6 +709,8 @@ class _SettingsState extends State<SettingsPage> {
   }
 
   Column _buildBackUpHistory() {
+    var backUpModels = _allBackUpModels.values.toList();
+    backUpModels.sort((a, b) => b.dateTimeKey.compareTo(a.dateTimeKey));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -850,29 +852,119 @@ class _SettingsState extends State<SettingsPage> {
                     });
                   },
                   child: Column(
-                    children: _allBackUpModels.values
-                        .toList()
-                        .reversed
+                    children: backUpModels
                         .map(
-                          (backUpModel) => RadioListTile<String>(
-                            value: backUpModel.dateTimeText,
-                            title: Text(
-                              '${backUpModel.dateTimeText.substring(0, 4)}-${backUpModel.dateTimeText.substring(4, 6)}-${backUpModel.dateTimeText.substring(6, 8)} ${backUpModel.dateTimeText.substring(8, 10)}:${backUpModel.dateTimeText.substring(10, 12)}:${backUpModel.dateTimeText.substring(12, 14)}',
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSecondaryContainer,
-                                  ),
+                          (backUpModel) => Dismissible(
+                            key: Key(backUpModel.toString()),
+                            background: Container(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.secondaryContainer,
                             ),
-                            subtitle: Text(
-                              backUpModel.type.typeText,
-                              style: Theme.of(context).textTheme.labelMedium
-                                  ?.copyWith(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.onSecondaryContainer,
+                            secondaryBackground: Container(
+                              color: Theme.of(context).colorScheme.error,
+                              alignment: Alignment.centerRight,
+                              padding: EdgeInsets.symmetric(horizontal: 16.0.w),
+                              child: Icon(
+                                Icons.delete,
+                                color: Theme.of(context).colorScheme.onError,
+                              ),
+                            ),
+                            confirmDismiss: (direction) async {
+                              if (direction == DismissDirection.endToStart) {
+                                return await showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('确认删除'),
+                                    content: const Text('确定要删除此备份吗？此操作不可撤销。'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
+                                        child: const Text('取消'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          if (_selectedBackUpModel
+                                                  ?.dateTimeText ==
+                                              backUpModel.dateTimeText) {
+                                            Navigator.of(context).pop(false);
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text('当前选中备份不能删除'),
+                                              ),
+                                            );
+                                            return;
+                                          } else {
+                                            // 删除文件
+                                            try {
+                                              _client?.remove(
+                                                '/${KString.webDavServerFolder}/${backUpModel.fileName}',
+                                              );
+                                              setState(() {
+                                                _allBackUpModels.remove(
+                                                  backUpModel.dateTimeText,
+                                                );
+                                                // 更新最后备份模型
+                                                _lastBackUpModel =
+                                                    _allBackUpModels.values
+                                                        .toList()
+                                                        .reversed
+                                                        .first;
+                                              });
+                                              Navigator.of(context).pop(true);
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text('删除文件成功'),
+                                                ),
+                                              );
+                                            } catch (e) {
+                                              Navigator.of(context).pop(false);
+
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text('删除文件失败：$e'),
+                                                ),
+                                              );
+                                              return;
+                                            }
+                                          }
+                                        },
+                                        child: const Text('确认'),
+                                      ),
+                                    ],
                                   ),
+                                );
+                              } else {
+                                return false;
+                              }
+                            },
+                            child: RadioListTile<String>(
+                              value: backUpModel.dateTimeText,
+                              title: Text(
+                                '${backUpModel.dateTimeText.substring(0, 4)}-${backUpModel.dateTimeText.substring(4, 6)}-${backUpModel.dateTimeText.substring(6, 8)} ${backUpModel.dateTimeText.substring(8, 10)}:${backUpModel.dateTimeText.substring(10, 12)}:${backUpModel.dateTimeText.substring(12, 14)}',
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSecondaryContainer,
+                                    ),
+                              ),
+                              subtitle: Text(
+                                backUpModel.type.typeText,
+                                style: Theme.of(context).textTheme.labelMedium
+                                    ?.copyWith(
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.onSecondaryContainer,
+                                    ),
+                              ),
                             ),
                           ),
                         )

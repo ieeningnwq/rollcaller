@@ -20,4 +20,7 @@ class BackUpModel {
     'result': result,
     'fileName': fileName,
   };
+
+  @override
+  toString() => 'BackUpModel(type: $type, dateTimeKey: $dateTimeKey, result: $result, fileName: $fileName)';
 }
