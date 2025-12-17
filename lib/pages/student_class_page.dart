@@ -61,7 +61,9 @@ class _StudentClassState extends State<StudentClassPage> {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
                     if (snapshot.hasError) {
-                      return Text('${KString.errorPrefix}${snapshot.error}'); // 加载班级失败
+                      return Text(
+                        '${KString.errorPrefix}${snapshot.error}',
+                      ); // 加载班级失败
                     } else {
                       _studentClassMap = snapshot.data!;
                       return SmartRefresher(
@@ -240,14 +242,14 @@ class _StudentClassState extends State<StudentClassPage> {
     _refreshController.loadComplete();
   }
 
-  Wrap _classNameQuantityStatusWidget(
+  Column _classNameQuantityStatusWidget(
     StudentClassModel studentClass,
     Icon statusIcon,
     Color statusColor,
     String quantityInfo,
     Color deprecationColor,
-  ) => Wrap(
-    spacing: 8.0.w,
+  ) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
         softWrap: true,
@@ -257,25 +259,30 @@ class _StudentClassState extends State<StudentClassPage> {
           color: Theme.of(context).colorScheme.onSurface,
         ),
       ),
-      Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.0.h, vertical: 8.0.w),
-        decoration: BoxDecoration(
-          color: deprecationColor,
-          borderRadius: BorderRadius.circular(12.0.r),
-        ),
-        child: Row(
-          children: [
-            statusIcon,
-            SizedBox(width: 4.0.w),
-            Text(
-              quantityInfo,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: statusColor,
-                fontWeight: FontWeight.w800,
-              ),
+      Row(
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16.0.h, vertical: 8.0.w),
+            decoration: BoxDecoration(
+              color: deprecationColor,
+              borderRadius: BorderRadius.circular(12.0.r),
             ),
-          ],
-        ),
+            child: Row(
+              children: [
+                statusIcon,
+                SizedBox(width: 4.0.w),
+                Text(
+                  quantityInfo,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: statusColor,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Spacer(),
+        ],
       ),
     ],
   );
@@ -391,7 +398,9 @@ class _StudentClassState extends State<StudentClassPage> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text(KString.confirmDeleteCallerTitle), // 确认删除
-                content: Text(KString.deleteClassWarnning), // '确定要删除班级吗？此操作不可恢复。'
+                content: Text(
+                  KString.deleteClassWarnning,
+                ), // '确定要删除班级吗？此操作不可恢复。'
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.of(context).pop(),
@@ -413,23 +422,23 @@ class _StudentClassState extends State<StudentClassPage> {
                       if (studentIds.isEmpty &&
                           randomCallers.isEmpty &&
                           attendanceCallers.isEmpty) {
-                        classDao
-                            .deleteStudentClassById(
+                        classDao.deleteStudentClassById(studentClass.id!).then((
+                          value,
+                        ) {
+                          if (value != 0) {
+                            // 删除学生班级关系表中的数据
+                            StudentClassRelationDao().deleteAllByClassId(
                               studentClass.id!,
-                            )
-                            .then((value) {
-                              if (value != 0) {
-                                // 删除学生班级关系表中的数据
-                                StudentClassRelationDao().deleteAllByClassId(studentClass.id!);
-                                // 删除成功
-                                setState(() {
-                                  _studentClassMap.remove(studentClass.id!);
-                                });
-                                if (context.mounted) {
-                                  Navigator.of(context).pop(); // 关闭确认弹窗
-                                }
-                              }
+                            );
+                            // 删除成功
+                            setState(() {
+                              _studentClassMap.remove(studentClass.id!);
                             });
+                            if (context.mounted) {
+                              Navigator.of(context).pop(); // 关闭确认弹窗
+                            }
+                          }
+                        });
                       } else {
                         // 班级下还有学生，提示用户先删除学生
                         // 显示SnackBar
@@ -439,7 +448,8 @@ class _StudentClassState extends State<StudentClassPage> {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(
-                                KString.forbitDeleteClassWarnningDetail, // '该班级下还有学生、随机点名器、签到点名器，无法删除。请先删除班级下的所有学生、随机点名器、签到点名器。'
+                                KString
+                                    .forbitDeleteClassWarnningDetail, // '该班级下还有学生、随机点名器、签到点名器，无法删除。请先删除班级下的所有学生、随机点名器、签到点名器。'
                                 style: TextStyle(
                                   color: Theme.of(
                                     context,
@@ -504,9 +514,11 @@ class _StudentClassState extends State<StudentClassPage> {
   String _getQuantityStatusInfo(StudentClassModel studentClass) {
     int classQuantity = studentClass.classQuantity;
     return classQuantity == studentClass.studentQuantity
-        ? KString.classFull // '班级人数已满'
+        ? KString
+              .classFull // '班级人数已满'
         : classQuantity < studentClass.studentQuantity
-        ? KString.classNotFull // '班级人数未满'
+        ? KString
+              .classNotFull // '班级人数未满'
         : KString.classOverQuantity; // '班级人数超员'
   }
 

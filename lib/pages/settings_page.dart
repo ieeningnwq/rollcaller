@@ -68,6 +68,9 @@ class _SettingsState extends State<SettingsPage> {
 
   bool _isThemeSettingsExpanded = false;
 
+  // 备份数据刷新
+  bool _isRefreshingBackUpData = false;
+
   @override
   dispose() {
     super.dispose();
@@ -128,65 +131,7 @@ class _SettingsState extends State<SettingsPage> {
       await Future.delayed(const Duration(milliseconds: 100));
     }
     if (_allBackUpModels.isEmpty) {
-      try {
-        await _client!.ping();
-        // 获取历史备份数据，从服务器获取数据
-        var list = await _client!.readDir('/${KString.webDavServerFolder}');
-        // 过滤出备份文件，并排序
-        list = list
-            .where(
-              (f) =>
-                  f.isDir == false &&
-                  f.name!.startsWith(KString.backupFileName) &&
-                  f.name!.endsWith('.json'),
-            )
-            .toList();
-        list.sort((a, b) => a.name!.compareTo(b.name!));
-        // 转换为备份模型
-        var backUpModels = list
-            .map(
-              (f) => BackUpModel.fromMap({
-                'type': BackUpTypeExtension.fromString(f.name!.split('_')[2]),
-                'dateTimeKey': f.name!.split('_')[3].replaceAll('.json', ''),
-                'result': true,
-                'fileName': f.name!,
-              }),
-            )
-            .toList();
-        // 转换为Map
-        _allBackUpModels = backUpModels.fold(
-          {},
-          (map, e) => map..addAll({e.dateTimeKey: e}),
-        );
-        // 获取上次备份数据
-        if (list.isNotEmpty) {
-          _lastBackUpModel =
-              _allBackUpModels[list.last.name!
-                  .split('_')[3]
-                  .replaceAll('.json', '')];
-          // 获取选中待回退的备份数据
-          _selectedBackUpModel = _lastBackUpModel;
-        } else {
-          _selectedBackUpModel = null;
-          _lastBackUpModel = null;
-        }
-      } catch (e) {
-        // 显示SnackBar
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                '获取WebDav配置失败：$e',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.onInverseSurface,
-                ),
-              ),
-              backgroundColor: Theme.of(context).colorScheme.inverseSurface,
-              duration: const Duration(seconds: 3),
-            ),
-          );
-        }
-      }
+      _refreshBackUpData();
     }
   }
 
@@ -224,6 +169,11 @@ class _SettingsState extends State<SettingsPage> {
                     FutureBuilder(
                       future: _getBackUpDataFuture,
                       builder: (context, snapshot) {
+                        if (_isRefreshingBackUpData) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
                         if (snapshot.connectionState == ConnectionState.done) {
                           if (snapshot.hasError) {
                             return Center(
@@ -821,10 +771,30 @@ class _SettingsState extends State<SettingsPage> {
         ),
         SizedBox(height: 12.h),
         // 备份历史标题
-        Text(
-          '备份历史',
-          textAlign: TextAlign.left,
-          style: Theme.of(context).textTheme.titleMedium,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '备份历史',
+              textAlign: TextAlign.left,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            TextButton.icon(
+              label: Text('刷新'),
+              icon: Icon(Icons.refresh),
+              onPressed: () {
+                setState(() {
+                  _isRefreshingBackUpData = true;
+                  _getBackUpDataFuture = _getBackUpData();
+                });
+                _refreshBackUpData().then(
+                  (value) => setState(() {
+                    _isRefreshingBackUpData = false;
+                  }),
+                );
+              },
+            ),
+          ],
         ),
         SizedBox(height: 12.h),
 
@@ -1875,6 +1845,68 @@ class _SettingsState extends State<SettingsPage> {
           (value) => value.setString(
             KString.themeModeStyleOptionKey,
             '${context.read<ThemeSwitcherProvider>().themeMode.toString()},${context.read<ThemeSwitcherProvider>().themeStyle.toString()},${ThemeStyleOptionExtension.pickedColor.toARGB32()}',
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _refreshBackUpData() async {
+    try {
+      await _client!.ping();
+      // 获取历史备份数据，从服务器获取数据
+      var list = await _client!.readDir('/${KString.webDavServerFolder}');
+      // 过滤出备份文件，并排序
+      list = list
+          .where(
+            (f) =>
+                f.isDir == false &&
+                f.name!.startsWith(KString.backupFileName) &&
+                f.name!.endsWith('.json'),
+          )
+          .toList();
+      list.sort((a, b) => a.name!.compareTo(b.name!));
+      // 转换为备份模型
+      var backUpModels = list
+          .map(
+            (f) => BackUpModel.fromMap({
+              'type': BackUpTypeExtension.fromString(f.name!.split('_')[2]),
+              'dateTimeKey': f.name!.split('_')[3].replaceAll('.json', ''),
+              'result': true,
+              'fileName': f.name!,
+            }),
+          )
+          .toList();
+      // 转换为Map
+      _allBackUpModels = backUpModels.fold(
+        {},
+        (map, e) => map..addAll({e.dateTimeKey: e}),
+      );
+      // 获取上次备份数据
+      if (list.isNotEmpty) {
+        _lastBackUpModel =
+            _allBackUpModels[list.last.name!
+                .split('_')[3]
+                .replaceAll('.json', '')];
+        // 获取选中待回退的备份数据
+        _selectedBackUpModel = _lastBackUpModel;
+      } else {
+        _selectedBackUpModel = null;
+        _lastBackUpModel = null;
+      }
+    } catch (e) {
+      // 显示SnackBar
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              '获取WebDav配置失败：$e',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onInverseSurface,
+              ),
+            ),
+            backgroundColor: Theme.of(context).colorScheme.inverseSurface,
+            duration: const Duration(seconds: 3),
           ),
         );
       }
