@@ -167,8 +167,6 @@ class _SettingsState extends State<SettingsPage> {
                     _buildBackUpSetting(),
                     SizedBox(height: 8.h),
                     _buildBackUpButtons(),
-                    SizedBox(height: 12.h),
-
                     FutureBuilder(
                       future: _getBackUpDataFuture,
                       builder: (context, snapshot) {
@@ -795,7 +793,6 @@ class _SettingsState extends State<SettingsPage> {
             ),
           ],
         ),
-        SizedBox(height: 12.h),
       ],
     );
   }
@@ -808,7 +805,7 @@ class _SettingsState extends State<SettingsPage> {
       children: [
         // 备份历史列表容器
         Container(
-          padding: EdgeInsets.all(16.0.r),
+          padding: EdgeInsets.all(8.0.w),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.secondaryContainer,
             borderRadius: BorderRadius.circular(8.0.r),
