@@ -52,12 +52,16 @@ class _AttendencePageState extends State<AttendencePage> {
     _searchController.addListener(() {
       // 更新筛选列表
       if (_searchController.text.isEmpty) {
-        _filteredStudents = _students;
+        setState(() {
+          _filteredStudents = _students;
+        });
       } else {
-        _filteredStudents = _students.where((student) {
-          return student.studentName.contains(_searchController.text) ||
-              student.studentNumber.contains(_searchController.text);
-        }).toList();
+        setState(() {
+          _filteredStudents = _students.where((student) {
+            return student.studentName.contains(_searchController.text) ||
+                student.studentNumber.contains(_searchController.text);
+          }).toList();
+        });
       }
     });
 
