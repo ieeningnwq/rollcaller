@@ -328,38 +328,60 @@ class _AttendencePageState extends State<AttendencePage> {
                                         ),
                                         // 一键签到按钮
                                         TextButton(
-                                          onPressed: () =>
-                                              _updteAllStudentsAttendanceStatus(
-                                                AttendanceStatus.present,
-                                              ),
+                                          onPressed: _filteredStudents.isNotEmpty
+                                              ? () =>
+                                                  _updteAllStudentsAttendanceStatus(
+                                                    AttendanceStatus.present,
+                                                  )
+                                              : null,
                                           child: Text(
                                             KString.signInAll, // 一键签到
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .labelSmall
-                                                ?.copyWith(
-                                                  color: Theme.of(
-                                                    context,
-                                                  ).colorScheme.primary,
-                                                ),
+                                            style: _filteredStudents.isNotEmpty
+                                                ? Theme.of(context)
+                                                    .textTheme
+                                                    .labelSmall
+                                                    ?.copyWith(
+                                                      color: Theme.of(
+                                                        context,
+                                                      ).colorScheme.primary,
+                                                    )
+                                                : Theme.of(context)
+                                                    .textTheme
+                                                    .labelSmall
+                                                    ?.copyWith(
+                                                      color: Theme.of(
+                                                        context,
+                                                      ).disabledColor,
+                                                    ),
                                           ),
                                         ),
                                         // 一键未签按钮
                                         TextButton(
-                                          onPressed: () =>
-                                              _updteAllStudentsAttendanceStatus(
-                                                AttendanceStatus.absent,
-                                              ),
+                                          onPressed: _filteredStudents.isNotEmpty
+                                              ? () =>
+                                                  _updteAllStudentsAttendanceStatus(
+                                                    AttendanceStatus.absent,
+                                                  )
+                                              : null,
                                           child: Text(
                                             KString.signOutAll, // 一键未签
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .labelSmall
-                                                ?.copyWith(
-                                                  color: Theme.of(
-                                                    context,
-                                                  ).colorScheme.primary,
-                                                ),
+                                            style: _filteredStudents.isNotEmpty
+                                                ? Theme.of(context)
+                                                    .textTheme
+                                                    .labelSmall
+                                                    ?.copyWith(
+                                                      color: Theme.of(
+                                                        context,
+                                                      ).colorScheme.primary,
+                                                    )
+                                                : Theme.of(context)
+                                                    .textTheme
+                                                    .labelSmall
+                                                    ?.copyWith(
+                                                      color: Theme.of(
+                                                        context,
+                                                      ).disabledColor,
+                                                    ),
                                           ),
                                         ),
                                       ],
