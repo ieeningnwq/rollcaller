@@ -326,6 +326,42 @@ class _AttendencePageState extends State<AttendencePage> {
                                                     .withAlpha(100),
                                               ),
                                         ),
+                                        // 一键签到按钮
+                                        TextButton(
+                                          onPressed: () =>
+                                              _updteAllStudentsAttendanceStatus(
+                                                AttendanceStatus.present,
+                                              ),
+                                          child: Text(
+                                            KString.signInAll, // 一键签到
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .labelSmall
+                                                ?.copyWith(
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary,
+                                                ),
+                                          ),
+                                        ),
+                                        // 一键未签按钮
+                                        TextButton(
+                                          onPressed: () =>
+                                              _updteAllStudentsAttendanceStatus(
+                                                AttendanceStatus.absent,
+                                              ),
+                                          child: Text(
+                                            KString.signOutAll, // 一键未签
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .labelSmall
+                                                ?.copyWith(
+                                                  color: Theme.of(
+                                                    context,
+                                                  ).colorScheme.primary,
+                                                ),
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ],
@@ -754,7 +790,8 @@ class _AttendencePageState extends State<AttendencePage> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    KString.forbitDeleteAttendanceCallerInfo, // 该点名器下有签到点名记录，无法删除。请先删除该点名器下的所有签到点名记录。
+                    KString
+                        .forbitDeleteAttendanceCallerInfo, // 该点名器下有签到点名记录，无法删除。请先删除该点名器下的所有签到点名记录。
                     style: TextStyle(
                       color: Theme.of(context).colorScheme.onInverseSurface,
                     ),
@@ -773,7 +810,9 @@ class _AttendencePageState extends State<AttendencePage> {
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: Text(KString.confirmDeleteCallerTitle), // 确认删除
-                  content: Text(KString.confirmDeleteCallerRecordContent), // 确定要删除选中的点名器吗？此操作不可撤销。
+                  content: Text(
+                    KString.confirmDeleteCallerRecordContent,
+                  ), // 确定要删除选中的点名器吗？此操作不可撤销。
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
@@ -910,6 +949,22 @@ class _AttendencePageState extends State<AttendencePage> {
   void _refreshPageData() {
     setState(() {
       _attendanceCallerFuture = _getAttendanceCallerPageInfo();
+    });
+  }
+
+  void _updteAllStudentsAttendanceStatus(AttendanceStatus status) {
+    setState(() {
+      for (int index = 0; index < _filteredStudents.length; index++) {
+        _attendanceCallerGroup!
+                .attendanceCallRecords[_filteredStudents[index].id!]!
+                .present =
+            status;
+        // 更新数据库
+        AttendanceCallRecordDao().updateAttendanceCallRecord(
+          _attendanceCallerGroup!.attendanceCallRecords[_filteredStudents[index]
+              .id!]!,
+        );
+      }
     });
   }
 }

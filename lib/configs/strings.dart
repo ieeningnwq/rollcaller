@@ -47,6 +47,9 @@ class KString {
   static const String attendanceStatistics = '签到统计'; // '签到统计'
   static const String forbitDeleteAttendanceCallerInfo =
       '该点名器下有签到点名记录，无法删除。请先删除该点名器下的所有签到点名记录。';
+  static const String signInAll = '一键签到';
+  static const String signOutAll = '一键未签';
+
   // ! 5、学生班级页面 student_class_page.dart
   static const String studentClassAppBarTitle = '教学班级';
   static const String noStudentClass = '暂无班级'; // '暂无班级'
