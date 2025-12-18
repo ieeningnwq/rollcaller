@@ -131,7 +131,7 @@ class _SettingsState extends State<SettingsPage> {
       await Future.delayed(const Duration(milliseconds: 100));
     }
     if (_allBackUpModels.isEmpty) {
-      _refreshBackUpData();
+      await _refreshBackUpData();
     }
   }
 
