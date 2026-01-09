@@ -91,6 +91,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         );
       }
     }
+    await Future.delayed(Duration(seconds: 1));
   }
 
   @override
@@ -113,7 +114,12 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                 home: IndexPage(),
               );
             } else {
-              return CircularProgressIndicator();
+              return Transform.scale(
+                scale: 0.3, // 放大0.2倍
+                child: CircularProgressIndicator(
+                  strokeWidth: 10.0,
+                ), // 同时调整描边宽度以增强视觉效果
+              );
             }
           },
         );
