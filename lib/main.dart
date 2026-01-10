@@ -18,6 +18,7 @@ import 'configs/strings.dart';
 import 'configs/theme_style_option_enum.dart'
     show ThemeStyleOptionExtension, ThemeStyleOption;
 import 'pages/index_page.dart';
+import 'pages/splash_page.dart';
 import 'providers/them_switcher_provider.dart';
 import 'utils/attendance_call_record_dao.dart';
 import 'utils/attendance_caller_dao.dart';
@@ -114,12 +115,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                 home: IndexPage(),
               );
             } else {
-              return Transform.scale(
-                scale: 0.3, // 放大0.2倍
-                child: CircularProgressIndicator(
-                  strokeWidth: 10.0,
-                ), // 同时调整描边宽度以增强视觉效果
-              );
+              return SplashPage();
             }
           },
         );
